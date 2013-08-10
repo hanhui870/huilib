@@ -14,7 +14,8 @@ class AutoLoad
 	 * 自动加载类
 	 * @tip 转发过来的请求形式module\common\core，没有最前面的斜线。
 	 */
-	public static function loadClass($name){
+	public static function loadClass($name)
+	{
 		echo $name;
 		$name=SYS_ROOT.str_replace('\\', SEP, $name).'.php';
 	
