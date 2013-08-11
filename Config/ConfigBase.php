@@ -102,8 +102,8 @@ class ConfigBase
 		$this->configFinal = $configGroup;
 		if (isset ( $configGroup [APP_ENV] )) {
 			$this->configEnv = $configGroup [APP_ENV];
-		}else{
-			$this->configEnv = array();
+		} else {
+			$this->configEnv = array ();
 		}
 	}
 
@@ -115,29 +115,37 @@ class ConfigBase
 	private function getSettingFromBlock(array $blockSetting)
 	{
 		$settingTree = array ();
-		\HuiLib\Helper\Debug::out ( $blockSetting );
+		
 		foreach ( $blockSetting as $key => $value ) {
 			$key = trim ( $key );
-			echo '--------keynow'.": $key\n";
-			if (String::exist ( $key, self::KEY_SEP )) {
-				$keyInfo = explode ( self::KEY_SEP, $key );
-				$keyTop = array_shift ( $keyInfo );
-				
-				if ($keyInfo) {
-					$blockNew = array (implode ( '.', $keyInfo ) => $value );
-					if (isset($settingTree [$keyTop])) {
-						$settingTree [$keyTop]+=self::getSettingFromBlock ( $blockNew );
-					}else{
-						$settingTree [$keyTop] = self::getSettingFromBlock ( $blockNew );
-					}
-				}
-			} else {
-				$settingTree [$key] = $value;
-			}
+			$settingTree = array_merge_recursive ( $settingTree, $this->buildNestArray ( $key, $value ) );
 		}
-		echo '--------settingtree'."\n";
-		\HuiLib\Helper\Debug::out ( $settingTree );
+		
 		return $settingTree;
+	}
+
+	/**
+	 * 把键值转换成嵌套数组值
+	 * @param string $key
+	 * @param string $value
+	 */
+	private function buildNestArray($key, $value, $parent = array())
+	{
+		if (String::exist ( $key, self::KEY_SEP )) {
+			$keyInfo = explode ( self::KEY_SEP, $key );
+			
+			$valueArray = array ();
+			$keyNow = array_shift ( $keyInfo );
+			
+			if (! isset ( $parent [$keyNow] )) {
+				$parent [$keyNow] = array ();
+			}
+			$parent [$keyNow] += self::buildNestArray ( implode ( '.', $keyInfo ), $value, $parent [$keyNow] );
+		} else {
+			$parent [$key] = $value;
+		}
+		
+		return $parent;
 	}
 
 	/**
@@ -147,12 +155,12 @@ class ConfigBase
 	 */
 	public function getByKey($key = '')
 	{
-		if (!$key) {
+		if (! $key) {
 			return $this->configEnv;
 		}
 		
-		if (isset($this->configEnv[$key])) {
-			return $this->configEnv[$key];
+		if (isset ( $this->configEnv [$key] )) {
+			return $this->configEnv [$key];
 		}
 		
 		return NULL;
@@ -165,12 +173,12 @@ class ConfigBase
 	 */
 	public function getBySection($section = '')
 	{
-		if (!$section) {
+		if (! $section) {
 			return $this->configFinal;
 		}
 		
-		if (isset($this->configFinal[$section])) {
-			return $this->configFinal[$section];
+		if (isset ( $this->configFinal [$section] )) {
+			return $this->configFinal [$section];
 		}
 		
 		return NULL;
