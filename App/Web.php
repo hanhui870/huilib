@@ -9,5 +9,22 @@ namespace HuiLib\App;
  */
 class Web extends Base
 {
+	private static $instance;
 	
+	private function __construct()
+	{
+	
+	}
+	
+	/**
+	 * 获取应用程序类实例
+	 * @return \HuiLib\Bootstrap
+	 */
+	public static function getInstance()
+	{
+		if (self::$instance == NULL) {
+			self::$instance = new self ();
+		}
+		return self::$instance;
+	}
 }

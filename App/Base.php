@@ -10,4 +10,5 @@ namespace HuiLib\App;
 class Base
 {
 	
+	
 }
