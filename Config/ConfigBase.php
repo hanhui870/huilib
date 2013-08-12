@@ -57,6 +57,9 @@ class ConfigBase
 
 	/**
 	 * 解析获取应用当前执行环境的配置
+	 * 
+	 * 此处数组相加不能使用array_merge_recursive，会导致某键多个值而覆盖不了
+	 * 此处不能使用数组+符号，+符号运算仅限于第一级数组，二级不支持。array_replace_recursive更合适。
 	 */
 	private function mergeConfig()
 	{
@@ -73,8 +76,8 @@ class ConfigBase
 				if (! isset ( $configGroup [$sectionNow] )) {
 					$configGroup [$sectionNow] = $settingTree;
 				} else {
-					//使用了数组+符号
-					$configGroup [$sectionNow] = $settingTree + $configGroup [$sectionNow];
+					$configGroup [$sectionNow]=array_replace_recursive($configGroup[$sectionNow], $settingTree);
+					//$configGroup [$sectionNow] = $settingTree + $configGroup [$sectionNow];
 				}
 				
 				//处理继承的关系
@@ -83,8 +86,8 @@ class ConfigBase
 					if (! isset ( $configGroup [$iterSection] )) {
 						continue;
 					}
-					//使用了数组+符号
-					$configGroup [$sectionNow] += $configGroup [$iterSection];
+					$configGroup [$sectionNow]=array_replace_recursive($configGroup [$iterSection], $configGroup [$sectionNow]);
+					//$configGroup [$sectionNow] = $configGroup [$sectionNow]+$configGroup [$iterSection];
 				}
 			} else {
 				//无继承分支，类似[production]
@@ -92,8 +95,8 @@ class ConfigBase
 				if (! isset ( $configGroup [$sectionNow] )) {
 					$configGroup [$sectionNow] = $settingTree;
 				} else {
-					//使用了数组+符号
-					$configGroup [$sectionNow] = $settingTree + $configGroup [$sectionNow];
+					$configGroup [$sectionNow]=array_replace_recursive($configGroup[$sectionNow], $settingTree);
+					//$configGroup [$sectionNow] = $settingTree + $configGroup [$sectionNow];
 				}
 			}
 		} //foreach
@@ -140,6 +143,7 @@ class ConfigBase
 			if (! isset ( $parent [$keyNow] )) {
 				$parent [$keyNow] = array ();
 			}
+			//递归从第一级创建，加法运算有效
 			$parent [$keyNow] += self::buildNestArray ( implode ( '.', $keyInfo ), $value, $parent [$keyNow] );
 		} else {
 			$parent [$key] = $value;
@@ -177,43 +181,6 @@ class ConfigBase
 		}
 		
 		return $valueIter;
-	}
-
-	/**
-	 * 把树形配置重新组合成分隔符间隔的
-	 * 
-	 * 配置解析的例外情况就是PHP设置初始化参数
-	 * 例如: session.save_handler; date.timezone等
-	 * 
-	 * 配置禁用数组形式的值，支持递归合并
-	 * 算法提示：同解析，需要从根向叶遍历，逆向递归关系判断会脱节
-	 */
-	public function _mergeKey($keyConfig, $mergedConfig = array())
-	{
-		foreach ( $keyConfig as $Key => $subConfig ) {
-			if (is_array ( $childConfig )) {
-				do {
-					$mergedConfig[$key]=$subConfig;
-
-				}while (is_array($subConfig));
-				
-				
-				//合并子配置
-				$childMerge = self::mergeKey ( $childConfig, $mergedConfig );
-				print_r($keyConfig);
-				print_r($childMerge);
-				foreach ( $childMerge as $secKey => $secConfig ) {
-					
-					
-					unset ( $mergedConfig [$secKey] );
-					
-				}
-			} else {
-				$mergedConfig[$key]=$subConfig;
-			}
-		}
-		
-		return $mergedConfig;
 	}
 	
 	/**
