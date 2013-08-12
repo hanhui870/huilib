@@ -151,6 +151,11 @@ class ConfigBase
 	/**
 	 * 通过键获取配置块，默认在当前运行环境下
 	 * 
+	 * 支持获取方法，支持不同粒度：
+	 * getByKey('webRun')
+	 * getByKey('webRun.cookie')
+	 * getByKey('webRun.cookie.pre')
+	 * 
 	 * @param string $key 要获取的配置键
 	 */
 	public function getByKey($key = '')
@@ -159,11 +164,99 @@ class ConfigBase
 			return $this->configEnv;
 		}
 		
-		if (isset ( $this->configEnv [$key] )) {
-			return $this->configEnv [$key];
+		$keyPath = explode ( self::KEY_SEP, $key );
+		
+		$valueIter = $this->configEnv;
+		foreach ( $keyPath as $keyIter ) {
+			if (isset ( $valueIter [$keyIter] )) {
+				$valueIter = $valueIter [$keyIter];
+			} else {
+				$valueIter = array ();
+				break;
+			}
 		}
 		
-		return NULL;
+		return $valueIter;
+	}
+
+	/**
+	 * 把树形配置重新组合成分隔符间隔的
+	 * 
+	 * 配置解析的例外情况就是PHP设置初始化参数
+	 * 例如: session.save_handler; date.timezone等
+	 * 
+	 * 配置禁用数组形式的值，支持递归合并
+	 * 算法提示：同解析，需要从根向叶遍历，逆向递归关系判断会脱节
+	 */
+	public function _mergeKey($keyConfig, $mergedConfig = array())
+	{
+		foreach ( $keyConfig as $Key => $subConfig ) {
+			if (is_array ( $childConfig )) {
+				do {
+					$mergedConfig[$key]=$subConfig;
+
+				}while (is_array($subConfig));
+				
+				
+				//合并子配置
+				$childMerge = self::mergeKey ( $childConfig, $mergedConfig );
+				print_r($keyConfig);
+				print_r($childMerge);
+				foreach ( $childMerge as $secKey => $secConfig ) {
+					
+					
+					unset ( $mergedConfig [$secKey] );
+					
+				}
+			} else {
+				$mergedConfig[$key]=$subConfig;
+			}
+		}
+		
+		return $mergedConfig;
+	}
+	
+	/**
+	 * 把树形配置重新组合成分隔符间隔的
+	 *
+	 * 配置解析的例外情况就是PHP设置初始化参数
+	 * 例如: session.save_handler; date.timezone等
+	 *
+	 * 配置禁用数组形式的值，支持递归合并
+	 * 
+	 * 算法提示：同解析，需要从根向叶遍历，逆向递归关系判断会脱节
+	 */
+	public function mergeKey($keyConfig)
+	{
+		$mergedConfig=$keyConfig;
+		foreach ( $keyConfig as $childKey => $childConfig ) {
+			$this->foreachKeyRecurse($childConfig, $childKey, $mergedConfig);
+		}
+	
+		return $mergedConfig;
+	}
+
+	/**
+	 * 逆向合并递归解析
+	 * 
+	 * @param string $childConfig
+	 * @param string $parentKey 父键
+	 * @param array $parentResult 递归解析父类
+	 */
+	private function foreachKeyRecurse($childConfig,  $parentKey, &$parentResult = array())
+	{
+		if (is_array ( $childConfig )) {
+			foreach ($childConfig as  $secKey => $secConfig){
+				unset($parentResult[$parentKey]);
+				$parentResult[$parentKey.self::KEY_SEP.$secKey]=$secConfig;
+			}
+			foreach ($parentResult as $mergedKey => $secConfig){
+				$this->foreachKeyRecurse($secConfig, $mergedKey, $parentResult);
+			}
+			
+		} else {
+			$parentResult[$parentKey]=$childConfig;
+		}
 	}
 
 	/**
