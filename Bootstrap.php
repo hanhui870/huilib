@@ -79,14 +79,15 @@ class Bootstrap
 		}
 		
 		$this->appConfig = new \HuiLib\Config\ConfigBase ( APP_CONFIG );
-		\HuiLib\Helper\Debug::out ( $this->getConfig()->getBySection());
+		\HuiLib\Helper\Debug::out ( $this->configInstance()->getBySection());
+		\HuiLib\Helper\Debug::out ( $this->configInstance()->mergeKey($this->configInstance()->getByKey('phpSettings')));
 	}
 
 	/**
 	 * 返回配置实例
 	 * @return \HuiLib\Config\ConfigBase
 	 */
-	public function getConfig()
+	public function configInstance()
 	{
 		return $this->appConfig;
 	}
