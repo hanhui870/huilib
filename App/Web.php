@@ -7,24 +7,24 @@ namespace HuiLib\App;
  * @author 祝景法
  * @since 2013/08/11
  */
-class Web extends Base
+class Web extends AppBase
 {
-	private static $instance;
+	const RUN_METHOD='web';
 	
-	private function __construct()
+	protected function __construct()
 	{
-	
+		parent::__construct();
+		
+		
 	}
 	
 	/**
-	 * 获取应用程序类实例
-	 * @return \HuiLib\Bootstrap
+	 * 初始化请求
 	 */
-	public static function getInstance()
+	protected function initRequest()
 	{
-		if (self::$instance == NULL) {
-			self::$instance = new self ();
-		}
-		return self::$instance;
+		$this->request=new \HuiLib\Request\Http();
+		
+		return $this->request;
 	}
 }

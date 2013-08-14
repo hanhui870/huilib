@@ -16,11 +16,12 @@ use HuiLib\Loader\AutoLoad;
  */
 class Bootstrap
 {
+	const DEFAULT_ENV = 'production';
 	private static $instance;
 	
 	/**
 	 * 运行配置
-	 * @var array
+	 * @var \HuiLib\Config\ConfigBase
 	 */
 	private $appConfig;
 	
@@ -29,19 +30,37 @@ class Bootstrap
 	 * @var string Enum
 	 */
 	private $runEnv;
+	
+	/**
+	 * 运行入口
+	 */
+	private $runMethod;
+	
+	/**
+	 * 应用单例
+	 * @var \HuiLib\App\AppBase
+	 */
+	private $application;
+	
+	/**
+	 * 期末执行绑定
+	 * @var HuiLib\Runtime\ShutCall
+	 */
+	private $shutCall;
+	
 	private $allowedEnv = array ('production', 'testing', 'develop' );
-	const DEFAULT_ENV = 'production';
-
+	
 	private function __construct()
 	{
 		if (! defined ( 'RUN_METHOD' ) ) {
 			throw new \Exception ( "Please define Constant var RUN_METHOD  in the entry!" );
 		}
+		$this->runMethod=RUN_METHOD;
 		
-		$this->setPath ();
-		$this->setEnv ();
-		$this->setLoader ();
-		$this->setConfig ();
+		$this->initPath ();
+		$this->initEnv ();
+		$this->initLoader ();
+		$this->initConfig ();
 	}
 
 	/**
@@ -49,7 +68,7 @@ class Bootstrap
 	 * 
 	 * @throws \Exception
 	 */
-	private function setPath()
+	private function initPath()
 	{
 		define ( 'SEP', DIRECTORY_SEPARATOR );
 		define ( 'SYS_PATH', dirname ( __FILE__ ) . SEP );
@@ -62,7 +81,7 @@ class Bootstrap
 	/**
 	 * 引入注册自动加载类
 	 */
-	private function setLoader()
+	private function initLoader()
 	{
 		include_once SYS_PATH . 'Loader/AutoLoad.php';
 		$loadInstance = \HuiLib\Loader\AutoLoad::getInstance ();
@@ -70,17 +89,15 @@ class Bootstrap
 	}
 
 	/**
-	 * 设置启动配置
+	 * 初始化启动配置
 	 */
-	private function setConfig()
+	private function initConfig()
 	{
 		if (! defined ( 'APP_CONFIG' )) {
 			throw new \Exception ( "Please define Constant var APP_CONFIG  in the entry!" );
 		}
 		
 		$this->appConfig = new \HuiLib\Config\ConfigBase ( APP_CONFIG );
-		\HuiLib\Helper\Debug::out ( $this->configInstance()->getBySection());
-		\HuiLib\Helper\Debug::out ( $this->configInstance()->mergeKey($this->configInstance()->getByKey('phpSettings')));
 	}
 
 	/**
@@ -94,16 +111,19 @@ class Bootstrap
 
 	/**
 	 * 初始化应用
+	 * @return \HuiLib\App\AppBase
 	 */
 	public function createApp()
 	{
-		die ();
+		$this->application=\HuiLib\App\AppBase::factory($this->runMethod, $this->appConfig);
+		
+		return $this->application;
 	}
 
 	/**
-	 * 设置应用当前运行环境
+	 * 初始化应用当前运行环境
 	 */
-	private function setEnv()
+	private function initEnv()
 	{
 		if (isset ( $_SERVER ['SERVER_ENV'] ) && in_array ( $_SERVER ['SERVER_ENV'], $this->allowedEnv )) {
 			define ( "APP_ENV", $_SERVER ['SERVER_ENV'] );
@@ -112,6 +132,73 @@ class Bootstrap
 		}
 	}
 
+	/**
+	 * 初始化数据库连接
+	 */
+	private function initDatabse()
+	{
+		
+	}
+	
+	/**
+	 * 初始化缓存连接
+	 */
+	private function initCache()
+	{
+	
+	}
+	
+	/**
+	 * 初始化Session配置
+	 */
+	private function initSession()
+	{
+	
+	}
+	
+	/**
+	 * 初始化错误处理器
+	 */
+	private function initErrorHandle()
+	{
+	
+	}
+	
+	/**
+	 * 初始化异常处理器
+	 */
+	private function initExceptionHandle()
+	{
+	
+	}
+	
+	/**
+	 * 执行期末绑定
+	 */
+	private function initShutCall()
+	{
+		$this->shutCall=\HuiLib\Runtime\ShutCall::getInstance();
+	}
+	
+	public function shutCallInstance(){
+		return $this->shutCall;
+	}
+	
+	/**
+	 * 获取已创建的应用
+	 */
+	public function appInstance(){
+		return $this->application;
+	}
+	
+	/**
+	 * 初始化性能记录器
+	 */
+	private function initProfile()
+	{
+		
+	}
+	
 	/**
 	 * 获取引导类实例
 	 * @return \HuiLib\Bootstrap

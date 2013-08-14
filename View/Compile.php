@@ -22,12 +22,16 @@ namespace HuiLib\View;
  */
 class Complie
 {
-	protected $v = array ();
+	/**
+	 * Assign的变量
+	 */
+	protected $data = array ();
+	
 	protected $viewFilePath = '';
 	protected $viewTempate;
-	protected $ajax = 0;
+	protected $ajaxLayout = 0;
 	//ajax匹配项目
-	protected $ajax_delimiter = '';
+	protected $ajaxDelimiter = '';
 	//模板最后更新时间
 	private $templateLifeSin = array ();
 	//递归解析最多允许3层级
@@ -51,7 +55,7 @@ class Complie
 			$con = file_get_contents ( $tp );
 		}
 		
-		if ($this->ajax) {
+		if ($this->ajaxLayout) {
 			$this->parseAjax ( $con ); //引用传递
 		}
 		
@@ -145,17 +149,17 @@ class Complie
 	/**
 	 * 触发解析函数
 	 * @aim 判断模板是否需要重新解析。首先判断主模板，然后通过模板缓存判断子模板。
-	 * 通过是否传递$ajax_delimiter确定是否仅传输ajax部分内容
+	 * 通过是否传递$ajaxDelimiter确定是否仅传输ajax部分内容
 	 */
-	function buffer($temp, $ajax_delimiter = '')
+	function buffer($temp, $ajaxDelimiter = '')
 	{
 		global $_g;
 		$this->viewFilePath = sys_root . $temp . '.htm.php';
 		
-		if ($ajax_delimiter) {
-			$this->ajax = 1;
-			$this->ajax_delimiter = $ajax_delimiter;
-			$cache = sys_root . "cache/{$temp}_{$ajax_delimiter}.ajax.php";
+		if ($ajaxDelimiter) {
+			$this->ajaxLayout = 1;
+			$this->ajaxDelimiter = $ajaxDelimiter;
+			$cache = sys_root . "cache/{$temp}_{$ajaxDelimiter}.ajax.php";
 		} else {
 			$cache = sys_root . "cache/$temp.cache.php";
 		}
@@ -176,13 +180,13 @@ class Complie
 				
 				if (max ( $this->templateLifeSin ) > $tt_cache) {
 					unlink ( $cache );
-					return $this->buffer ( $temp, $ajax_delimiter );
+					return $this->buffer ( $temp, $ajaxDelimiter );
 				}
 			} else {
 				//模板间隔刷新
 				if (! empty ( $this->v ['config'] ['viewFilePathcache_life'] ) && $this->v ['time'] - filemtime ( $cache ) >= $this->v ['config'] ['viewFilePathcache_life']) {
 					unlink ( $cache );
-					return $this->buffer ( $temp, $ajax_delimiter );
+					return $this->buffer ( $temp, $ajaxDelimiter );
 				}
 			}
 		}
@@ -229,11 +233,11 @@ class Complie
 	function parseAjax(&$con)
 	{
 		//无限定符 直接返回
-		if (empty ( $this->ajax_delimiter ))
+		if (empty ( $this->ajaxDelimiter ))
 			return false;
 			
 			//ajax特定区域匹配项目
-		$deli = ($this->ajax_delimiter) ? ' ' . preg_quote ( $this->ajax_delimiter ) : '';
+		$deli = ($this->ajaxDelimiter) ? ' ' . preg_quote ( $this->ajaxDelimiter ) : '';
 		
 		/* 存在ajax标签时按照标签，不然则全部内容
 		 * <!--ajax deli-->code<!--/ajax deli-->

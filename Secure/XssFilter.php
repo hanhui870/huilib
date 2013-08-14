@@ -9,5 +9,7 @@ namespace HuiLib\Secure;
  */
 class XssFilter
 {
-	
+	public static function filter($string){
+		
+	}
 }
