@@ -141,7 +141,7 @@ class Bootstrap
 	}
 	
 	/**
-	 * 初始化缓存连接
+	 * 初始化缓存资源
 	 */
 	private function initCache()
 	{
@@ -149,7 +149,7 @@ class Bootstrap
 	}
 	
 	/**
-	 * 初始化Session配置
+	 * 初始化Session资源
 	 */
 	private function initSession()
 	{
