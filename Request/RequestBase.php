@@ -9,6 +9,11 @@ namespace HuiLib\Request;
  */
 class RequestBase
 {
+	//输入安全检测
+	const CHECK_CSRF=1;
+	const CHECK_SQL_INJECTION=2;
+	const CHECK_XSS=4;
+	
 	//路由信息中的包
 	protected $package;
 	//控制器
@@ -36,7 +41,8 @@ class RequestBase
 	}
 	
 	/**
-	 * 设置输入参数安全检查设置
+	 * 设置默认输入参数安全检查设置，具体获取时也可指定
+	 * 
 	 * 三位分别代表：Csrf, SqlInjection, Xss
 	 */
 	public function setSafeCheck($checkCode)
