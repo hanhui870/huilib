@@ -11,9 +11,9 @@ class Web extends AppBase
 {
 	const RUN_METHOD='web';
 	
-	protected function __construct()
+	protected function __construct($config)
 	{
-		parent::__construct();
+		parent::__construct($config);
 		
 		
 	}

@@ -20,12 +20,6 @@ class Bootstrap
 	private static $instance;
 	
 	/**
-	 * 运行配置
-	 * @var \HuiLib\Config\ConfigBase
-	 */
-	private $appConfig;
-	
-	/**
 	 * 运行环境
 	 * @var string Enum
 	 */
@@ -60,7 +54,6 @@ class Bootstrap
 		$this->initPath ();
 		$this->initEnv ();
 		$this->initLoader ();
-		$this->initConfig ();
 	}
 
 	/**
@@ -89,33 +82,12 @@ class Bootstrap
 	}
 
 	/**
-	 * 初始化启动配置
-	 */
-	private function initConfig()
-	{
-		if (! defined ( 'APP_CONFIG' )) {
-			throw new \Exception ( "Please define Constant var APP_CONFIG  in the entry!" );
-		}
-		
-		$this->appConfig = new \HuiLib\Config\ConfigBase ( APP_CONFIG );
-	}
-
-	/**
-	 * 返回配置实例
-	 * @return \HuiLib\Config\ConfigBase
-	 */
-	public function configInstance()
-	{
-		return $this->appConfig;
-	}
-
-	/**
 	 * 初始化应用
 	 * @return \HuiLib\App\AppBase
 	 */
-	public function createApp()
+	public function createApp($config)
 	{
-		$this->application=\HuiLib\App\AppBase::factory($this->runMethod, $this->appConfig);
+		$this->application=\HuiLib\App\AppBase::factory($this->runMethod, $config);
 		
 		return $this->application;
 	}
@@ -133,70 +105,10 @@ class Bootstrap
 	}
 
 	/**
-	 * 初始化数据库连接
-	 */
-	private function initDatabse()
-	{
-		
-	}
-	
-	/**
-	 * 初始化缓存资源
-	 */
-	private function initCache()
-	{
-	
-	}
-	
-	/**
-	 * 初始化Session资源
-	 */
-	private function initSession()
-	{
-	
-	}
-	
-	/**
-	 * 初始化错误处理器
-	 */
-	private function initErrorHandle()
-	{
-	
-	}
-	
-	/**
-	 * 初始化异常处理器
-	 */
-	private function initExceptionHandle()
-	{
-	
-	}
-	
-	/**
-	 * 执行期末绑定
-	 */
-	private function initShutCall()
-	{
-		$this->shutCall=\HuiLib\Runtime\ShutCall::getInstance();
-	}
-	
-	public function shutCallInstance(){
-		return $this->shutCall;
-	}
-	
-	/**
 	 * 获取已创建的应用
 	 */
 	public function appInstance(){
 		return $this->application;
-	}
-	
-	/**
-	 * 初始化性能记录器
-	 */
-	private function initProfile()
-	{
-		
 	}
 	
 	/**

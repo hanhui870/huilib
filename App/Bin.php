@@ -11,9 +11,9 @@ class Bin extends AppBase
 {
 	const RUN_METHOD='bin';
 	
-	protected function __construct()
+	protected function __construct($config)
 	{
-		
+		parent::__construct($config);
 	}
 	
 	/**
