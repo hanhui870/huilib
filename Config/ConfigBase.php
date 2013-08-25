@@ -77,7 +77,6 @@ class ConfigBase
 					$configGroup [$sectionNow] = $settingTree;
 				} else {
 					$configGroup [$sectionNow]=array_replace_recursive($configGroup[$sectionNow], $settingTree);
-					//$configGroup [$sectionNow] = $settingTree + $configGroup [$sectionNow];
 				}
 				
 				//处理继承的关系
@@ -87,7 +86,6 @@ class ConfigBase
 						continue;
 					}
 					$configGroup [$sectionNow]=array_replace_recursive($configGroup [$iterSection], $configGroup [$sectionNow]);
-					//$configGroup [$sectionNow] = $configGroup [$sectionNow]+$configGroup [$iterSection];
 				}
 			} else {
 				//无继承分支，类似[production]
@@ -96,7 +94,6 @@ class ConfigBase
 					$configGroup [$sectionNow] = $settingTree;
 				} else {
 					$configGroup [$sectionNow]=array_replace_recursive($configGroup[$sectionNow], $settingTree);
-					//$configGroup [$sectionNow] = $settingTree + $configGroup [$sectionNow];
 				}
 			}
 		} //foreach
@@ -243,6 +240,4 @@ class ConfigBase
 		
 		return NULL;
 	}
-	
-	
 }
