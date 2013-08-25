@@ -20,7 +20,7 @@ namespace HuiLib\View;
  * @author hanhui
  * @since 2013/08/11 来自原ylstu项目
  */
-class Complie
+class Engine
 {
 	/**
 	 * Assign的变量
