@@ -22,11 +22,22 @@ abstract class AppBase
 	protected $request;
 	
 	/**
+	 * 响应内容
+	 */
+	protected $responce;
+	
+	/**
 	 * 运行配置
 	 * @var \HuiLib\Config\ConfigBase
 	 */
 	private $appConfig;
 	private $configPath;
+	
+	/**
+	 * 数据库连接
+	 *  @var \HuiLib\Db\Adapter
+	 */
+	private static $dbConnect;
 
 	/**
 	 * 构造函数
@@ -42,7 +53,15 @@ abstract class AppBase
 		$this->configPath=$config;
 		
 		$this->bootStrap = \HuiLib\Bootstrap::getInstance ();
+		
+		//初始化应用配置
+		$this->initConfig();
+
+		//初始化请求对象
 		$this->initRequest();
+		
+		//php运行配置
+		$this->initPhpSetting();
 	}
 
 	/**
@@ -50,6 +69,7 @@ abstract class AppBase
 	 */
 	public function run()
 	{
+		
 	}
 	
 	/**
@@ -71,15 +91,32 @@ abstract class AppBase
 
 	/**
 	 * 初始化请求
+	 * 
+	 * 先在之类初始化请求，然后父类初始化配置
 	 */
-	abstract protected function initRequest();
+	protected function initRequest(){
+		$this->request->setConfig($this->appConfig);
+	}
 
 	/**
 	 * 初始化数据库连接
 	 */
 	private function initDatabse()
 	{
+		$dbSetting=$this->appConfig->getByKey('db');
+		self::$dbConnect=\HuiLib\Db\DbFactory::create($dbSetting);
+	}
 	
+	/**
+	 * 获取数据库连接
+	 * @return \HuiLib\Db\Pdo\PdoBase
+	 */
+	public function getDb(){
+		if (self::$dbConnect===NULL) {
+			$this->initDatabse();
+		}
+		
+		return self::$dbConnect;
 	}
 	
 	/**
@@ -112,6 +149,20 @@ abstract class AppBase
 	private function initExceptionHandle()
 	{
 	
+	}
+	
+	/**
+	 * 初始化错误处理器
+	 */
+	private function initPhpSetting()
+	{
+		$settings=$this->appConfig->mergeKey($this->appConfig->getByKey('phpSettings'));
+		
+		foreach ($settings as $key=>$value){
+			ini_set($key, $value);
+		}
+		
+		return true;
 	}
 	
 	/**

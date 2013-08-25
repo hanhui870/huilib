@@ -22,22 +22,23 @@ class RequestBase
 	protected $action;
 	//子操作
 	protected $subAction;
+	
 	protected $safeCheck;
 	
+	protected $appConfig;
 	
-	public function get($key = NULL)
-	{
-
-	}
-	
-	public function set($key, $value)
+	function __construct()
 	{
 	
 	}
 	
-	public function getRoutePath()
+	/**
+	 * 设置配置文件实例
+	 * @param \HuiLib\Config\ConfigBase $config
+	 */
+	function setConfig(\HuiLib\Config\ConfigBase $config)
 	{
-	
+		$this->appConfig=$config;	
 	}
 	
 	/**
