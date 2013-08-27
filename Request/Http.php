@@ -22,13 +22,13 @@ class Http extends RequestBase
 	 * 
 	 * @param string $key
 	 */
-	public function getInput($key = NULL)
+	public static function getInput($key = NULL, $type=parent::TYPE_NONE)
 	{
 		if (NULL === $key) {
 			return $_GET;
 		}
-	
-		return (isset($_GET[$key])) ? $_GET[$key] : NULL;
+
+		return isset($_GET[$key]) ? parent::typeCheck($_GET[$key], $type) : parent::typeCheck(NULL, $type);
 	}
 	
 	/**
@@ -36,13 +36,13 @@ class Http extends RequestBase
 	 *
 	 * @param string $key
 	 */
-	public function postInput($key = NULL)
+	public static function postInput($key = NULL, $type=parent::TYPE_NONE)
 	{
 		if (NULL === $key) {
 			return $_POST;
 		}
 		
-		return (isset($_POST[$key])) ? $_POST[$key] : NULL;
+		return isset($_POST[$key]) ?  parent::typeCheck($_POST[$key], $type) : parent::typeCheck(NULL, $type);
 	}
 	
 	/**
@@ -50,7 +50,7 @@ class Http extends RequestBase
 	 *
 	 * @param string $key
 	 */
-	public function cookieInput($key = NULL)
+	public static function cookieInput($key = NULL, $type=parent::TYPE_NONE)
 	{
 		if (NULL === $key) {
 			return $_COOKIE;
@@ -58,7 +58,7 @@ class Http extends RequestBase
 
 		$key=$this->getCookiePre().$key;
 	
-		return (isset($_COOKIE[$key])) ? $_POST[$_COOKIE] : NULL;
+		return isset($_COOKIE[$key]) ? parent::typeCheck($_COOKIE[$key], $type) : parent::typeCheck(NULL, $type);
 	}
 	
 	/**

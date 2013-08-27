@@ -14,6 +14,14 @@ class RequestBase
 	const CHECK_SQL_INJECTION=2;
 	const CHECK_XSS=4;
 	
+	const TYPE_INT='integer';
+	const TYPE_FLOAT='float';
+	const TYPE_STRING='string';
+	const TYPE_BOOL='boolean';
+	const TYPE_ARRAY='array';
+	const TYPE_OBJECT='object';
+	const TYPE_NONE=NULL;
+	
 	//路由信息中的包
 	protected $package;
 	//控制器
@@ -51,22 +59,33 @@ class RequestBase
 		$this->safeCheck=$checkCode;
 	}
 	
-	public function getServer($key = NULL)
+	public static function getServer($key = NULL, $type=parent::TYPE_NONE)
 	{
 		if (NULL === $key) {
 			return $_SERVER;
 		}
 	
-		return (isset($_SERVER[$key])) ? $_SERVER[$key] : NULL;
+		return isset($_SERVER[$key]) ? self::typeCheck($_SERVER[$key], $type) : parent::typeCheck(NULL, $type);
 	}
 	
-	public function getEnv($key = NULL)
+	public static function getEnv($key = NULL, $type=parent::TYPE_NONE)
 	{
 		if (NULL === $key) {
 			return $_ENV;
 		}
 	
-		return (isset($_ENV[$key])) ? $_ENV[$key] : NULL;
+		return isset($_ENV[$key]) ? self::typeCheck($_ENV[$key], $type) : parent::typeCheck(NULL, $type);
 	}
 	
+	/**
+	 * 强制转换输入参数类型
+	 * @param mix $var 变量名
+	 * @param string $type 变量类型
+	 */
+	public static function typeCheck($var, $type=self::TYPE_NONE){		
+		//成功时返回 TRUE， 或者在失败时返回 FALSE.
+		$type && settype($var, $type);
+		
+		return $var;
+	}
 }
