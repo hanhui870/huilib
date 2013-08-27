@@ -22,6 +22,17 @@ class RequestBase
 	const TYPE_OBJECT='object';
 	const TYPE_NONE=NULL;
 	
+	/**
+	 * 重写前部分信息，不包含参数部分，不包含http部分
+	 * 默认$_SERVER['SCRIPT_URL']，重写基础信息
+	 * 
+	 * [SCRIPT_URL] => /fdsafdas/fsdafdsa/fsdafsda
+	 * [SCRIPT_URI] => http://iyunlin/fdsafdas/fsdafdsa/fsdafsda
+	 * [REQUEST_URI] => /fdsafdas/fsdafdsa/fsdafsda?hello=fsdfsda
+	 * [QUERY_STRING] => hello=fsdfsda
+	 */
+	protected $scriptUrl;
+	
 	//路由信息中的包
 	protected $package;
 	//控制器
