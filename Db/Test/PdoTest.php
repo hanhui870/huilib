@@ -7,12 +7,18 @@ namespace HuiLib\Db\Test;
  * @author 祝景法
  * @since 2013/08/25
  */
-class PdoTest
+class PdoTest extends \HuiLib\Test\TestBase
 {
-	public function testMysql(){
-		$re=$this->getDb()->getConnection()->query("select count(*) from user");
+	public function run(){
+		$this->testMysql();
+	}
+	
+	private function testMysql(){
+		$re=$this->app->getDb()->getConnection()->query("select count(*) from user");
 		var_dump($re->fetchAll());
 	}
 
-
+	protected static function className(){
+		return __CLASS__;
+	}
 }

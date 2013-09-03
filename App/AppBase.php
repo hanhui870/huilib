@@ -37,7 +37,7 @@ abstract class AppBase
 	 * 数据库连接
 	 *  @var \HuiLib\Db\Adapter
 	 */
-	private static $dbConnect;
+	private static $dbInstance;
 
 	/**
 	 * 构造函数
@@ -65,11 +65,26 @@ abstract class AppBase
 	}
 
 	/**
-	 * 执行应用入口
+	 * 应用执行入口
 	 */
 	public function run()
 	{
 		
+	}
+	
+	/**
+	 * 测试执行入口
+	 */
+	public function runTest()
+	{
+		$queryString=\HuiLib\Request\Http::getQueryString(); 
+		
+		//初始化测试库
+		$instance=$queryString::getInstance();
+		$instance->setApp($this);
+		
+		//执行
+		$instance->run();
 	}
 	
 	/**
@@ -104,7 +119,7 @@ abstract class AppBase
 	private function initDatabse()
 	{
 		$dbSetting=$this->appConfig->getByKey('db');
-		self::$dbConnect=\HuiLib\Db\DbFactory::create($dbSetting);
+		self::$dbInstance=\HuiLib\Db\DbFactory::create($dbSetting);
 	}
 	
 	/**
@@ -112,11 +127,11 @@ abstract class AppBase
 	 * @return \HuiLib\Db\Pdo\PdoBase
 	 */
 	public function getDb(){
-		if (self::$dbConnect===NULL) {
+		if (self::$dbInstance===NULL) {
 			$this->initDatabse();
 		}
 		
-		return self::$dbConnect;
+		return self::$dbInstance;
 	}
 	
 	/**

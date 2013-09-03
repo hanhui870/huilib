@@ -62,6 +62,13 @@ class Http extends RequestBase
 	}
 	
 	/**
+	 * 获取页面请假参数
+	 */
+	public static function getQueryString(){
+		return parent::getServer('QUERY_STRING', parent::TYPE_STRING);
+	}
+	
+	/**
 	 * 获取Cookie前缀
 	 */
 	public function getCookiePre(){
