@@ -17,6 +17,10 @@ class PdoTest extends \HuiLib\Test\TestBase
 		$re=$this->app->getDb()->getConnection()->query("select count(*) from user");
 		var_dump($re->fetchAll());
 	}
+	
+	private function testSelect(){
+		
+	}
 
 	protected static function className(){
 		return __CLASS__;
