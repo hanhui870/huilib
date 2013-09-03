@@ -1,5 +1,5 @@
 <?php
-namespace HuiLib\Db;
+namespace HuiLib\Db\Query;
 
 /**
  * Sql语句查询类Delete操作
@@ -7,7 +7,7 @@ namespace HuiLib\Db;
  * @author 祝景法
  * @since 2013/09/03
  */
-class Delete extends Query
+class Delete extends \HuiLib\Db\Query
 {
 
 	

@@ -9,7 +9,52 @@ namespace HuiLib\Db;
  */
 class Query
 {
-
+	/**
+	 * 操作的表
+	 */
+	protected $table;
 	
+	/**
+	 * 数据库连接适配器
+	 * @var \HuiLib\Db\Adapter 
+	 */
+	protected $adapter;
+	
+	protected  function __construct(){
+		
+	}
+	
+	public function setAdapter(\HuiLib\Db\Adapter $adapter)
+	{
+		$this->adapter=$adapter;
+	}
+
+	/**
+	 * 返回一个Select实例
+	 */
+	public static function Select(){
+		
+	}
+	
+	/**
+	 * 返回一个Insert实例
+	 */
+	public static function Insert(){
+	
+	}
+	
+	/**
+	 * 返回一个Update实例
+	 */
+	public static function Update(){
+	
+	}
+	
+	/**
+	 * 返回一个Delete实例
+	 */
+	public static function Delete(){
+	
+	}
 	
 }
