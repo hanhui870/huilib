@@ -50,6 +50,11 @@ class AutoLoad
 	{
 		$nameInfo=explode('\\', $name);
 		$spaceName=array_shift($nameInfo);
+
+		//字母数字\_
+		if (preg_match("/[^\w\\\]+/i", $name, $m)) {
+			throw new \Exception ( "Hack discovered!" );
+		}
 		
 		$spacePath=$this->getRegisteredPath($spaceName);
 		if (!is_dir($spacePath)) 
