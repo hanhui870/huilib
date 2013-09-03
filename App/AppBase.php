@@ -35,7 +35,7 @@ abstract class AppBase
 	
 	/**
 	 * 数据库连接
-	 *  @var \HuiLib\Db\Adapter
+	 *  @var \HuiLib\Db\DbBase
 	 */
 	private static $dbInstance;
 
@@ -119,7 +119,7 @@ abstract class AppBase
 	private function initDatabse()
 	{
 		$dbSetting=$this->appConfig->getByKey('db');
-		self::$dbInstance=\HuiLib\Db\DbFactory::create($dbSetting);
+		self::$dbInstance=\HuiLib\Db\DbBase::create($dbSetting);
 	}
 	
 	/**

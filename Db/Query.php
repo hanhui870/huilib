@@ -16,7 +16,7 @@ class Query
 	
 	/**
 	 * 数据库连接适配器
-	 * @var \HuiLib\Db\Adapter 
+	 * @var \HuiLib\Db\DbBase
 	 */
 	protected $adapter;
 	
@@ -24,7 +24,7 @@ class Query
 		
 	}
 	
-	public function setAdapter(\HuiLib\Db\Adapter $adapter)
+	public function setAdapter(\HuiLib\Db\DbBase $adapter)
 	{
 		$this->adapter=$adapter;
 	}

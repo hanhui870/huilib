@@ -7,7 +7,7 @@ namespace HuiLib\Db\Pdo;
  * @author 祝景法
  * @since 2013/08/25
  */
-class PdoBase extends \HuiLib\Db\Adapter
+class PdoBase extends \HuiLib\Db\DbBase
 {	
 	public function __construct($config)
 	{
