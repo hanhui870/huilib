@@ -9,7 +9,10 @@ namespace HuiLib\Db;
  */
 abstract class Adapter
 {
-	private $connection;
+	/**
+	 * 数据库连接
+	 */
+	protected $connection;
 
 	public function getConnection()
 	{
