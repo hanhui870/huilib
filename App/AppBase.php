@@ -207,7 +207,7 @@ abstract class AppBase
 	 */
 	public static function factory($runMethod, $config)
 	{
-		$appClass = '\\HuiLib\\App\\' . $runMethod;
+		$appClass = '\\HuiLib\\App\\' . ucfirst($runMethod);
 		$appInstance = new $appClass ($config);
 		return $appInstance;
 	}
