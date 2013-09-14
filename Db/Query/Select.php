@@ -26,8 +26,6 @@ class Select extends \HuiLib\Db\Query
 	const JOIN_OUTER = 'outer';
 	const JOIN_LEFT = 'left';
 	const JOIN_RIGHT = 'right';
-	const WHERE_AND='AND';
-	const WHERE_OR='OR';
 	
 	/**
 	 * @var array
@@ -83,23 +81,7 @@ class Select extends \HuiLib\Db\Query
 			$this->from($table);
 		}
 	}
-	
-	/**
-	 * 设置操作表
-	 * 
-	 * @param  string|array $table
-	 * @throws \HuiLib\Error\Exception
-	 * @return Select
-	 */
-	public function from($table)
-	{
-		if (is_array($table) && (!is_string(key($table)) || count($table) !== 1)) {
-			throw new \HuiLib\Error\Exception ('设置查询表的时候，必须是关联数组，且仅有一条');
-		}
-	
-		$this->table = $table;
-		return $this;
-	}
+
 
 	/**
 	 * 设置SQL查询获取的类
@@ -170,29 +152,6 @@ class Select extends \HuiLib\Db\Query
 		return $this;
 	}
 	
-
-	 /**
-     * 设置Where条件
-     * 
-     * eg where:
-     * array('a=1', 'b is null')
-     * 
-     * 支持一级，其他层次，直接写在子句中，OR查询需要同等级条件一起输入。提倡简单的sql。
-     * 
-     * @param array|string $array 条件关联数组
-     * @param string $operator 查询条件类型
-     * 
-     * @return Select
-     */
-    public function where($where, $operator=self::WHERE_AND)
-    {
-    	if (!is_array($where)) {
-    		$where=array($where);
-    	}
-    	$this->where [] = array ('where' => $where, 'operator' => $operator );
-    	return $this;
-    }
-
 	/**
 	 * 设置Group查询属性
 	 * 
@@ -245,23 +204,7 @@ class Select extends \HuiLib\Db\Query
 		return $this;
 	}
 
-	/**
-	 * 设置limit属性
-	 * 
-	 * @param int $limit
-	 * @throws \HuiLib\Error\Exception
-	 * @return \HuiLib\Db\Query\Select
-	 */
-	public function limit($limit)
-	{
-		if (! is_numeric ( $limit )) {
-			throw new \HuiLib\Error\Exception ( 'Query/Select limit值必须为数值' );
-		}
-		
-		$this->limit = $limit;
-		return $this;
-	}
-
+	
 	/**
 	 * 设置offset属性
 	 *
@@ -351,7 +294,6 @@ class Select extends \HuiLib\Db\Query
 	protected function renderColumns()
 	{
 		$field=array();
-		
 		foreach ($this->columns as $alias=>$column){
 			if (is_string($alias)) {
 				$field[]=sprintf("%s as %s", $column, $alias);
@@ -366,35 +308,7 @@ class Select extends \HuiLib\Db\Query
 		
 		return implode(', ', $field);
 	}
-	
-	protected function renderFrom()
-	{
-		return  'from '.$this->getAliasTable($this->table);
-	}
-	
-	/**
-	 * 生成查询条件
-	 *
-	 * @return string
-	 */
-	protected function renderWhere()
-	{
-		if ($this->where===NULL) {
-			return '';
-		}
-		
-		$where=array();
-		foreach ($this->where as $unit){
-			$where[]='('.implode(') '.$unit['operator'].'( ', $unit['where']).')';
-		}
-		
-		if (count($where)==1) {
-			return 'where '.implode(self::WHERE_AND, $where);
-		}else{
-			return 'where ('.implode(self::WHERE_AND, $where).')';
-		}
-	}
-	
+
 	/**
 	 * 生成Union
 	 *
@@ -462,22 +376,6 @@ class Select extends \HuiLib\Db\Query
 		return 'group by '.implode(', ', $this->group);
 	}
 	
-	/**
-	 * 生成Limit
-	 *
-	 * @return string
-	 */
-	protected function renderLimit()
-	{
-		if ($this->limit===NULL) {
-			return '';
-		}
-		if ($this->adapter==NULL) {
-			throw new \HuiLib\Error\Exception ( 'renderLimit:需要先设置Adapter对象' );
-		}
-		return $this->adapter->getDriver()->limit($this->limit);
-	}
-	
 	/* 生成Offset
 	*
 	* @return string
@@ -529,9 +427,10 @@ class Select extends \HuiLib\Db\Query
 	protected function compile()
 	{
 		$parts=array();
-		$parts[self::SELECT]='select';
+		$parts['start']='select';
 		$parts[self::COLUMNS]=$this->renderColumns();
-		$parts[self::TABLE]=$this->renderFrom();
+		$parts['from']='from';
+		$parts[self::TABLE]=$this->renderTable();
 		$parts[self::JOINS]=$this->renderJoin();
 		$parts[self::INDEX]=$this->renderIndex();
 		$parts[self::WHERE]=$this->renderWhere();
@@ -542,13 +441,8 @@ class Select extends \HuiLib\Db\Query
 		$parts[self::LIMIT]=$this->renderLimit();
 		$parts[self::OFFSET]=$this->renderOffset();
 
-		//清除多余空格
-		foreach ($parts as $key=>$value){
-			if (empty($value)) {
-				unset($parts[$key]);
-			}
-		}
-		return implode(' ', $parts);
+		$this->parts=&$parts;
+		return parent::compile();
 	}
 	
 	/**
@@ -557,5 +451,23 @@ class Select extends \HuiLib\Db\Query
 	public function toString()
 	{
 		return $this->compile();
+	}
+	
+	public function table($table){
+		parent::table($table);
+		
+		return $this;
+	}
+	
+	public function where($where, $operator=self::WHERE_AND){
+		parent::where($where, $operator);
+	
+		return $this;
+	}
+	
+	public function limit($limit){
+		parent::limit($limit);
+	
+		return $this;
 	}
 }
