@@ -240,4 +240,8 @@ class ConfigBase
 		
 		return NULL;
 	}
+	
+	public function toArray(){
+		return $this->getBySection();
+	}
 }
