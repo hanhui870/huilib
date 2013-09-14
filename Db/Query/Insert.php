@@ -92,9 +92,22 @@ class Insert extends \HuiLib\Db\Query
 	 * eg.
 	 * array('field1'=>'value1', 'field2'=>'value2', 'field3'=>'value3' ...)
 	 */
-	public function kvInsert($pair)
+	public function kvInsert(array $pair)
 	{
+		if (empty($pair)) {
+			throw new \HuiLib\Error\Exception ( 'kvInsert:待插入的关联数组不能为空' );
+		}
 		
+		$keys=$values=array();
+		foreach ($pair as $key=>$value){
+			$keys[]=$key;
+			$values[]=$value;
+		}
+		
+		$this->fields($keys);
+		$this->values($values);
+		
+		return $this;
 	}
 	
 	/**
