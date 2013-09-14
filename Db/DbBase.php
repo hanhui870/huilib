@@ -13,6 +13,8 @@ abstract class DbBase
 {
 	/**
 	 * 数据库连接
+	 * 
+	 * @var \PDO
 	 */
 	protected $connection;
 	
@@ -21,9 +23,36 @@ abstract class DbBase
 	 */
 	protected $driver;
 
+	/**
+	 * 获取数据库连接，便于直接查询
+	 */
 	public function getConnection()
 	{
 		return $this->connection;
+	}
+	
+	/**
+	 * 获取具体配置驱动实例
+	 */
+	public function getDriver()
+	{
+		return $this->driver;
+	}
+	
+	/**
+	 * 执行数据库查询
+	 * 
+	 * 默认获取关联查询数据
+	 * 
+	 * @param \HuiLib\Db\Query $query SQL语句对象
+	 * @return \PDOStatement
+	 */
+	public function query($query, $fetchStyle=\PDO::FETCH_ASSOC)
+	{
+		$query->setAdapter($this);
+
+		//echo $query->toString();
+		return $this->connection->query($query->toString(), $fetchStyle);
 	}
 	
 	/**
@@ -39,9 +68,11 @@ abstract class DbBase
 			case 'pdo':
 				$adapter=new \HuiLib\Db\Pdo\PdoBase($config);
 				break;
+			case 'mongo':
+				
+				break;
 		}
 	
 		return $adapter;
 	}
-	
 }
