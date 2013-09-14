@@ -239,7 +239,7 @@ class Select extends \HuiLib\Db\Query
 	}
 
 	/**
-	 * 重置查询条件某部分
+	 * 重置语句部分参数
 	 *
 	 * @param array $part
 	 * @return \HuiLib\Db\Query\Select

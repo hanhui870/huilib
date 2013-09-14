@@ -10,6 +10,17 @@ namespace HuiLib\Db\Query;
 class Update extends \HuiLib\Db\Query
 {
 
+	/**
+	 * 编译成SQL语句
+	 */
+	protected function compile(){
 	
+	}
 	
+	/**
+	 * 生成SQL语句
+	 */
+	public function toString(){
+		return $this->compile();
+	}
 }
