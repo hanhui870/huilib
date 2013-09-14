@@ -26,6 +26,7 @@ class Select extends \HuiLib\Db\Query
 	const JOIN_OUTER = 'outer';
 	const JOIN_LEFT = 'left';
 	const JOIN_RIGHT = 'right';
+	const FOR_UPDATE = 'forUpdate';
 	
 	/**
 	 * @var array
@@ -40,32 +41,32 @@ class Select extends \HuiLib\Db\Query
 	/**
 	 * @var array
 	*/
-	protected $where = null;
+	protected $where = NULL;
 	
 	/**
 	 * @var array
 	 */
-	protected $order = null;
+	protected $order = NULL;
 	
 	/**
-	 * @var null|array
+	 * @var NULL|array
 	*/
-	protected $group = null;
+	protected $group = NULL;
 	
 	/**
-	 * @var int|null
+	 * @var int|NULL
 	 */
-	protected $limit = null;
+	protected $limit = NULL;
 	
 	/**
-	 * @var string|null
+	 * @var string|NULL
 	 */
-	protected $index = null;
+	protected $index = NULL;
 	
 	/**
-	 * @var int|null
+	 * @var int|NULL
 	 */
-	protected $offset = null;
+	protected $offset = NULL;
 	
 	/**
 	 * @var array
@@ -73,10 +74,15 @@ class Select extends \HuiLib\Db\Query
 	protected $union = array ();
 	
 	/**
+	 * @var boolean
+	 */
+	protected $forUpdate = false;
+	
+	/**
 	 * 构造
 	 * @param string $table 查询操作的表
 	 */
-	protected  function __construct($table = null){
+	protected  function __construct($table = NULL){
 		if ($table) {
 			$this->from($table);
 		}
@@ -221,10 +227,20 @@ class Select extends \HuiLib\Db\Query
 		$this->offset = $offset;
 		return $this;
 	}
+	
+	/**
+	 * 开启更新锁定事务模式
+	 */
+	public function enableForUpdate()
+	{
+		$this->forUpdate=true;
+	
+		return $this;
+	}
 
 	/**
 	 * 重置查询条件某部分
-	 * 
+	 *
 	 * @param array $part
 	 * @return \HuiLib\Db\Query\Select
 	 */
@@ -232,7 +248,7 @@ class Select extends \HuiLib\Db\Query
 	{
 		switch ($part) {
 			case self::TABLE :
-				$this->table = null;
+				$this->table = NULL;
 				break;
 			case self::COLUMNS :
 				$this->columns = array ();
@@ -244,22 +260,28 @@ class Select extends \HuiLib\Db\Query
 				$this->where = array();
 				break;
 			case self::GROUP :
-				$this->group = null;
+				$this->group = NULL;
 				break;
 			case self::LIMIT :
-				$this->limit = null;
+				$this->limit = NULL;
 				break;
 			case self::OFFSET :
-				$this->offset = null;
+				$this->offset = NULL;
 				break;
 			case self::ORDER :
-				$this->order = null;
+				$this->order = NULL;
 				break;
 			case self::INDEX :
-				$this->index = null;
+				$this->index = NULL;
 				break;
 			case self::UNION :
 				$this->union = array ();
+				break;
+			case self::FOR_UPDATE :
+				$this->forUpdate = false;
+				break;
+			case self::ENDS :
+				$this->ends = '';
 				break;
 		}
 		return $this;
@@ -269,7 +291,7 @@ class Select extends \HuiLib\Db\Query
 	 * 获取原始状态值
 	 * @param string $key
 	 */
-	public function getRawState($key = null)
+	public function getRawState($key = NULL)
 	{
 		$rawState = array(
 				self::TABLE      => $this->table,
@@ -323,7 +345,7 @@ class Select extends \HuiLib\Db\Query
 		$union=array();
 		foreach ($this->union as $unit){
 			//虽然子句也可以用offset limit order group等信息，但还是限制在整个主句中。
-			$unit['select']->reset(self::ORDER)->reset(self::GROUP)->reset(self::LIMIT)->reset(self::OFFSET);
+			$unit['select']->reset(self::ORDER)->reset(self::GROUP)->reset(self::LIMIT)->reset(self::OFFSET)->reset(self::ENDS);
 			$union[]=$unit['type'].' '. $unit['select']->toString();
 		}
 		
@@ -406,6 +428,20 @@ class Select extends \HuiLib\Db\Query
 	}
 	
 	/**
+	 * 生成ForUpdate
+	 *
+	 * @return string
+	 */
+	protected function renderForUpdate()
+	{
+		if (!$this->forUpdate) {
+			return '';
+		}
+	
+		return 'for update';
+	}
+	
+	/**
 	 * 查询获取表
 	 * @param array|string $table
 	 * @throws \HuiLib\Error\Exception
@@ -440,6 +476,8 @@ class Select extends \HuiLib\Db\Query
 		$parts[self::GROUP]=$this->renderGroup();
 		$parts[self::LIMIT]=$this->renderLimit();
 		$parts[self::OFFSET]=$this->renderOffset();
+		$parts[self::FOR_UPDATE]=$this->renderForUpdate();
+		$parts[self::ENDS]=$this->ends;
 
 		$this->parts=&$parts;
 		return parent::compile();

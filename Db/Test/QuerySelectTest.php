@@ -10,7 +10,7 @@ namespace HuiLib\Db\Test;
 class QuerySelectTest extends \HuiLib\Test\TestBase
 {
 	public function run(){
-		$this->testUnionSelect();
+		$this->testAdapterSelect();
 	}
 	
 	/**
@@ -51,7 +51,7 @@ class QuerySelectTest extends \HuiLib\Test\TestBase
 	 * Select 普通测试
 	 */
 	private function testAdapterSelect(){
-		$select=\HuiLib\Db\Query::select()->table('test')->where('id=2')->limit(10)->offset(1);
+		$select=\HuiLib\Db\Query::select()->table('test')->where('id=2')->limit(10)->offset(0)->enableForUpdate();
 		
 		$re=$this->app->getDb()->query($select);
 		\HuiLib\Helper\Debug::out ($re->fetchAll());
