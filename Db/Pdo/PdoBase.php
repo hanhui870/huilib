@@ -17,6 +17,13 @@ class PdoBase extends \HuiLib\Db\DbBase
 			$this->connection = new \PDO($dsn, $config['user'], $config['password']);
 			$this->connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 			
+			//设置字符集
+			if(isset($config['charset'])){
+				$driverClass='\HuiLib\Db\Pdo\\'.ucfirst($config['driver']);
+				$this->driver=new $driverClass();
+				$this->connection->query($this->driver->charset($config['charset']));
+			}
+
 		} catch (\PDOException $exception) {
 			throw new \HuiLib\Error\Exception($exception->getMessage(), $exception->getCode());
 		}

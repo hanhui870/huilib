@@ -15,6 +15,11 @@ abstract class DbBase
 	 * 数据库连接
 	 */
 	protected $connection;
+	
+	/**
+	 * 数据库驱动 如mysql
+	 */
+	protected $driver;
 
 	public function getConnection()
 	{
