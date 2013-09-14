@@ -55,6 +55,17 @@ class Delete extends \HuiLib\Db\Query
 	}
 	
 	/**
+	 * 直接发起默认数据库请求
+	 * 
+	 * @return int 删除操作影响行数
+	 */
+	public function query()
+	{
+		$stmt=parent::query();
+		return $stmt->rowCount();
+	}
+	
+	/**
 	 * 生成SQL语句
 	 */
 	public function toString(){
