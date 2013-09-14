@@ -219,6 +219,7 @@ class Insert extends \HuiLib\Db\Query
 		
 		$values=array();
 		foreach ( $this->values as $valueArray ) {
+			//escape，进行值参数安全转义
 			$valueArray=array_map(array($this, 'realEscape'), $valueArray);
 			$values[] = '('.implode(', ', $valueArray).')';
 		}
@@ -292,6 +293,17 @@ class Insert extends \HuiLib\Db\Query
 		return implode('', $SQLS);
 	}
 
+	/**
+	 * 直接发起默认数据库请求
+	 *
+	 * @return int 插入操作影响行数
+	 */
+	public function query()
+	{
+		$stmt=parent::query();
+		return $stmt->rowCount();
+	}
+	
 	/**
 	 * 编译成SQL语句
 	 */

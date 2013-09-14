@@ -40,11 +40,6 @@ class Select extends \HuiLib\Db\Query
 	
 	/**
 	 * @var array
-	*/
-	protected $where = NULL;
-	
-	/**
-	 * @var array
 	 */
 	protected $order = NULL;
 	
@@ -52,11 +47,6 @@ class Select extends \HuiLib\Db\Query
 	 * @var NULL|array
 	*/
 	protected $group = NULL;
-	
-	/**
-	 * @var int|NULL
-	 */
-	protected $limit = NULL;
 	
 	/**
 	 * @var string|NULL

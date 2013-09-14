@@ -7,7 +7,7 @@ namespace HuiLib\Db\Test;
  * @author 祝景法
  * @since 2013/09/13
  */
-class QueryDeleteTest extends \HuiLib\Test\TestBase
+class QueryUpdateTest extends \HuiLib\Test\TestBase
 {
 	public function run(){
 		$this->test();
@@ -17,9 +17,10 @@ class QueryDeleteTest extends \HuiLib\Test\TestBase
 	 * 测试
 	 */
 	private function test(){
-		$delete=\HuiLib\Db\Query::delete()->table('test')->where(array('id=1379182395'))->limit(10);
-		echo $delete->query();
-		echo $delete->toString();
+		$update=\HuiLib\Db\Query::update()->table('test')->where(array('id=2'))
+		->values(array('test'=>'zzzzzzzzzzzzzzzzzzzzzzz', 'num'=>array('plain'=>'num=num+1')));
+		$update->query();
+		echo $update->toString();
 	}
 
 	protected static function className(){
