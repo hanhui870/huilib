@@ -134,8 +134,8 @@ class Update extends \HuiLib\Db\Query
 		return $this;
 	}
 	
-	public function where($where, $operator=self::WHERE_AND){
-		parent::where($where, $operator);
+	public function where(Where $where){
+		parent::where($where);
 	
 		return $this;
 	}

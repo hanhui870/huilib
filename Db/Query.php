@@ -17,8 +17,6 @@ class Query
 	const TABLE = 'table';
 	const WHERE = 'where';
 	const LIMIT = 'limit';
-	const WHERE_AND='and';
-	const WHERE_OR='or';
 	const ENDS='ends';//结束分号
 	
 	/**
@@ -43,7 +41,7 @@ class Query
 	protected $ends=';';
 	
 	/**
-	 * @var array
+	 * @var \HuiLib\Db\Query\Where
 	 */
 	protected $where = NULL;
 	
@@ -56,15 +54,17 @@ class Query
 	 * 构造函数受保护
 	 * 
 	 * 通过select、update、insert、delete等静态函数初始化
+	 * 
+	 * @param string $table 操作的表
 	 */
-	protected function __construct()
-	{
+	protected  function __construct($table = NULL){
+		if ($table) {
+			$this->table($table);
+		}
 	}
 
 	/**
 	 * 设置适配器，需要compile的时候必须设置
-	 * 
-	 * 一般在调用query前set
 	 * 
 	 * @param \HuiLib\Db\DbBase $adapter
 	 * @return \HuiLib\Db\Query
@@ -103,9 +103,9 @@ class Query
 	 * 
 	 * @return \HuiLib\Db\Query\Select
 	 */
-	public static function select()
+	public static function select($table = NULL)
 	{
-		return new \HuiLib\Db\Query\Select ();
+		return new \HuiLib\Db\Query\Select ($table);
 	}
 
 	/**
@@ -113,9 +113,9 @@ class Query
 	 * 
 	 * @return \HuiLib\Db\Query\Insert
 	 */
-	public static function insert()
+	public static function insert($table = NULL)
 	{
-		return new \HuiLib\Db\Query\Insert ();
+		return new \HuiLib\Db\Query\Insert ($table);
 	}
 
 	/**
@@ -123,9 +123,9 @@ class Query
 	 * 
 	 * @return \HuiLib\Db\Query\Update
 	 */
-	public static function update()
+	public static function update($table = NULL)
 	{
-		return new \HuiLib\Db\Query\Update ();
+		return new \HuiLib\Db\Query\Update ($table);
 	}
 
 	/**
@@ -133,9 +133,9 @@ class Query
 	 * 
 	 * @return \HuiLib\Db\Query\Delete
 	 */
-	public static function delete()
+	public static function delete($table = NULL)
 	{
-		return new \HuiLib\Db\Query\Delete ();
+		return new \HuiLib\Db\Query\Delete ($table);
 	}
 
 	/**
@@ -169,23 +169,18 @@ class Query
 	 * 
 	 * Select/Delete/Update用到
 	 *
-	 * KVpair、plainQuote、nameBind三种模式:
-	 * eg where:
-	 * array('a=1', 'b is NULL')
+	 * KVpair、plainQuote、nameBind三种模式，具体见Where类
 	 *
-	 * 支持一级，其他层次，直接写在子句中，OR查询需要同等级条件一起输入。提倡简单的sql。
+	 * @param \HuiLib\Db\Query\Where $where where条件对象
 	 *
-	 * @param array|string $array 条件关联数组
-	 * @param string $operator 查询条件类型
-	 *
-	 * @return Select
+	 * @return \HuiLib\Db\Query
 	 */
-	public function where($where, $operator=self::WHERE_AND)
+	public function where(Query\Where $where)
 	{
-		if (!is_array($where)) {
-			$where=array($where);
-		}
-		$this->where [] = array ('where' => $where, 'operator' => $operator );
+		$this->setAdapter();
+		$this->where=$where;
+		$this->where->setQuery($this);
+		
 		return $this;
 	}
 	
@@ -196,7 +191,7 @@ class Query
 	 *
 	 * @param int $limit
 	 * @throws \HuiLib\Error\Exception
-	 * @return \HuiLib\Db\Query\Select
+	 * @return \HuiLib\Db\Query
 	 */
 	public function limit($limit)
 	{
@@ -240,16 +235,7 @@ class Query
 			return '';
 		}
 	
-		$where=array();
-		foreach ($this->where as $unit){
-			$where[]='('.implode(') '.$unit['operator'].'( ', $unit['where']).')';
-		}
-	
-		if (count($where)==1) {
-			return 'where '.implode(self::WHERE_AND, $where);
-		}else{
-			return 'where ('.implode(self::WHERE_AND, $where).')';
-		}
+		return 'where '.$this->where->toString();
 	}
 	
 	/**
@@ -269,24 +255,24 @@ class Query
 	/**
 	 * 直接发起默认数据库请求
 	 * 
-	 * @return \PDOStatement
+	 * @return \HuiLib\Db\Query
 	 */
 	public function query()
 	{
 		$this->setAdapter();
-		return $this->adapter->getConnection()->query($this->toString());
+		$innerStatment=$this->adapter->getConnection()->query($this->toString());
+		return Result::create($innerStatment);
 	}
 	
+	/**
+	 * Prepare查询，先调用prepare，然后调用::execute($param)
+	 * @return \HuiLib\Db\Query
+	 */
 	public function prepare()
 	{
 		$this->setAdapter();
-		return $this->adapter->getConnection()->prepare($this->toString());
-	}
-	
-	public function exec()
-	{
-		$this->setAdapter();
-		return $this->adapter->getConnection()->exec($this->toString());
+		$innerStatment=$this->adapter->getConnection()->prepare($this->toString());
+		return Result::create($innerStatment);
 	}
 
 	/**

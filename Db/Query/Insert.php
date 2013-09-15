@@ -88,6 +88,10 @@ class Insert extends \HuiLib\Db\Query
 	 * eg.
 	 * array('fieldValue1', 'fieldValue2', 'fieldValue3', 'fieldValue4', ...)
 	 * 
+	 * eg dupValues. 直接设置的，必须以关联数组形式，不然调用默认value数组
+	 * array('field1'=>'value1', 'field2'=>'value2', 'field3'=>'value3' ...) //insert set
+	 * array('num'=>array('plain'=>'num=num+1')) //duplicate update 浏览量+1
+	 * 
 	 * 注意和fields的前后对应
 	 *
 	 * @param array $values
@@ -111,10 +115,6 @@ class Insert extends \HuiLib\Db\Query
 	/**
 	 * 设置dupliate update的值，一次一行，通过values()调用
 	 *
-	 * eg. 直接dupValues设置的，必须以关联数组形式，不然调用默认value数组
-	 * array('field1'=>'value1', 'field2'=>'value2', 'field3'=>'value3' ...) 不需要plain模式，update需要
-	 * array('num'=>array('plain'=>'num=num+1')) //遇到重复浏览量+1，注意结构
-	 * 
 	 * @param int $iter 当前value数组的键，保证和values数组匹配
 	 * @param array $values
 	 * @return \HuiLib\Db\Query\Insert
@@ -220,7 +220,7 @@ class Insert extends \HuiLib\Db\Query
 		$values=array();
 		foreach ( $this->values as $valueArray ) {
 			//escape，进行值参数安全转义
-			$valueArray=array_map(array($this, 'realEscape'), $valueArray);
+			$valueArray=array_map(array($this, 'escape'), $valueArray);
 			$values[] = '('.implode(', ', $valueArray).')';
 		}
 		
@@ -243,7 +243,7 @@ class Insert extends \HuiLib\Db\Query
 		foreach ($valueArray as $keyIter=>$value){
 			if (!isset($this->fields[$keyIter])) throw new \HuiLib\Error\Exception ( 'Insert::kvDupReMap，字段和字段值数组不匹配' );
 			
-			$setTemp=$this->fields[$keyIter].'='.$this->realEscape($value);
+			$setTemp=$this->fields[$keyIter].'='.$this->escape($value);
 			$normalSets[]=$setTemp;
 			if (in_array($this->fields[$keyIter], $this->dupFields) && empty($this->dupValues[$iter])) {
 				//没有独立设置了重复更新数组
@@ -255,7 +255,7 @@ class Insert extends \HuiLib\Db\Query
 		if (isset($this->dupValues[$iter])) {
 			foreach ($this->dupValues[$iter] as $keyString=>$value){
 				if (is_string($value)) {//key=>value 形式
-					$dupSets[]=$keyString.'='.$this->realEscape($this->dupValues[$iter][$keyString]);
+					$dupSets[]=$keyString.'='.$this->escape($this->dupValues[$iter][$keyString]);
 				}elseif (is_array($value) && isset($value['plain'])){
 					$dupSets[]=$value['plain'];//num=num+1等，特殊形式
 				}

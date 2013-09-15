@@ -67,17 +67,6 @@ class Select extends \HuiLib\Db\Query
 	 * @var boolean
 	 */
 	protected $forUpdate = false;
-	
-	/**
-	 * 构造
-	 * @param string $table 查询操作的表
-	 */
-	protected  function __construct($table = NULL){
-		if ($table) {
-			$this->from($table);
-		}
-	}
-
 
 	/**
 	 * 设置SQL查询获取的类
@@ -397,9 +386,7 @@ class Select extends \HuiLib\Db\Query
 		if ($this->offset===NULL) {
 			return '';
 		}
-		if ($this->adapter==NULL) {
-			throw new \HuiLib\Error\Exception ( 'renderLimit:需要先设置Adapter对象' );
-		}
+		$this->setAdapter();
 		return $this->adapter->getDriver()->offset($this->offset);
 	}
 	
@@ -413,7 +400,7 @@ class Select extends \HuiLib\Db\Query
 		if ($this->index===NULL) {
 			return '';
 		}
-		
+		$this->setAdapter();
 		return $this->adapter->getDriver()->index($this->index);
 	}
 	
@@ -429,22 +416,6 @@ class Select extends \HuiLib\Db\Query
 		}
 	
 		return 'for update';
-	}
-	
-	/**
-	 * 查询获取表
-	 * @param array|string $table
-	 * @throws \HuiLib\Error\Exception
-	 * @return string
-	 */
-	private function getAliasTable($table){
-		if (is_string($table)) {
-			return $table;
-		}elseif (is_array($table)) {
-			return  current($table). ' as ' . key($table);
-		}
-		
-		throw new \HuiLib\Error\Exception ('查询表设置错误');
 	}
 	
 	/**
@@ -487,8 +458,8 @@ class Select extends \HuiLib\Db\Query
 		return $this;
 	}
 	
-	public function where($where, $operator=self::WHERE_AND){
-		parent::where($where, $operator);
+	public function where(Where $where){
+		parent::where($where);
 	
 		return $this;
 	}

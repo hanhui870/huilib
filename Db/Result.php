@@ -5,7 +5,7 @@ namespace HuiLib\Db;
  * Sql语句查询类结构集
  *
  * @author 祝景法
- * @since 2013/09/03
+ * @since 2013/09/15
  */
 class Result
 {
@@ -13,10 +13,16 @@ class Result
 	const DEFAULT_FETCH_STYLE=\PDO::FETCH_ASSOC;
 	
 	/**
-	 * prepare->exec bind 查询
+	 * prepare->execute bind 查询
 	 * @var \PDOStatement
 	 */
 	protected $innerStatment = NULL;
+	
+	/**
+	 * 上次execute查询绑定的的参数
+	 * @var array
+	 */
+	protected $lastBindParam = NULL;
 	
 	protected function __construct(\PDOStatement $statement){
 		$this->innerStatment=$statement;
@@ -35,8 +41,19 @@ class Result
 			throw new \HuiLib\Error\Exception ('execute查询，必须先调用Query::prepare');
 		}
 		$this->innerStatment->execute($param);
-	
+		$this->lastBindParam=$param;
+		
 		return $this;
+	}
+	
+	/**
+	 * 获取上次execute查询绑定的的参数
+	 * 
+	 * @return array:
+	 */
+	public function getLastBindParam()
+	{
+		return $this->lastBindParam;
 	}
 	
 
