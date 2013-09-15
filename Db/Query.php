@@ -4,7 +4,10 @@ namespace HuiLib\Db;
 /**
  * Sql语句基础类
  *
- * TODO  生成where等条件语句的安全性quote调用问题
+ * 安全性转义等问题:
+ * 1、insert data: (Fields) values (Values1), (Values1)形式; KVinsert也转换成前种形式，支持duplicate key update; 值已经使用Query::escape转义
+ * 2、update data: KVsets和plain update两种模式。前种已经自动转义，后种一般系统输入，无需转义
+ * 3、where cond:KVpair、plainQuote、nameBind三种，均在编译时转义；
  *
  * @author 祝景法
  * @since 2013/09/03
@@ -27,7 +30,7 @@ class Query
 	 * 数据库连接适配器
 	 * @var \HuiLib\Db\DbBase
 	 */
-	protected $adapter;
+	protected $adapter=NULL;
 	
 	/**
 	 * SQL语句组成部分
@@ -68,8 +71,18 @@ class Query
 	 */
 	public function setAdapter(\HuiLib\Db\DbBase $adapter=NULL)
 	{
+		//已设置
+		if ($this->adapter!==NULL) {
+			return $this;
+		}
+		
+		//未提供adapter，使用默认
 		if ($adapter===NULL) {
 			$adapter=\HuiLib\Bootstrap::getInstance()->appInstance()->getDb();
+		}
+		
+		if (! $adapter instanceof \HuiLib\Db\DbBase) {
+			throw new \HuiLib\Error\Exception ( 'Query::setAdapter:系统必须提供有效的DB adapter' );
 		}
 
 		$this->adapter = $adapter;
@@ -156,6 +169,7 @@ class Query
 	 * 
 	 * Select/Delete/Update用到
 	 *
+	 * KVpair、plainQuote、nameBind三种模式:
 	 * eg where:
 	 * array('a=1', 'b is NULL')
 	 *
@@ -194,10 +208,25 @@ class Query
 		return $this;
 	}
 	
+	/**
+	 * 查询获取表
+	 * @param array|string $table
+	 * @throws \HuiLib\Error\Exception
+	 * @return string
+	 */
+	protected function getAliasTable($table){
+		if (is_string($table)) {
+			return $table;
+		}elseif (is_array($table)) {
+			return  current($table). ' as ' . key($table);
+		}
+	
+		throw new \HuiLib\Error\Exception ('查询表设置错误');
+	}
 	
 	protected function renderTable()
 	{
-		return $this->table;
+		return $this->getAliasTable($this->table);
 	}
 	
 	/**
@@ -233,9 +262,7 @@ class Query
 		if ($this->limit===NULL) {
 			return '';
 		}
-		if ($this->adapter==NULL) {
-			throw new \HuiLib\Error\Exception ( 'renderLimit:需要先设置Adapter对象' );
-		}
+		$this->setAdapter();
 		return $this->adapter->getDriver()->limit($this->limit);
 	}
 	
@@ -247,8 +274,19 @@ class Query
 	public function query()
 	{
 		$this->setAdapter();
-	
 		return $this->adapter->getConnection()->query($this->toString());
+	}
+	
+	public function prepare()
+	{
+		$this->setAdapter();
+		return $this->adapter->getConnection()->prepare($this->toString());
+	}
+	
+	public function exec()
+	{
+		$this->setAdapter();
+		return $this->adapter->getConnection()->exec($this->toString());
 	}
 
 	/**
@@ -268,12 +306,31 @@ class Query
 	/**
 	 * 转义SQL 语句中使用的字符串中的特殊字符
 	 * 
-	 * @param unknown $value
+	 * 数组转换：仅支持单维数组
+	 * array('fafdas', 'fd', 'eeee', 'bbbbb')
+	 * ↓↓↓↓
+	 * 'fafdas', 'fd', 'eeee', 'bbbbb'
+	 * 
+	 * @param string|int|array $value
 	 * @return string
 	 */
-	public function realEscape($value)
+	public function escape($value)
 	{
-		return $this->adapter->getConnection()->quote($value);
+		if (empty($value)) {
+			return '';
+		}
+		$this->setAdapter();
+		
+		if (is_array($value)) {
+			
+			$inArray=array();
+			foreach ($value as $item){
+				$inArray[]=$this->adapter->getConnection()->quote($item);
+			}
+			return implode(',', $inArray);
+		}else{
+			return $this->adapter->getConnection()->quote($value);
+		}
 	}
 
 	/**
