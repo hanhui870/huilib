@@ -25,8 +25,7 @@ class WhereTest extends \HuiLib\Test\TestBase
 		$where2=Where::createQuote('num in (?)', array(3, 5, 16));
 		$where1->andCase($where2);
 		$where->orCase($where1);
-		
-		
+
 		//初始化adapter后才能escape
 		$select->where($where);
 		
@@ -34,22 +33,47 @@ class WhereTest extends \HuiLib\Test\TestBase
 	}
 	
 	private function testChainWhere(){
-		Debug::benchStart();
-		
 		$select=Query::select('test');
+				
 		$where1=Where::createPair('test', 'zzzzzzzzzzzzzzzzzzzzzzz')
 			->orCase(Where::createPlain('test is null'));
-		
 		$where=Where::createQuote('num in (?)', array(3, 5, 16))->andCase($where1, Where::HAND_LEFT);
 	
 		//初始化adapter后才能escape
 		$select->where($where);
 	
-		echo $select->toString();
 		$re=$select->query();
-		\HuiLib\Helper\Debug::out ($re->fetchAll());
+		echo $select->toString();
 		
-		Debug::benchFinish();
+		\HuiLib\Helper\Debug::out ($re->fetchAll());
+	}
+	
+	private function testWhereBenchMark(){
+		Debug::mark('startSelect');
+		$select=Query::select('test');
+		Debug::mark('endSelect');
+	
+		Debug::mark('startWhere');
+		$where1=Where::createPair('test', 'zzzzzzzzzzzzzzzzzzzzzzz')
+		->orCase(Where::createPlain('test is null'));
+	
+		$where=Where::createQuote('num in (?)', array(3, 5, 16))->andCase($where1, Where::HAND_LEFT);
+		Debug::mark('endWhere');
+	
+		//初始化adapter后才能escape
+		$select->where($where);
+	
+		//echo $select->toString();
+		Debug::mark('startQuery');
+		$re=$select->query();
+		Debug::mark('endQuery');
+		\HuiLib\Helper\Debug::out ($re->fetchAll());
+	
+		Debug::elapsed('startSelect', 'endSelect');
+		Debug::elapsed('startWhere', 'endWhere');
+		Debug::elapsed('startQuery', 'endQuery');
+		Debug::elapsed('startSelect', 'endQuery');
+		Debug::elapsed('startSelect', 'endALL');
 	}
 
 	protected static function className(){
