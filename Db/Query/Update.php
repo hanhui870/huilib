@@ -12,14 +12,14 @@ class Update extends \HuiLib\Db\Query
 	const UPDATE = 'update';
 	const TABLE = 'table';
 	const WHERE = 'where';
-	const VALUES = 'values';
+	const SETS = 'sets';
 	const LIMIT = 'limit';
 	
 	/**
 	 * 更新的键值对
 	 * @var array();
 	 */
-	protected $values;
+	protected $sets;
 	
 	/**
 	 * 设置待插入的值，一次一个更新
@@ -30,15 +30,15 @@ class Update extends \HuiLib\Db\Query
 	 *
 	 * 注意和fields的前后对应
 	 *
-	 * @param array $values
+	 * @param array $sets
 	 * @return \HuiLib\Db\Query\Update
 	 */
-	public function values($values)
+	public function sets($sets)
 	{
-		if (!is_array($values)) {
-			$values = array($values);
+		if (!is_array($sets)) {
+			$sets = array($sets);
 		}
-		$this->values = $values;
+		$this->sets = $sets;
 		return $this;
 	}
 	
@@ -57,8 +57,8 @@ class Update extends \HuiLib\Db\Query
 			case self::WHERE :
 				$this->where = array();
 				break;
-			case self::VALUES :
-				$this->values = array ();
+			case self::SETS :
+				$this->sets = array ();
 				break;
 			case self::LIMIT :
 				$this->limit = NULL;
@@ -86,22 +86,22 @@ class Update extends \HuiLib\Db\Query
 	 *
 	 * @return string
 	 */
-	protected function renderValues()
+	protected function renderSets()
 	{
-		if ($this->values===array()) {
+		if ($this->sets===array()) {
 			return '';
 		}
 
-		$values=array();
-		foreach ( $this->values as $keyString=>$value ) {
+		$sets=array();
+		foreach ( $this->sets as $keyString=>$value ) {
 			if (is_string($value)) {//key=>value 形式
-				$values[]=$keyString.'='.$this->realEscape($value);
+				$sets[]=$keyString.'='.$this->escape($value);
 			}elseif (is_array($value) && isset($value['plain'])){
-				$values[]=$value['plain'];//num=num+1等，特殊形式
+				$sets[]=$value['plain'];//num=num+1等，特殊形式
 			}
 		}
 	
-		return implode(', ', $values);
+		return implode(', ', $sets);
 	}
 	
 	/**
@@ -112,7 +112,7 @@ class Update extends \HuiLib\Db\Query
 		$parts['start']='update';
 		$parts[self::TABLE]=$this->renderTable();
 		$parts ['setSep'] = 'set';
-		$parts [self::VALUES] = $this->renderValues ();
+		$parts [self::SETS] = $this->renderSets ();
 		$parts[self::WHERE]=$this->renderWhere();
 		$parts[self::LIMIT]=$this->renderLimit();
 		$parts[self::ENDS]=$this->ends;

@@ -17,8 +17,8 @@ class QueryUpdateTest extends \HuiLib\Test\TestBase
 	 * 测试
 	 */
 	private function test(){
-		$update=\HuiLib\Db\Query::update()->table('test')->where(array('id=2'))
-		->values(array('test'=>'zzzzzzzzzzzzzzzzzzzzzzz', 'num'=>array('plain'=>'num=num+1')));
+		$update=\HuiLib\Db\Query::update()->table('test')->where(array('id=16'))
+		->sets(array('test'=>'zzzzzzzzzzzzzzzzzzzzzzz', 'num'=>array('plain'=>'num=num+1')));
 		$update->query();
 		echo $update->toString();
 	}
