@@ -1,6 +1,8 @@
 <?php
 namespace HuiLib\Db\Test;
 
+use HuiLib\Db\Query\Where;
+
 /**
  * 数据库Query测试类
  *
@@ -17,7 +19,7 @@ class QueryUpdateTest extends \HuiLib\Test\TestBase
 	 * 测试
 	 */
 	private function test(){
-		$update=\HuiLib\Db\Query::update()->table('test')->where(array('id=16'))
+		$update=\HuiLib\Db\Query::update()->table('test')->where(Where::createPair('id', '16'))
 		->sets(array('test'=>'zzzzzzzzzzzzzzzzzzzzzzz', 'num'=>array('plain'=>'num=num+1')));
 		$update->query();
 		echo $update->toString();

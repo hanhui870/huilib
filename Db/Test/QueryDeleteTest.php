@@ -1,6 +1,8 @@
 <?php
 namespace HuiLib\Db\Test;
 
+use HuiLib\Db\Query\Where;
+
 /**
  * 数据库Query测试类
  *
@@ -17,7 +19,7 @@ class QueryDeleteTest extends \HuiLib\Test\TestBase
 	 * 测试
 	 */
 	private function test(){
-		$delete=\HuiLib\Db\Query::delete()->table('test')->where(array('id=1379182395'))->limit(10);
+		$delete=\HuiLib\Db\Query::delete()->table('test')->where(Where::createPair('id', '2'))->limit(10);
 		echo $delete->query();
 		echo $delete->toString();
 	}

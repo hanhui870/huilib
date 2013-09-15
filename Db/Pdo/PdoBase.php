@@ -9,7 +9,7 @@ namespace HuiLib\Db\Pdo;
  */
 class PdoBase extends \HuiLib\Db\DbBase
 {	
-	public function __construct($config)
+	protected function __construct($config)
 	{
 		try {
 			$dsn=$config['driver'].":host={$config['host']};dbname={$config['name']}"; //data source name
