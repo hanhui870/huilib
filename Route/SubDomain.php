@@ -2,12 +2,12 @@
 namespace HuiLib\Route;
 
 /**
- * URL链接重写到标准
+ * 定位于2级子域名路由
  *
  * @author 祝景法
  * @since 2013/09/15
  */
-class Rewrite
+class ShortName
 {
 	
 	
