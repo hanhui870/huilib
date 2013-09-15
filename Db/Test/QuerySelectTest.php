@@ -10,26 +10,30 @@ namespace HuiLib\Db\Test;
 class QuerySelectTest extends \HuiLib\Test\TestBase
 {
 	public function run(){
-		$this->testAdapterSelect();
+		$this->testJoinSelect();
 	}
 	
 	/**
 	 * Select Union测试
 	 */
 	private function testUnionSelect(){
+		
 		$select=\HuiLib\Db\Query::select()->table('test')->where(array('test=2','id=3'), \HuiLib\Db\Query\Select::WHERE_OR)->limit(10)->order('id asc');
 
 		$select1=\HuiLib\Db\Query::select()->table('test')->where('id=2')->limit(16)->offset(21);//从句limit offset等信息会被忽略
 
+		//array quote
+		//echo $select->escape(array('fafdas', 'fd', 'eeee', 'bbbbb'));
+		
 		$select->union($select1);
 
-		$shmt=$this->app->getDb()->query($select);
+		$shmt=$select->query();
 
 		//整体输出
-		//\HuiLib\Helper\Debug::out ($shmt->fetchAll());
+		\HuiLib\Helper\Debug::out ($shmt->fetchAll());
 		
 		//Foreach style
-		foreach ($shmt as $unit){
+		foreach ($shmt->getStatement() as $unit){
 			\HuiLib\Helper\Debug::out ($unit);
 		}
 		
@@ -37,12 +41,26 @@ class QuerySelectTest extends \HuiLib\Test\TestBase
 	}
 	
 	/**
+	 * Select Bind测试
+	 */
+	private function testBindSelect(){
+		//as name测试
+		$select=\HuiLib\Db\Query::select()->columns(array('PrimaryID'=>'id', 'Description'=>'test'))->table(array('t'=>'test'))
+		->join(array('n'=>'name'), 't.id=n.tid', 'n.name as sname, n.sid as bbid')->where('t.id=:id')->limit(10)->offset(0);
+	
+		$re=$select->prepare()->execute(array('id'=>2));
+		\HuiLib\Helper\Debug::out ($re->fetchAll());
+		echo $select->toString();
+	}
+	
+	/**
 	 * Select Join测试
 	 */
 	private function testJoinSelect(){
+		//as name测试
 		$select=\HuiLib\Db\Query::select()->columns(array('PrimaryID'=>'id', 'Description'=>'test'))->table(array('t'=>'test'))->join(array('n'=>'name'), 't.id=n.tid', 'n.name as sname, n.sid as bbid')->where('t.id=2')->limit(10)->offset(0);
 
-		$re=$this->app->getDb()->query($select);
+		$re=$select->query();
 		\HuiLib\Helper\Debug::out ($re->fetchAll());
 		echo $select->toString();
 	}
@@ -53,7 +71,7 @@ class QuerySelectTest extends \HuiLib\Test\TestBase
 	private function testAdapterSelect(){
 		$select=\HuiLib\Db\Query::select()->table('test')->where('id=2')->limit(10)->offset(0)->enableForUpdate();
 		
-		$re=$this->app->getDb()->query($select);
+		$re=$select->query();
 		\HuiLib\Helper\Debug::out ($re->fetchAll());
 		echo $select->toString();
 	}

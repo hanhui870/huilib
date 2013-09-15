@@ -40,22 +40,6 @@ abstract class DbBase
 	}
 	
 	/**
-	 * 执行数据库查询
-	 * 
-	 * 默认获取关联查询数据
-	 * 
-	 * @param \HuiLib\Db\Query $query SQL语句对象
-	 * @return \PDOStatement
-	 */
-	public function query($query, $fetchStyle=\PDO::FETCH_ASSOC)
-	{
-		$query->setAdapter($this);
-
-		//echo $query->toString();
-		return $this->connection->query($query->toString(), $fetchStyle);
-	}
-	
-	/**
 	 * 创建DB实例 DB factory方法
 	 */
 	public static function create($config)
