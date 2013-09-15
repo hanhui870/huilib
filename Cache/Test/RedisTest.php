@@ -2,7 +2,7 @@
 namespace HuiLib\Cache\Test;
 
 /**
- * 缓存测试类
+ * 缓存Redis测试类
  *
  * @author 祝景法
  * @since 2013/09/15

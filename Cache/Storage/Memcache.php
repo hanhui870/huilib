@@ -9,5 +9,33 @@ namespace HuiLib\Cache\Storage;
  */
 class Memcache extends \HuiLib\Cache\CacheBase
 {
+	protected function __construct($config)
+	{
+	
+	}
+	
+	/**
+	 * 保存一个缓存
+	 */
+	public function save($key, $value)
+	{
+	
+	}
+	
+	/**
+	 * 删除一个缓存
+	 */
+	public function delete($key)
+	{
+	
+	}
+	
+	/**
+	 * 获取一个缓存内容
+	 */
+	public function get($key)
+	{
+	
+	}
 	
 }

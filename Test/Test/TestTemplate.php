@@ -1,13 +1,13 @@
 <?php
-namespace HuiLib\Cache\Test;
+namespace HuiLib\Test\Test;
 
 /**
- * 缓存测试类
+ * 模板测试类
  *
  * @author 祝景法
  * @since 2013/09/15
  */
-class CacheTest extends \HuiLib\Test\TestBase
+class TestTemplate extends \HuiLib\Test\TestBase
 {
 	public function run(){
 		$this->test();

@@ -9,5 +9,8 @@ namespace HuiLib\Cache\Storage;
  */
 class File extends \HuiLib\Cache\CacheBase
 {
+	protected function __construct($config)
+	{
 	
+	}
 }
