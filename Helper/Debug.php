@@ -9,22 +9,45 @@ namespace HuiLib\Helper;
  */
 class Debug
 {
-	private static $startTime;
+	const lineSep="\n";
+	
+	/**
+	 * 时间标签
+	 *
+	 * @var array
+	 */
+	private static $marker = array();
 
-	public static function benchStart()
+	/**
+	 * 做出一个标记
+	 * @param string $label 标记名称
+	 * @return boolean
+	 */
+	public static function mark($label)
 	{
-		self::$startTime = microtime ( 1 );
+		self::$marker[$label] = microtime ( 1 );
 		
-		return true;
+		return self::$marker[$label];
 	}
 
-	public static function benchFinish()
+	/**
+	 * 计算两个标记点之间的消逝时间
+	 * 
+	 * @param float $start 开始标记
+	 * @param float $end 结束标记
+	 */
+	public static function elapsed($start, $end)
 	{
-		$br = RUN_METHOD == "cli" ? "\n" : "<br/>";
-		echo $br . 'Bench Start:' . self::$startTime;
-		$endTime = microtime ( 1 );
-		echo $br . 'Bench Finish:' . $endTime;
-		echo $br . 'Consume Time Total:' . ( float ) ($endTime - self::$startTime);
+		if (!isset(self::$marker[$start])) {
+			throw new \HuiLib\Error\Exception ( "BenchMark开始标记{$start}未设置" );
+		}
+		if (!isset(self::$marker[$end])) {
+			self::$marker[$end] = microtime ( 1 );
+		}
+		echo self::lineSep . "Bench Start {$start}:" .self::$marker[$start];
+		echo self::lineSep . "Bench Finish {$end}:" . self::$marker[$end];
+		echo self::lineSep . 'Consume Time Total:' . ( float ) (self::$marker[$end] - self::$marker[$start]);
+		echo self::lineSep;
 	}
 	
 	/**

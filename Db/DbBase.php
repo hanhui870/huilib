@@ -13,12 +13,30 @@ abstract class DbBase
 {
 	/**
 	 * 数据库连接
+	 * 
+	 * @var \PDO
 	 */
 	protected $connection;
+	
+	/**
+	 * 数据库驱动 如mysql
+	 */
+	protected $driver;
 
+	/**
+	 * 获取数据库连接，便于直接查询
+	 */
 	public function getConnection()
 	{
 		return $this->connection;
+	}
+	
+	/**
+	 * 获取具体配置驱动实例
+	 */
+	public function getDriver()
+	{
+		return $this->driver;
 	}
 	
 	/**
@@ -34,9 +52,11 @@ abstract class DbBase
 			case 'pdo':
 				$adapter=new \HuiLib\Db\Pdo\PdoBase($config);
 				break;
+			case 'mongo':
+				
+				break;
 		}
 	
 		return $adapter;
 	}
-	
 }

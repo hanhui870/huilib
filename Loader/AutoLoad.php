@@ -48,7 +48,10 @@ class AutoLoad
 	 */
 	public function loadClass($name)
 	{
+		//\符号是命名空间分隔符
 		$nameInfo=explode('\\', $name);
+		
+		//命名空间首标识符已经剔除，直接包含在路径信息中，便于自由放置
 		$spaceName=array_shift($nameInfo);
 
 		//字母数字\_
@@ -61,7 +64,7 @@ class AutoLoad
 		{
 			throw new \Exception ( "the SpaceName:{$spaceName} has not registered or not accessable!" );
 		}
-		
+
 		$name = $spacePath . implode(SEP, $nameInfo) . '.php';
 		if (file_exists ( $name )) {
 			include_once $name;
