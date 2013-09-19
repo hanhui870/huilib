@@ -9,7 +9,7 @@ namespace HuiLib\App;
  */
 class Bin extends AppBase
 {
-	const RUN_METHOD='bin';
+	const RUN_METHOD='Bin';
 	
 	protected function __construct($config)
 	{

@@ -17,65 +17,7 @@ class Http extends RequestBase
 		parent::__construct();
 	}
 	
-	/**
-	 * 获取GET参数
-	 * 
-	 * @param string $key
-	 */
-	public static function getInput($key = NULL, $type=parent::TYPE_NONE)
-	{
-		if (NULL === $key) {
-			return $_GET;
-		}
-
-		return isset($_GET[$key]) ? parent::typeCheck($_GET[$key], $type) : parent::typeCheck(NULL, $type);
-	}
-	
-	/**
-	 * 获取POST参数
-	 *
-	 * @param string $key
-	 */
-	public static function postInput($key = NULL, $type=parent::TYPE_NONE)
-	{
-		if (NULL === $key) {
-			return $_POST;
-		}
+	private function init(){
 		
-		return isset($_POST[$key]) ?  parent::typeCheck($_POST[$key], $type) : parent::typeCheck(NULL, $type);
-	}
-	
-	/**
-	 * 获取Cookie参数
-	 *
-	 * @param string $key
-	 */
-	public static function cookieInput($key = NULL, $type=parent::TYPE_NONE)
-	{
-		if (NULL === $key) {
-			return $_COOKIE;
-		}
-
-		$key=$this->getCookiePre().$key;
-	
-		return isset($_COOKIE[$key]) ? parent::typeCheck($_COOKIE[$key], $type) : parent::typeCheck(NULL, $type);
-	}
-	
-	/**
-	 * 获取页面请假参数
-	 */
-	public static function getQueryString(){
-		return parent::getServer('QUERY_STRING', parent::TYPE_STRING);
-	}
-	
-	/**
-	 * 获取Cookie前缀
-	 */
-	public function getCookiePre(){
-		if (self::$cookiePre===NULL) {
-			self::$cookiePre=$this->appConfig->getByKey('webRun.cookie.pre');
-		}
-		
-		return self::$cookiePre;
 	}
 }

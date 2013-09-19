@@ -57,7 +57,7 @@ abstract class AppBase
 		//初始化应用配置
 		$this->initConfig();
 
-		//初始化请求对象
+		//初始化请求对象 具体可能在子类初始化
 		$this->initRequest();
 		
 		//php运行配置
@@ -77,7 +77,7 @@ abstract class AppBase
 	 */
 	public function runTest()
 	{
-		$queryString=\HuiLib\Request\Http::getQueryString(); 
+		$queryString=\HuiLib\Helper\Param::getQueryString(); 
 		
 		//初始化测试库
 		$instance=$queryString::getInstance();
@@ -119,7 +119,9 @@ abstract class AppBase
 	private function initDatabse()
 	{
 		$dbSetting=$this->appConfig->getByKey('db');
-		self::$dbInstance=\HuiLib\Db\DbBase::create($dbSetting);
+		\HuiLib\Db\DbBase::setConfig($dbSetting);
+		self::$dbInstance=\HuiLib\Db\DbBase::createMaster();
+		
 	}
 	
 	/**

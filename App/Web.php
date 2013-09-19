@@ -9,7 +9,7 @@ namespace HuiLib\App;
  */
 class Web extends AppBase
 {
-	const RUN_METHOD='web';
+	const RUN_METHOD='Web';
 	
 	protected function __construct($config)
 	{
