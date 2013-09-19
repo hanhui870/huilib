@@ -22,6 +22,11 @@ abstract class DbBase
 	 * 数据库驱动 如mysql
 	 */
 	protected $driver;
+	
+	/**
+	 * 数据库主从配置
+	 */
+	private static $config;
 
 	/**
 	 * 获取数据库连接，便于直接查询
@@ -40,23 +45,78 @@ abstract class DbBase
 	}
 	
 	/**
+	 * 设置数据库配置
+	 * @param array $config
+	 */
+	public static function setConfig($config){
+		self::$config=$config;
+	}
+	
+	/**
+	 * 创建DB Master实例
+	 */
+	public static function createMaster()
+	{
+		if (empty(self::$config['master'])) {
+			throw new \HuiLib\Error\Exception('Db master config can not be empty!');
+		}
+
+		return self::doingCreate(self::$config['master']);
+	}
+	
+	/**
+	 * 创建DB Slave实例
+	 */
+	public static function createSlave($slaveNode=NULL)
+	{
+		if (empty(self::$config['slave'])) {
+			throw new \HuiLib\Error\Exception('Empty slave config!');
+		}
+		
+		$slaveConfig=self::$config['slave'];
+		if (empty($slaveNode)) {
+			$dbConfig=$slaveConfig[array_rand($slaveConfig)];
+		}elseif (isset(self::$slaveConfig[$slaveNode])){
+			$dbConfig=self::$slaveConfig[$slaveNode];
+		}else{
+			throw new \HuiLib\Error\Exception('Specified slave config is empty!');
+		}
+		
+		return self::doingCreate($dbConfig);
+	}
+	
+	/**
 	 * 创建DB实例 DB factory方法
 	 */
-	public static function create($config)
-	{
-		if (empty($config['adapter'])) {
+	private static function doingCreate($dbConfig){
+		if (empty($dbConfig['adapter'])) {
 			throw new \HuiLib\Error\Exception('Db adapter can not be empty!');
 		}
-	
-		switch ($config['adapter']){
+
+		switch ($dbConfig['adapter']){
 			case 'pdo':
-				$adapter=new \HuiLib\Db\Pdo\PdoBase($config);
+				$adapter=new \HuiLib\Db\Pdo\PdoBase($dbConfig);
 				break;
 			case 'mongo':
-				
+		
 				break;
 		}
-	
+		
 		return $adapter;
-	}
+	} 
+	
+	/**
+	 * 开启一个事务
+	 */
+	abstract public function beginTransaction();
+	
+	/**
+	 * 开启一个事务
+	 */
+	abstract public function commit();
+	
+	/**
+	 * 事务回滚
+	 */
+	abstract public function rollback();
 }

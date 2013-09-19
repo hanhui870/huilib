@@ -9,23 +9,48 @@ namespace HuiLib\Db\Pdo;
  */
 class PdoBase extends \HuiLib\Db\DbBase
 {	
-	protected function __construct($config)
+	protected function __construct($dbConfig)
 	{
 		try {
-			$dsn=$config['driver'].":host={$config['host']};dbname={$config['name']}"; //data source name
+			$dsn=$dbConfig['driver'].":host={$dbConfig['host']};dbname={$dbConfig['name']}"; //data source name
+			$this->connection = new \PDO($dsn, $dbConfig['user'], $dbConfig['password']);
 			
-			$this->connection = new \PDO($dsn, $config['user'], $config['password']);
+			//设置Pdo错误模式为异常
 			$this->connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
 			
 			//设置字符集
-			if(isset($config['charset'])){
-				$driverClass='\HuiLib\Db\Pdo\\'.ucfirst($config['driver']);
+			if(isset($dbConfig['charset'])){
+				$driverClass='\HuiLib\Db\Pdo\\'.ucfirst($dbConfig['driver']);
 				$this->driver=new $driverClass();
-				$this->connection->query($this->driver->charset($config['charset']));
+				$this->connection->query($this->driver->charset($dbConfig['charset']));
 			}
 
 		} catch (\PDOException $exception) {
 			throw new \HuiLib\Error\Exception($exception->getMessage(), $exception->getCode());
 		}
+	}
+	
+	/**
+	 * 开启一个事务
+	 */
+	public function beginTransaction()
+	{
+		return $this->connection->beginTransaction();
+	}
+	
+	/**
+	 * 开启一个事务
+	 */
+	public function commit()
+	{
+		return $this->connection->commit();
+	}
+	
+	/**
+	 * 事务回滚
+	 */
+	public function rollback()
+	{
+		return $this->connection->rollBack();
 	}
 }

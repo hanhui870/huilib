@@ -99,6 +99,30 @@ class Query
 	}
 
 	/**
+	 * 开启一个事务
+	 */
+	public function beginTransaction()
+	{
+		return $this->adapter->beginTransaction();
+	}
+	
+	/**
+	 * 开启一个事务
+	 */
+	public function commit()
+	{
+		return $this->adapter->commit();
+	}
+	
+	/**
+	 * 事务回滚
+	 */
+	public function rollback()
+	{
+		return $this->adapter->rollback();
+	}
+	
+	/**
 	 * 返回一个Select实例
 	 * 
 	 * @return \HuiLib\Db\Query\Select
