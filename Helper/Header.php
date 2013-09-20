@@ -25,5 +25,6 @@ class Header
 	{
 		header ( $code );
 		header ( "Location: $location" );
+		die();
 	}
 }

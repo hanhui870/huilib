@@ -22,11 +22,6 @@ namespace HuiLib\View;
  */
 class Engine
 {
-	/**
-	 * Assign的变量
-	 */
-	protected $data = array ();
-	
 	protected $viewFilePath = '';
 	protected $viewTempate;
 	protected $ajaxLayout = 0;
@@ -206,7 +201,7 @@ class Engine
 		$tls = array ();
 		$this->viewTempate = file_get_contents ( $this->viewFilePath );
 		$this->viewTempate = preg_replace ( "/\{sub\s+([^\}]+)\}/ies", "\$this->loadsub('\\1')", $this->viewTempate );
-		//out($this->templateLifeSin);die();
+
 		return $tls;
 	}
 
@@ -233,10 +228,11 @@ class Engine
 	function parseAjax(&$con)
 	{
 		//无限定符 直接返回
-		if (empty ( $this->ajaxDelimiter ))
+		if (empty ( $this->ajaxDelimiter )){
 			return false;
-			
-			//ajax特定区域匹配项目
+		}
+
+		//ajax特定区域匹配项目
 		$deli = ($this->ajaxDelimiter) ? ' ' . preg_quote ( $this->ajaxDelimiter ) : '';
 		
 		/* 存在ajax标签时按照标签，不然则全部内容

@@ -18,10 +18,10 @@ class String
 	public static function substr($string, $start, $length, $addDot = self::DOT_ENDING_NO, $htmlEncode = self::HTML_ENCODE_NO)
 	{
 		if ($htmlEncode)
-			$str = zjsuhtml_decode ( $string );
+			$str = self::htmlEncode ( $string );
 		$string = mb_substr ( $string, $start, $addDot ? $length - 3 : $length, self::DEFAULT_CHARSET ) . ($addDot && mb_strlen ( $string, self::DEFAULT_CHARSET ) > $length ? '...' : '');
 		if ($htmlEncode)
-			$string = zjsuhtml_encode ( $string );
+			$string = self::htmlDecode ( $string );
 		return $string;
 	}
 

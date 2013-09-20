@@ -57,11 +57,14 @@ abstract class AppBase
 		//初始化应用配置
 		$this->initConfig ();
 		
-		//初始化请求对象 具体可能在子类初始化
-		$this->initRequest ();
-		
 		//php运行配置
 		$this->initPhpSetting ();
+		
+		//自动加载配置
+		$this->initAutoLoad ();
+		
+		//初始化请求对象 具体可能在子类初始化
+		$this->initRequest ();
 	}
 
 	/**
@@ -69,6 +72,8 @@ abstract class AppBase
 	 */
 	public function run()
 	{
+		$this->request->init();
+		$this->request->controllerInstance()->dispatch();
 	}
 
 	/**
@@ -102,6 +107,15 @@ abstract class AppBase
 	{
 		return $this->appConfig;
 	}
+	
+	/**
+	 * 返回启动器实例
+	 * @return \HuiLib\Bootstrap
+	 */
+	public function bootstrapInstance()
+	{
+		return $this->bootStrap;
+	}
 
 	/**
 	 * 初始化请求
@@ -110,6 +124,15 @@ abstract class AppBase
 	 */
 	protected function initRequest()
 	{
+	}
+	
+	/**
+	 * 返回请求对象实例
+	 * @return \HuiLib\Request\RequestBase
+	 */
+	public function requestInstance()
+	{
+		return $this->request;
 	}
 
 	/**
@@ -133,6 +156,20 @@ abstract class AppBase
 		}
 		
 		return self::$dbInstance;
+	}
+
+	/**
+	 * 获取应用所在的命名空间
+	 */
+	public function getAppNamespace()
+	{
+		$appNamespace=$this->appConfig->getByKey ( 'app.namespace' );
+		
+		if (empty($appNamespace) || !is_string($appNamespace)) {
+			throw new \HuiLib\Error\Exception ( "配置文件应用命名空间{app.namespace}配置错误!" );
+		}
+		
+		return $appNamespace;
 	}
 
 	/**
@@ -172,6 +209,21 @@ abstract class AppBase
 		
 		foreach ( $settings as $key => $value ) {
 			ini_set ( $key, $value );
+		}
+		
+		return true;
+	}
+
+	/**
+	 * 将配置文件中的autoLoad项目注册到load空间
+	 */
+	protected function initAutoLoad()
+	{
+		$loads = $this->appConfig->getByKey ( 'autoLoad' );
+		
+		$loader = $this->bootStrap->autoLoaderInstance ();
+		foreach ( $loads as $name => $path ) {
+			$loader->addSpace ( $name, $path );
 		}
 		
 		return true;

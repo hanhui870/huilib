@@ -16,16 +16,127 @@ class Param
 	const TYPE_ARRAY='array';
 	const TYPE_OBJECT='object';
 	const TYPE_NONE=NULL;
+	
+	/**
+	 * 请求方式
+	 */
+	const SCHEME_HTTP  = 'http';
+	const SCHEME_HTTPS = 'https';
+	
+	/**
+	 * 原始请求数据
+	 */
+	private static $rawInputBody=NULL;
 
-	public static function getServer($key, $type=self::TYPE_NONE)
+	/**
+	 * 获取GET参数
+	 *
+	 * @param string $key
+	 */
+	public static function get($key, $type=self::TYPE_NONE)
+	{
+		return isset($_GET[$key]) ? self::typeCheck($_GET[$key], $type) : self::typeCheck(NULL, $type);
+	}
+	
+	/**
+	 * 获取POST参数
+	 *
+	 * @param string $key
+	 */
+	public static function post($key, $type=self::TYPE_NONE)
+	{
+		return isset($_POST[$key]) ?  self::typeCheck($_POST[$key], $type) : self::typeCheck(NULL, $type);
+	}
+	
+	/**
+	 * 获取Cookie参数
+	 *
+	 * @param string $key
+	 */
+	public static function cookie($key, $type=self::TYPE_NONE)
+	{
+		return isset($_COOKIE[$key]) ? self::typeCheck($_COOKIE[$key], $type) : self::typeCheck(NULL, $type);
+	}
+	
+	/**
+	 * 获取Server参数
+	 *
+	 * @param string $key
+	 */
+	public static function server($key, $type=self::TYPE_NONE)
 	{
 		return isset($_SERVER[$key]) ? self::typeCheck($_SERVER[$key], $type) : self::typeCheck(NULL, $type);
 	}
 	
-	public static function getEnv($key, $type=self::TYPE_NONE)
+	/**
+	 * 获取Env参数
+	 *
+	 * @param string $key
+	 */
+	public static function env($key, $type=self::TYPE_NONE)
 	{
 		return isset($_ENV[$key]) ? self::typeCheck($_ENV[$key], $type) : self::typeCheck(NULL, $type);
 	}
+	
+	/**
+	 * 获取页面请假参数
+	 */
+	public static function getQueryString(){
+		return self::server('QUERY_STRING', self::TYPE_STRING);
+	}
+	
+	/**
+	 * 获取重写基准路径
+	 */
+	public static function getScriptUrl(){
+		return self::server('SCRIPT_URL', self::TYPE_STRING);
+	}
+	
+	/**
+	 * 是否Ajax请求
+	 * @return boolean
+	 */
+	public static function isXmlHttpRequest()
+	{
+		return (self::server('X_REQUESTED_WITH') == 'XMLHttpRequest');
+	}
+	
+	/**
+	 * 获取访问客户IP
+	 *
+	 * @param  boolean $checkProxy 是否包括代理
+	 * @return string
+	 */
+	public static function getClientIp($checkProxy = true)
+	{
+		if ($checkProxy && self::server('HTTP_CLIENT_IP', Param::TYPE_STRING) != null) {
+			$ip = self::server('HTTP_CLIENT_IP', Param::TYPE_STRING);
+		} else if ($checkProxy && self::server('HTTP_X_FORWARDED_FOR', self::TYPE_STRING) != null) {
+			$ip = self::server('HTTP_X_FORWARDED_FOR', self::TYPE_STRING);
+		} else {
+			$ip = self::server('REMOTE_ADDR', self::TYPE_STRING);
+		}
+	
+		return $ip;
+	}
+	
+	/**
+	 * 获取HTTP原始请求数据
+	 */
+	public static function getRawInput()
+	{
+		if (NULL === self::$rawInputBody) {
+			$body = file_get_contents('php://input');
+	
+			if (strlen(trim($body)) > 0) {
+				self::$rawInputBody = $body;
+			} else {
+				self::$rawInputBody = false;
+			}
+		}
+		return self::$rawInputBody;
+	}
+	
 	
 	/**
 	 * 强制转换输入参数类型
@@ -40,39 +151,71 @@ class Param
 	}
 	
 	/**
-	 * 获取GET参数
-	 *
-	 * @param string $key
+	 * 获取请求方法
 	 */
-	public static function getInput($key, $type=self::TYPE_NONE)
+	public static function getMethod()
 	{
-		return isset($_GET[$key]) ? self::typeCheck($_GET[$key], $type) : self::typeCheck(NULL, $type);
+		return  self::server('REQUEST_METHOD', self::TYPE_STRING);
 	}
 	
 	/**
-	 * 获取POST参数
-	 *
-	 * @param string $key
+	 * 获取请求模式
+	 * @return string
 	 */
-	public static function postInput($key, $type=self::TYPE_NONE)
+	public static function getScheme()
 	{
-		return isset($_POST[$key]) ?  self::typeCheck($_POST[$key], $type) : self::typeCheck(NULL, $type);
+		return (self::server('HTTPS', self::TYPE_STRING) == 'on') ? self::SCHEME_HTTPS : self::SCHEME_HTTP;
 	}
 	
 	/**
-	 * 获取Cookie参数
+	 * 是否Post方式发起的请求
 	 *
-	 * @param string $key
+	 * @return boolean
 	 */
-	public static function cookieInput($key, $type=self::TYPE_NONE)
+	public static function isPost()
 	{
-		return isset($_COOKIE[$key]) ? self::typeCheck($_COOKIE[$key], $type) : self::typeCheck(NULL, $type);
+		if ('POST' == self::getMethod()) {
+			return true;
+		}
+	
+		return false;
 	}
 	
 	/**
-	 * 获取页面请假参数
+	 * 是否Get方式发起的请求
+	 *
+	 * @return boolean
 	 */
-	public static function getQueryString(){
-		return self::getServer('QUERY_STRING', self::TYPE_STRING);
+	public static function isGet()
+	{
+		if ('GET' == self::getMethod()) {
+			return true;
+		}
+	
+		return false;
+	}
+	
+	/**
+	 * 是否Put方式发起的请求
+	 *
+	 * @return boolean
+	 */
+	public static function isPut()
+	{
+		if ('PUT' == self::getMethod()) {
+			return true;
+		}
+	
+		return false;
+	}
+	
+	/**
+	 * 是否是HTTPS请求
+	 *
+	 * @return boolean
+	 */
+	public function isSecure()
+	{
+		return (self::getScheme() === self::SCHEME_HTTPS);
 	}
 }

@@ -44,6 +44,8 @@ class Bootstrap
 	
 	private $allowedEnv = array ('production', 'testing', 'develop' );
 	
+	private static $loadInstance;
+	
 	private function __construct()
 	{
 		if (! defined ( 'RUN_METHOD' ) ) {
@@ -66,6 +68,8 @@ class Bootstrap
 		define ( 'SEP', DIRECTORY_SEPARATOR );
 		//URL地址分隔符
 		define ( 'URL_SEP', '/' );
+		//命名空间分隔符
+		define ( 'NAME_SEP', '\\' );
 		define ( 'SYS_PATH', dirname ( __FILE__ ) . SEP );
 		
 		if (! defined ( 'APP_PATH' ) || ! defined ( 'WWW_PATH' )) {
@@ -79,8 +83,12 @@ class Bootstrap
 	private function initLoader()
 	{
 		include_once SYS_PATH . 'Loader/AutoLoad.php';
-		$loadInstance = \HuiLib\Loader\AutoLoad::getInstance ();
-		spl_autoload_register ( array ($loadInstance, 'loadClass' ) );
+		self::$loadInstance = \HuiLib\Loader\AutoLoad::getInstance ();
+		spl_autoload_register ( array (self::$loadInstance, 'loadClass' ) );
+	}
+	
+	public function autoLoaderInstance(){
+		return self::$loadInstance;
 	}
 
 	/**

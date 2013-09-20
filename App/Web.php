@@ -23,7 +23,7 @@ class Web extends AppBase
 	 */
 	protected function initRequest()
 	{
-		$this->request=new \HuiLib\Request\Http($this->appConfig);
+		$this->request=new \HuiLib\Request\Http($this);
 		parent::initRequest();
 		
 		return $this->request;
