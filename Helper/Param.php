@@ -66,8 +66,6 @@ class Param
 	 */
 	public static function cookieInput($key, $type=self::TYPE_NONE)
 	{
-		$key=$this->getCookiePre().$key;
-	
 		return isset($_COOKIE[$key]) ? self::typeCheck($_COOKIE[$key], $type) : self::typeCheck(NULL, $type);
 	}
 	
@@ -76,16 +74,5 @@ class Param
 	 */
 	public static function getQueryString(){
 		return self::getServer('QUERY_STRING', self::TYPE_STRING);
-	}
-	
-	/**
-	 * 获取Cookie前缀
-	 */
-	public function getCookiePre(){
-		if (self::$cookiePre===NULL) {
-			self::$cookiePre=$this->appConfig->getByKey('webRun.cookie.pre');
-		}
-	
-		return self::$cookiePre;
 	}
 }
