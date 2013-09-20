@@ -64,6 +64,8 @@ class Bootstrap
 	private function initPath()
 	{
 		define ( 'SEP', DIRECTORY_SEPARATOR );
+		//URL地址分隔符
+		define ( 'URL_SEP', '/' );
 		define ( 'SYS_PATH', dirname ( __FILE__ ) . SEP );
 		
 		if (! defined ( 'APP_PATH' ) || ! defined ( 'WWW_PATH' )) {
