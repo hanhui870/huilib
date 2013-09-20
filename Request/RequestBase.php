@@ -7,7 +7,7 @@ namespace HuiLib\Request;
  * @author 祝景法
  * @since 2013/08/14
  */
-class RequestBase
+abstract class RequestBase
 {
 	/**
 	 * 重写前部分信息，不包含参数部分，不包含http部分
@@ -31,9 +31,10 @@ class RequestBase
 	
 	protected $appConfig;
 	
-	function __construct()
+	function __construct(\HuiLib\Config\ConfigBase $config)
 	{
-		
+		$this->setConfig($config);
+		$this->init();
 	}
 	
 	/**
@@ -45,5 +46,9 @@ class RequestBase
 		$this->appConfig=$config;	
 	}
 
+	/**
+	 * 请求对象初始化
+	 */
+	abstract protected function init();
 	
 }

@@ -12,12 +12,16 @@ class Http extends RequestBase
 	protected $requestUri;
 	static $cookiePre=NULL;
 	
-	function __construct()
-	{
-		parent::__construct();
+	public function init(){
+		$this->formatRequestURI();
 	}
 	
-	private function init(){
+	/**
+	 * 规范访问请求Url
+	 */
+	protected function formatRequestURI(){
 		
 	}
+	
+	
 }

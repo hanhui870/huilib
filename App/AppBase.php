@@ -17,7 +17,7 @@ abstract class AppBase
 	
 	/**
 	 * 请求对象
-	 * @var \HuiLib\Request\Base 
+	 * @var \HuiLib\Request\RequestBase
 	 */
 	protected $request;
 	
@@ -30,14 +30,14 @@ abstract class AppBase
 	 * 运行配置
 	 * @var \HuiLib\Config\ConfigBase
 	 */
-	private $appConfig;
-	private $configPath;
+	protected $appConfig;
+	protected $configPath;
 	
 	/**
 	 * 数据库连接
 	 *  @var \HuiLib\Db\DbBase
 	 */
-	private static $dbInstance;
+	protected static $dbInstance;
 
 	/**
 	 * 构造函数
@@ -47,21 +47,21 @@ abstract class AppBase
 	 */
 	protected function __construct($config)
 	{
-		if (! is_file($config) ) {
+		if (! is_file ( $config )) {
 			throw new \Exception ( "Please specify a accessable config file!" );
 		}
-		$this->configPath=$config;
+		$this->configPath = $config;
 		
 		$this->bootStrap = \HuiLib\Bootstrap::getInstance ();
 		
 		//初始化应用配置
-		$this->initConfig();
-
+		$this->initConfig ();
+		
 		//初始化请求对象 具体可能在子类初始化
-		$this->initRequest();
+		$this->initRequest ();
 		
 		//php运行配置
-		$this->initPhpSetting();
+		$this->initPhpSetting ();
 	}
 
 	/**
@@ -69,32 +69,31 @@ abstract class AppBase
 	 */
 	public function run()
 	{
-		
 	}
-	
+
 	/**
 	 * 测试执行入口
 	 */
 	public function runTest()
 	{
-		$queryString=\HuiLib\Helper\Param::getQueryString(); 
+		$queryString = \HuiLib\Helper\Param::getQueryString ();
 		
 		//初始化测试库
-		$instance=$queryString::getInstance();
-		$instance->setApp($this);
+		$instance = $queryString::getInstance ();
+		$instance->setApp ( $this );
 		
 		//执行
-		$instance->run();
+		$instance->run ();
 	}
-	
+
 	/**
 	 * 初始化启动配置
 	 */
-	private function initConfig()
+	protected function initConfig()
 	{
 		$this->appConfig = new \HuiLib\Config\ConfigBase ( $this->configPath );
 	}
-	
+
 	/**
 	 * 返回配置实例
 	 * @return \HuiLib\Config\ConfigBase
@@ -109,99 +108,95 @@ abstract class AppBase
 	 * 
 	 * 先在之类初始化请求，然后父类初始化配置
 	 */
-	protected function initRequest(){
-		$this->request->setConfig($this->appConfig);
+	protected function initRequest()
+	{
 	}
 
 	/**
 	 * 初始化数据库连接
 	 */
-	private function initDatabse()
+	protected function initDatabse()
 	{
-		$dbSetting=$this->appConfig->getByKey('db');
-		\HuiLib\Db\DbBase::setConfig($dbSetting);
-		self::$dbInstance=\HuiLib\Db\DbBase::createMaster();
-		
+		$dbSetting = $this->appConfig->getByKey ( 'db' );
+		\HuiLib\Db\DbBase::setConfig ( $dbSetting );
+		self::$dbInstance = \HuiLib\Db\DbBase::createMaster ();
 	}
-	
+
 	/**
 	 * 获取数据库连接
 	 * @return \HuiLib\Db\Pdo\PdoBase
 	 */
-	public function getDb(){
-		if (self::$dbInstance===NULL) {
-			$this->initDatabse();
+	public function getDb()
+	{
+		if (self::$dbInstance === NULL) {
+			$this->initDatabse ();
 		}
 		
 		return self::$dbInstance;
 	}
-	
+
 	/**
 	 * 初始化缓存资源
 	 */
-	private function initCache()
+	protected function initCache()
 	{
-	
 	}
-	
+
 	/**
 	 * 初始化Session资源
 	 */
-	private function initSession()
+	protected function initSession()
 	{
-	
 	}
-	
+
 	/**
 	 * 初始化错误处理器
 	 */
-	private function initErrorHandle()
+	protected function initErrorHandle()
 	{
-	
 	}
-	
+
 	/**
 	 * 初始化异常处理器
 	 */
-	private function initExceptionHandle()
+	protected function initExceptionHandle()
 	{
-	
 	}
-	
+
 	/**
 	 * 初始化错误处理器
 	 */
-	private function initPhpSetting()
+	final protected function initPhpSetting()
 	{
-		$settings=$this->appConfig->mergeKey($this->appConfig->getByKey('phpSettings'));
+		$settings = $this->appConfig->mergeKey ( $this->appConfig->getByKey ( 'phpSettings' ) );
 		
-		foreach ($settings as $key=>$value){
-			ini_set($key, $value);
+		foreach ( $settings as $key => $value ) {
+			ini_set ( $key, $value );
 		}
 		
 		return true;
 	}
-	
+
 	/**
 	 * 执行期末绑定
 	 */
-	private function initShutCall()
+	protected function initShutCall()
 	{
-		$this->shutCall=\HuiLib\Runtime\ShutCall::getInstance();
+		$this->shutCall = \HuiLib\Runtime\ShutCall::getInstance ();
 	}
-	
-	public function shutCallInstance(){
+
+	public function shutCallInstance()
+	{
 		return $this->shutCall;
 	}
-	
+
 	/**
 	 * 初始化性能记录器
 	 */
-	private function initProfile()
+	protected function initProfile()
 	{
-	
 	}
-	
+
 	/**
 	 * 初始化应用类
 	 * 
@@ -209,8 +204,8 @@ abstract class AppBase
 	 */
 	public static function factory($runMethod, $config)
 	{
-		$appClass = '\\HuiLib\\App\\' . ucfirst($runMethod);
-		$appInstance = new $appClass ($config);
+		$appClass = '\\HuiLib\\App\\' . ucfirst ( $runMethod );
+		$appInstance = new $appClass ( $config );
 		return $appInstance;
 	}
 }
