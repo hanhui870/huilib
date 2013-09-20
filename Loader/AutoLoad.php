@@ -62,7 +62,7 @@ class AutoLoad
 		$spacePath=$this->getRegisteredPath($spaceName);
 		if (!is_dir($spacePath)) 
 		{
-			throw new \Exception ( "the SpaceName:{$spaceName} has not registered or not accessable!" );
+			throw new \Exception ( "the SpaceName:{$spaceName} is not registered or not accessable!" );
 		}
 
 		$name = $spacePath . implode(SEP, $nameInfo) . '.php';
