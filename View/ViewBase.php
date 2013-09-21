@@ -13,7 +13,7 @@ abstract class ViewBase
 {
 	/**
 	 * 渲染引擎类
-	 * @var \HuiLib\View\Engine 
+	 * @var \HuiLib\View\TemplateEngine 
 	 */
 	protected $_engineInstance;
 	
@@ -26,9 +26,18 @@ abstract class ViewBase
 	/**
 	 * 初始化渲染引擎
 	 */
-	protected function initEngine()
+	protected function initEngine($view, $ajaxDelimiter = NULL)
 	{
-		$this->_engineInstance = new \HuiLib\View\Engine ();
+		$this->_engineInstance = new \HuiLib\View\TemplateEngine($view, $ajaxDelimiter);
+		
+		$viewConfig=$this->_appInstance->configInstance()->getByKey('webRun.view');
+		
+		if (empty($viewConfig['viewPath']) || empty($viewConfig['cachePath'])) {
+			throw new \HuiLib\Error\Exception ( "请在网站配置中同时添加webRun.view.viewPath和webRun.view.cachePath路径" );
+		}
+		
+		$this->_engineInstance->setViewPath($viewConfig['viewPath']);
+		$this->_engineInstance->setCachePath($viewConfig['cachePath']);
 	}
 
 	/**
@@ -62,5 +71,5 @@ abstract class ViewBase
 		return $this;
 	}
 
-	abstract function render();
+	abstract function render($view, $ajaxDelimiter = NULL);
 }

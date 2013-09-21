@@ -74,6 +74,7 @@ abstract class AppBase
 	{
 		$this->request->init();
 		$this->request->controllerInstance()->dispatch();
+		$this->request->controllerInstance()->output();
 	}
 
 	/**

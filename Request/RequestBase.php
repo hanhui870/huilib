@@ -51,7 +51,7 @@ abstract class RequestBase
 	 * @return \HuiLib\App\Controller
 	 */
 	public function controllerInstance(){
-		return $this->controller;
+		return $this->controllerInstance;
 	}
 
 	/**

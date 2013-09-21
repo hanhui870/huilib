@@ -9,7 +9,7 @@ namespace HuiLib\App;
  */
 class View extends \HuiLib\View\ViewBase
 {
-	protected function __construct(\HuiLib\App\AppBase $appInstance)
+	public function __construct(\HuiLib\App\AppBase $appInstance)
 	{
 		$this->_appInstance=$appInstance;
 	}
@@ -17,8 +17,11 @@ class View extends \HuiLib\View\ViewBase
 	/**
 	 * 渲染输出
 	 */
-	public function render()
+	public function render($view, $ajaxDelimiter = NULL)
 	{
+		$this->initEngine($view, $ajaxDelimiter);
+		$this->_engineInstance->parse()->writeCompiled();
 		
+		include $this->_engineInstance->getCachePath();
 	}
 }

@@ -91,7 +91,10 @@ class Http extends RequestBase
 		$controllerClass=NAME_SEP.$this->appInstance->getAppNamespace().NAME_SEP.'Controller'.NAME_SEP.ucfirst($this->package).NAME_SEP.ucfirst($this->controller);
 		
 		try {
-			$this->controller=new $controllerClass($this->appInstance);
+			$this->controllerInstance=new $controllerClass($this->appInstance);
+			$this->controllerInstance->setPackage($this->package);
+			$this->controllerInstance->setController($this->controller);
+			
 		}catch (\Exception $exception){
 			//TODO 二级目录路由处理
 			
