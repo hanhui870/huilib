@@ -1,6 +1,5 @@
 <?php
 namespace HuiLib\View;
-use HuiLib\Helper\String;
 
 /**
  * HuiLib模板引擎解析类 
