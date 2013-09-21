@@ -55,7 +55,7 @@ class AutoLoad
 		$spaceName=array_shift($nameInfo);
 
 		//字母数字\_
-		if (preg_match("/[^\w\\\]+/i", $name, $m)) {
+		if (preg_match("/[^\w\\\]+/i", $name)) {
 			throw new \Exception ( "Hack discovered!" );
 		}
 		
