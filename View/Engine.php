@@ -2,11 +2,11 @@
 namespace HuiLib\View;
 
 /**
- * 模板引擎解析类 
+ * HuiLib模板引擎解析类 
  * 
  * 用法：
  *   1、<!--ajax deli-->code<!--/ajax deli--> Ajax请求获取判断页面。
- *   2、{sub member_header} 获取子模板，简单起见，只支持一级获取。Ajax请求不支持。
+ *   2、{sub member_header} 获取子模板。
  *   3、变量包含：{$var}、/ *{$var}* /(comment in javascript)、控制器复制变量保存在var中。数组支持js对象书写方式。
  *   4、{if}{/if}对应if循环；{loop}{/loop}对应foreach循环；{for}{/for}对应for循环。
  *   5、{eval} 对应php的eval函数。
@@ -18,7 +18,7 @@ namespace HuiLib\View;
  *   2、2012.12.12 删除buffer_ajax函数，整合到buffer中，精简结构。
  *   
  * @author hanhui
- * @since 2013/08/11 来自原ylstu项目
+ * @since 2013/08/11
  */
 class Engine
 {
@@ -233,12 +233,12 @@ class Engine
 		}
 
 		//ajax特定区域匹配项目
-		$deli = ($this->ajaxDelimiter) ? ' ' . preg_quote ( $this->ajaxDelimiter ) : '';
+		$delimiter = ($this->ajaxDelimiter) ? ' ' . preg_quote ( $this->ajaxDelimiter ) : '';
 		
 		/* 存在ajax标签时按照标签，不然则全部内容
 		 * <!--ajax deli-->code<!--/ajax deli-->
 		*/
-		preg_match_all ( "/\<\!\-\-ajax" . $deli . "\-\-\>(.*?)<\!\-\-\/ajax" . $deli . "\-\-\>/is", $con, $matches );
+		preg_match_all ( "/\<\!\-\-ajax" . $delimiter . "\-\-\>(.*?)<\!\-\-\/ajax" . $delimiter . "\-\-\>/is", $con, $matches );
 		
 		//不能使用$matches，不是非空数组
 		if (! empty ( $matches [1] )) {

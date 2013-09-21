@@ -1,0 +1,75 @@
+{sub Head}
+<div id="page_wrap" class="clearfix">
+<!--右侧-->
+	<div class="right border right_container system_container">
+		<div class="mtop" id="r1">
+			<div class="r1_con">
+				<!--主内容区-->
+				<div class="main_con mt_10 message">
+					<h1 class="todo clearfix">
+						<span class="left">发送新私信</span> 
+						<form class="search_message right clearfix">
+							<input type="text" class="input border left" name="query">
+							<a class="jb left" href="javascript:void(0);">搜索私信</a>
+						</form>
+					</h1>
+					<!--ajax message_post_tpl-->
+					{block footJs}
+					<script>
+					/*全局事件绑定 避免二次加载*/
+					if(su.fan_list==undefined){
+						$.get('/utility/follow/fan?ajax=1', {rand:Math.random()}, function(re){
+						    eval('su.fan_list='+re);
+							{if !empty($var.user)}
+								su.fan_list[{$var.user.uid}].selected=1;
+							{/if}
+						});
+						$(document).ready(su.post_ready);
+						$(document).ready(function(){
+							var param={};
+							param.fanType='fan_list';
+							param.type='html_tag';
+							param.jqSel='.message_post_box .input_user';
+							su.friend_selector_ready(param);
+						});
+						$(document).ready(su.post_submit_ready);
+						su.max_message_length = {$setting.max_message_length};
+						su.max_message_groupsend = {$setting.max_message_groupsend};
+					}else{
+						//初始化好友列表 解除选中状态
+						su.relation_list_init('fan_list');
+					}
+					//设置聚焦
+					{if !empty($var.user)}
+					setTimeout(function(){$('#post_message .editor_content').focus();}, 50)
+					{else}
+					setTimeout(function(){$('#post_message .input_user').click();}, 800)
+					{/if}
+					</script>
+					{/block footJs}
+					{if !empty($get.ajax)}
+					<link href="/css/system_normal.css" rel="stylesheet" type="text/css" />
+					{/if}
+					<div class="message_post_box">
+						<table class="table sys_editor" id="post_message" rel="{$var.postMessage.formAction}" handle="{$var.postMessage.callback}">
+							<tr>
+								<th>接收人{$userlist[$user.uid].name}：</th>
+								<th>发射人{$svar.config[$k.v].siteName}：</th>
+								<td>
+									<div class="input input_users clearfix">
+										{if !empty($var.user)}
+										<div class="users clearfix"><p rel="{$var.user.uid}" class="sys_user">{$var.user.name}<a href="javascript:void(0);" class="delete"></a></p></div>
+										{/if}
+										<input type="text" class="input_user{if $get.ajax} ajax{/if}" maxlength="80" name="topic" autocomplete="off" tabindex="100">
+									</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<!--/ajax message_post_tpl-->
+				</div>		
+			</div>
+		</div>
+	</div>
+</div>
+{sub Foot}

@@ -1,0 +1,25 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<!--仅首页显示slogan-->
+<title>{if !empty($var.site_title)}{$var.site_title}{else}{$setting.site_name}{/if}</title>
+<meta http-equiv="Content-Type" content="text/html; charset={$config.charset}"/>
+<!--canonical 记住得用绝对路径-->
+{if !empty($var.canonical)}
+<link rel="canonical" href="{$var.canonical}"/>
+{/if}
+<!--seo优化-->
+{if !empty($var.seo)}
+<meta name="keywords" content="{$var->seo->keywords}"/>
+<meta name="description" content="{$var->seo->description}"/>
+{/if}
+<link rel="Shortcut Icon" href="{$resourceUrl}favicon.ico"/>
+<link rel="Bookmark" href="{$resourceUrl}favicon.ico"/>
+<link href="{$resourceUrl}css/{CSS_CACHE}main.css?ver={VER}" rel="stylesheet" type="text/css"/>
+<!--附加额外css-->
+{if !empty($var.attach_css)}
+{loop $var.attach_css $k $v}
+<link href="{$resourceUrl}css/{CSS_CACHE}{$v}?ver={VER}" rel="stylesheet" type="text/css"/>
+{/loop}
+{/if}
+</head>

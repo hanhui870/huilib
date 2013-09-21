@@ -1,0 +1,76 @@
+	<div id="{if !empty($var.footSpecific)}{$var.footSpecific}{else}page_foot{/if}" class="clearfix">
+		<span class="left"><a href="{$mainUrl}">{$setting.site_name}</a> &copy; 2006 - {php echo date("Y");}</span>
+		<span class="right"><a href="{$mainUrl}about">关于{$setting.site_name}({$domain})</a> | <a href="{$mainUrl}promotion">推广合作</a> | <a href="{$mainUrl}link">友情链接</a> | <a href="{$mainUrl}passport/agreement">隐私</a> | <a href="{$mainUrl}help">帮助</a> | <a href="http://www.miibeian.gov.cn" target="_blank">浙ICP备09030349号</a></span>
+	</div>
+	<div id="float_div"></div>
+</div>
+
+<script language="javascript" type="text/javascript" src="{$resourceUrl}js/other/jquery-1.4.4.js"></script>
+<script language="javascript" type="text/javascript" src="{$resourceUrl}js/core.js?ver={VER}"></script>
+<script language="javascript" type="text/javascript" src="{$resourceUrl}js/post.js?ver={VER}"></script>
+{if $config.debug_dom}<script language="javascript" type="text/javascript" src="{$resourceUrl}js/firebug-lite.js"></script>{/if}
+<!--附加额外JS-->
+{if !empty($var.attach_js)}
+{loop $var.attach_js $k $v}
+<script language="javascript" type="text/javascript" src="{$resourceUrl}js/{$v}?ver={VER}"></script>
+{/loop}
+{/if}
+<script type="text/javascript">
+$(document).ready(su.global_ready);
+/*js赋值*/
+/*{if !empty($var.globalJavascriptAppend)}*/
+{$var.globalJavascriptAppend}
+/*{/if}*/
+
+/*全局变量*/
+/*{if !empty($yl.uid)}*/
+var yl={};
+yl.name='{$yl.name}';
+yl.uid='{$yl.uid}';
+yl.profile='{$yl.profile}';
+/*{if $yl.certify}*/
+yl.certify='{$yl.certify}';
+/*{/if}*/
+/*{/if}*/
+su.url='{$url}';
+su.mainurl='{$mainUrl}';
+su.enableHttps='{$config.https}';
+/*{php $requestObj=\request::getInstance()}*/
+su.app='{php echo $requestObj->getApp();}';
+/*页面当前操作信息代码*/
+su.apping='{php echo $requestObj->getApp();}';
+su.controling='{php echo $requestObj->getControl();}';
+su.doing='{php echo $requestObj->getDo();}';
+su.topic_max_bind='{$setting.topic_max_bind}';
+</script>
+/*{blockHolder footJs}*/
+<$!--[if lte IE 6]>
+<script src="{$resourceUrl}/js/DD_belatedPNG_0.0.8a.js" type="text/javascript"></script>
+<script type="text/javascript">
+	/*放在文档加载完毕，避免与幻灯片切换冲突。仅IE6。*/
+	$(document).ready(function(){
+		DD_belatedPNG.fix('img'); 
+	});
+</script>
+<![endif]--$>
+
+{if \request::needSyncLogin()&&empty($yl.uid)}
+<!--同步登录代码段-->
+<script type="text/javascript">
+$(document).ready(function(){
+	su.syncLogin();
+});
+</script>
+{/if}
+
+<div id="goTop"><a href="javascript:void(0);"></a></div>
+
+{if !\request::isHttps()}
+<!--暂时使用cnzz统计代码-->
+<div class="none"><script src="http://s85.cnzz.com/stat.php?id=4339514&web_id=4339514" language="JavaScript"></script></div>
+{/if}
+
+<!--处理debug 一般注释会被清理-->
+{if $config.debug}<$!--debug_content--$>{/if}
+</body>
+</html>
