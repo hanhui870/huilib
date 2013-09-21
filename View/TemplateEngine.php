@@ -17,6 +17,7 @@ use HuiLib\Helper\String;
  *   8、{block var}{/block} 用于代码块模板文件中前后替换。替换用{blockHolder var}
  *   9、会清除HTML、JS注释
  *   
+ *   TODO template refresh
  * @author hanhui
  * @since 2013/09/21 重写自ylstu模板引擎
  */
