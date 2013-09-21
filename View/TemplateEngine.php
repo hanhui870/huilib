@@ -66,6 +66,11 @@ class TemplateEngine
 
 	function __construct($view, $ajaxDelimiter = NULL)
 	{
+		//字母数字\/_
+		if (preg_match("/[^\w\/\\\]+/i", $view)) {
+			throw new \HuiLib\Error\Exception ( "Hack discovered!" );
+		}
+		
 		$this->view=$view;
 		$this->ajaxDelimiter = $ajaxDelimiter;
 	}
