@@ -9,5 +9,15 @@ namespace HuiLib\Request;
  */
 class Bin extends RequestBase
 {
+	protected $scriptUrl=NULL;
 	
+	public function init(){
+		//TODO 需要根据启动参数获取路由参数
+		$this->scriptUrl = Param::getScriptUrl();
+
+		/**
+		 * url路由处理
+		*/
+		$this->urlRoute ();
+	}
 }
