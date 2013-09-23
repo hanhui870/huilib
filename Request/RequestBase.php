@@ -70,25 +70,39 @@ abstract class RequestBase
 		if (empty($pathInfo[1])) {
 			$pathInfo[1]='index';
 		}
+		$this->package=$pathInfo[1];
 	
 		if (empty($pathInfo[2])) {
 			$pathInfo[2]='index';
 		}
-	
-		$this->package=$pathInfo[1];
 		$this->controller=$pathInfo[2];
+		
 		$controllerClass=NAME_SEP.$this->appInstance->getAppNamespace().NAME_SEP.'Controller'.NAME_SEP.ucfirst($this->package).NAME_SEP.ucfirst($this->controller);
-	
 		try {
 			$this->controllerInstance=new $controllerClass($this->appInstance);
 			$this->controllerInstance->setPackage($this->package);
 			$this->controllerInstance->setController($this->controller);
 				
 		}catch (\Exception $exception){
-			//TODO 二级目录路由处理
-				
-			var_dump($exception);
+			//检测包路由 不存在包路径触发
+			$packageDir=APP_PATH.SEP.'Controller'.SEP.ucfirst($this->package).SEP;
+			if (!is_dir($packageDir) && $this->appConfig->getByKey('webRun.route.SubDirectory')) {
+				//不存在包 已设置二级目录路由
+				$route=new \HuiLib\Route\SubDirectory();
+				$route->route();
+			}else{
+				//TODO Message display
+				throw new \HuiLib\Error\Exception("该页面不可访问");
+			}
 		}
+	}
+	
+	/**
+	 * 二次路由
+	 */
+	public function reRoute($scriptUrl)
+	{
+		
 	}
 
 	/**

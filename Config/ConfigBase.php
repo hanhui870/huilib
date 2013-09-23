@@ -158,6 +158,7 @@ class ConfigBase
 	 * getByKey('webRun.cookie.pre')
 	 * 
 	 * @param string $key 要获取的配置键
+	 * @return mix 空值返回array(),便于用于返回值遍历
 	 */
 	public function getByKey($key = '')
 	{

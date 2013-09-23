@@ -90,6 +90,23 @@ class Controller
 			$this->renderView ();
 		}
 	}
+	
+	/**
+	 * 控制器内二级以上路由方法
+	 * 
+	 * 由__call()转发而来
+	 * 比如:/thread/2，/thread/2/thread路由到相应方法，不存在相应方法的前提下
+	 * 两个层次：控制器层级(/thread/2)、类方法层级(thread/log/2 落到thread::log方法)
+	 */
+	protected function shortNameRoute($name, $arguments)
+	{
+		
+		//$key, $shortName
+		
+		//* @param string $key 路由标志 比如user, thread
+		//* @param string $shortName 待路由的字符串 比如hanhui
+		
+	}
 
 	/**
 	 * 请求派发前事件
@@ -181,5 +198,10 @@ class Controller
 	public function setAction($action)
 	{
 		$this->action = $action;
+	}
+	
+	public function __call($name, $arguments)
+	{
+		$this->shortNameRoute($name, $arguments);
 	}
 }

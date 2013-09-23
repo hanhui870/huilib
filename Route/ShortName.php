@@ -9,8 +9,11 @@ namespace HuiLib\Route;
  * @author 祝景法
  * @since 2013/09/15
  */
-class ShortName
+class ShortName extends RouteBase
 {
 	
+	public function route()
+	{
 	
+	}
 }

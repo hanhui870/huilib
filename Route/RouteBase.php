@@ -13,7 +13,8 @@ namespace HuiLib\Route;
 abstract class RouteBase
 {
 	
-	abstract function route(){
+	public abstract function route()
+	{
 		
 	}
 }

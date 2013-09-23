@@ -7,8 +7,11 @@ namespace HuiLib\Route;
  * @author 祝景法
  * @since 2013/09/15
  */
-class SubDirectory
+class SubDirectory extends RouteBase
 {
 	
-	
+	public function route()
+	{
+		
+	}
 }
