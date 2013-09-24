@@ -142,9 +142,10 @@ class Param
 	 * 强制转换输入参数类型
 	 * @param mix $var 变量名
 	 * @param string $type 变量类型
+	 * 
+	 * 	返回是类型安全的，根据具体类型
 	 */
 	public static function typeCheck($var, $type=self::TYPE_NONE){
-		//成功时返回 TRUE， 或者在失败时返回 FALSE.
 		$type && settype($var, $type);
 	
 		return $var;
