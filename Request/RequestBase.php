@@ -10,25 +10,36 @@ namespace HuiLib\Request;
 abstract class RequestBase
 {
 	/**
-	 * 默认$_SERVER['SCRIPT_URL']，重写基础信息
+	 * 系统主要路由资源定位符
+	 * 
+	 * 类似http://iyunlin.com/thread/view/8878 => iyunlin.com/thread/view/8878
+	 * 
+	 * Http默认Host+ScriptUrl; Bin由参数组建
 	 */
-	protected $scriptUrl;
+	protected $routeUri=NULL;
+	
+	/**
+	 * 路由结果数组
+	 * 
+	 * @var array 组成:Host, Package, Controller, Action, SubAction五层次封装，便于以后拓展
+	 */
+	protected $routeInfo=NULL;
 
 	//路由信息中的包
-	protected $package;
+	protected $package=NULL;
 	
 	//控制器类
-	protected $controller;
+	protected $controller=NULL;
 	
 	/**
 	 * 控制器实例
 	 * @var \HuiLib\App\Controller
 	 */
-	protected $controllerInstance;
+	protected $controllerInstance=NULL;
 	
-	protected $appInstance;
+	protected $appInstance=NULL;
 	
-	protected $appConfig;
+	protected $appConfig=NULL;
 	
 	function __construct(\HuiLib\App\AppBase $app)
 	{
@@ -65,27 +76,21 @@ abstract class RequestBase
 	 * 
 	 */
 	protected function urlRoute() {
-		$pathInfo=explode(URL_SEP, $this->scriptUrl);
-	
-		if (empty($pathInfo[1])) {
-			$pathInfo[1]='index';
-		}
-		$this->package=$pathInfo[1];
-	
-		if (empty($pathInfo[2])) {
-			$pathInfo[2]='index';
-		}
-		$this->controller=$pathInfo[2];
+		$this->host=$this->getHostRouteSeg();
+		$this->package=$this->getPackageRouteSeg();
+		$this->controller=$this->getControllerRouteSeg();
 		
 		$controllerClass=NAME_SEP.$this->appInstance->getAppNamespace().NAME_SEP.'Controller'.NAME_SEP.ucfirst($this->package).NAME_SEP.ucfirst($this->controller);
 		try {
 			$this->controllerInstance=new $controllerClass($this->appInstance);
 			$this->controllerInstance->setPackage($this->package);
 			$this->controllerInstance->setController($this->controller);
-				
+			$this->controllerInstance->setHost($this->host);
+
 		}catch (\Exception $exception){
 			//检测包路由 不存在包路径触发
-			$packageDir=APP_PATH.SEP.'Controller'.SEP.ucfirst($this->package).SEP;
+			$packageDir=APP_PATH.'Controller'.SEP.ucfirst($this->package).SEP;
+			$this->appConfig->getByKey('webRun.route.SubDirectory');
 			if (!is_dir($packageDir) && $this->appConfig->getByKey('webRun.route.SubDirectory')) {
 				//不存在包 已设置二级目录路由
 				$route=new \HuiLib\Route\SubDirectory();
@@ -98,11 +103,129 @@ abstract class RequestBase
 	}
 	
 	/**
+	 * 初始化系统关键路由信息
+	 */
+	protected function initRouteInfo()
+	{
+		if ($this->routeUri==NULL) {
+			throw new \HuiLib\Error\Exception("关键路由信息ScriptUrl未初始化");
+		}
+		
+		$routeInfo=explode(URL_SEP, $this->routeUri);
+		
+		$this->routeInfo=$routeInfo;
+	}
+	
+	/**
 	 * 二次路由
 	 */
 	public function reRoute($scriptUrl)
 	{
 		
+	}
+	
+	/**
+	 * 获取主机段路由信息
+	 */
+	public function getHostRouteSeg()
+	{
+		if (isset($this->routeInfo[0])) {
+			return $this->routeInfo[0];
+		}else{
+			return '';
+		}
+	}
+
+	/**
+	 * 获取包段路由信息
+	 */
+	public function getPackageRouteSeg()
+	{
+		if (isset($this->routeInfo[1])) {
+			return $this->routeInfo[1];
+		}else{
+			return '';
+		}
+	}
+	
+	/**
+	 * 获取控制器段路由信息
+	 * 
+	 * @return string 默认index控制器
+	 */
+	public function getControllerRouteSeg()
+	{
+		if (isset($this->routeInfo[2])) {
+			return $this->routeInfo[2];
+		}else{
+			return 'index';
+		}
+	}
+	
+	/**
+	 * 获取动作段路由信息
+	 * 
+	 * @return string 默认index动作
+	 */
+	public function getActionRouteSeg()
+	{
+		if (isset($this->routeInfo[3])) {
+			return $this->routeInfo[3];
+		}else{
+			return 'index';
+		}
+	}
+	
+	/**
+	 * 获取子动作段路由信息
+	 */
+	public function getSubActionRouteSeg()
+	{
+		if (isset($this->routeInfo[4])) {
+			return $this->routeInfo[4];
+		}else{
+			return '';
+		}
+	}
+	
+	/**
+	 * 设置主机段路由信息
+	 */
+	public function setHostRouteSeg($host)
+	{
+		$this->routeInfo[0]=$host;
+	}
+	
+	/**
+	 * 设置包段路由信息
+	 */
+	public function setPackageRouteSeg($package)
+	{
+		$this->routeInfo[1]=$package;
+	}
+	
+	/**
+	 * 设置控制器段路由信息
+	 */
+	public function setControllerRouteSeg($controller)
+	{
+		$this->routeInfo[2]=$controller;
+	}
+	
+	/**
+	 * 设置动作段路由信息
+	 */
+	public function setActionRouteSeg($action)
+	{
+		$this->routeInfo[3]=$action;
+	}
+	
+	/**
+	 * 设置子动作段路由信息
+	 */
+	public function setSubActionRouteSeg($subAction)
+	{
+		$this->routeInfo[4]=$subAction;
 	}
 
 	/**

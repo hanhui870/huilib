@@ -10,6 +10,12 @@ namespace HuiLib\App;
 class Controller
 {
 	/**
+	 * 当前主机名
+	 * @var String
+	 */
+	protected $host;
+	
+	/**
 	 * 当前处理包名
 	 * @var String
 	 */
@@ -26,6 +32,12 @@ class Controller
 	 * @var String
 	 */
 	protected $action;
+	
+	/**
+	 * 当前处理子动作名
+	 * @var String
+	 */
+	protected $subAction;
 	
 	/**
 	 * 基础APP实例
@@ -81,7 +93,10 @@ class Controller
 			$this->initView ();
 		}
 		
-		$this->indexAction ();
+		//路由方法 附加操作后缀
+		$this->action=$this->request->getActionRouteSeg();
+		$action=$this->action.'Action';
+		$this->$action();
 		
 		$this->postDispatch ();
 		
@@ -95,17 +110,22 @@ class Controller
 	 * 控制器内二级以上路由方法
 	 * 
 	 * 由__call()转发而来
-	 * 比如:/thread/2，/thread/2/thread路由到相应方法，不存在相应方法的前提下
+	 * 比如:/thread/2，/thread/2/reply路由到相应方法，不存在相应方法的前提下
 	 * 两个层次：控制器层级(/thread/2)、类方法层级(thread/log/2 落到thread::log方法)
+	 * 
+	 * 可使用Redis Hash实现
+	 * 
+	 * @param string $key 路由标志 比如user, thread
+     * @param string $shortName 待路由的字符串 比如hanhui
 	 */
-	protected function shortNameRoute($name, $arguments)
+	protected function shortNameRoute($methodName, $arguments)
 	{
+		$key=$this->host.URL_SEP.$this->package.URL_SEP.$this->controller.URL_SEP.$this->action;
 		
-		//$key, $shortName
-		
-		//* @param string $key 路由标志 比如user, thread
-		//* @param string $shortName 待路由的字符串 比如hanhui
-		
+		//不存在包 已设置二级目录路由
+		$route=new \HuiLib\Route\ShortName();
+		$route->route();
+		die();
 	}
 
 	/**
@@ -184,6 +204,11 @@ class Controller
 	{
 		$this->autoRender = FALSE;
 	}
+	
+	public function setHost($host)
+	{
+		$this->host = $host;
+	}
 
 	public function setPackage($package)
 	{
@@ -198,6 +223,11 @@ class Controller
 	public function setAction($action)
 	{
 		$this->action = $action;
+	}
+	
+	public function setSubAction($subAction)
+	{
+		$this->subAction = $subAction;
 	}
 	
 	public function __call($name, $arguments)

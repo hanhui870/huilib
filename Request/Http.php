@@ -32,10 +32,15 @@ class Http extends RequestBase
 		$this->scriptUrl = Param::getScriptUrl();
 		$this->httpHost = Param::server('HTTP_HOST', Param::TYPE_STRING);
 		
+		//规范访问重写请求Url
 		$this->formatRequestURI();
 		
+		//设置路由资源定位符，并初始化路由信息
+		$this->routeUri=$this->httpHost.$this->scriptUrl;
+		$this->initRouteInfo();
+		
 		/**
-		 * url路由处理
+		 * url路由处理 调用父方法
 		 */
 		$this->urlRoute ();
 	}

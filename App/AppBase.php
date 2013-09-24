@@ -73,7 +73,13 @@ abstract class AppBase
 	public function run()
 	{
 		$this->request->init();
-		$this->request->controllerInstance()->dispatch();
+		
+		if (method_exists($this->request->controllerInstance(), 'dispatch')) {
+			$this->request->controllerInstance()->dispatch();
+		}else{
+			throw new \HuiLib\Error\Exception ( "AppBase::run controller dispatch failed!" );
+		}
+		
 		$this->request->controllerInstance()->output();
 	}
 

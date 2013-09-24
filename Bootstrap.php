@@ -113,6 +113,16 @@ class Bootstrap
 			define ( "APP_ENV", self::DEFAULT_ENV );
 		}
 	}
+	
+	/**
+	 * 初始化异常和错误处理程序
+	 * 
+	 * TODO
+	 */
+	private function initErrorHandle()
+	{
+		
+	}
 
 	/**
 	 * 获取已创建的应用

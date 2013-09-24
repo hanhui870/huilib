@@ -14,6 +14,6 @@ class ShortName extends RouteBase
 	
 	public function route()
 	{
-	
+		echo 'ShortName Routed!';
 	}
 }

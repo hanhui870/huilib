@@ -12,6 +12,6 @@ class SubDirectory extends RouteBase
 	
 	public function route()
 	{
-		
+		echo 'SubDirectory Routed!';
 	}
 }
