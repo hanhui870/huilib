@@ -16,6 +16,11 @@ class View extends \HuiLib\View\ViewBase
 	
 	/**
 	 * 渲染输出
+	 * 
+	 * 3种模板刷新更新机制：
+	 * 1、配置template.refresh，(子)模板有修改会自动刷新，较耗资源适合开发环境
+	 * 2、配置template.life，缓存操作生存期限后，自动删除重建
+	 * 3、统一通过管理后台，刷新模板缓存
 	 */
 	public function render($view, $ajaxDelimiter = NULL)
 	{
