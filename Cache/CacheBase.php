@@ -7,34 +7,74 @@ namespace HuiLib\Cache;
  * @author 祝景法
  * @since 2013/09/15
  */
-class CacheBase
+abstract class CacheBase
 {
-	protected function __construct($config)
-	{
+	/**
+	 * 缓存初始化配置
+	 * @var array
+	 */
+	protected $config;
 	
+	protected function __construct()
+	{
 	}
 	
 	/**
 	 * 保存一个缓存
+	 * 
+	 * @param string $key 缓存键
+	 * @param mix $value 缓存值
 	 */
-	public function save($key, $value)
-	{
-		
+	public abstract function add($key, $value);
+	
+	/**
+	 * 保存一个缓存
+	 * 
+	 * 默认调用add版本，类似memcache有独立实现的，可以覆盖
+	 */
+	public function replace($key, $value){
+		return $this->add($key, $value);
 	}
 	
 	/**
 	 * 删除一个缓存
+	 * 
+	 * @param string $key 缓存键
 	 */
-	public function delete($key)
-	{
+	public abstract function delete($key);
+	
+	/**
+	 * 获取一个缓存内容
+	 * 
+	 * @param string $key 缓存键
+	 */
+	public abstract function get($key);
+	
+	/**
+	 * 清空所有数据
+	 *
+	 */
+	public function flush(){
+		
+	}
+	
+	/**
+	 * 清空所有数据
+	 *
+	 * @param string $key 缓存键
+	 * @param mix $value 增加的值
+	 */
+	public function increase($key, $value=1){
 	
 	}
 	
 	/**
-	 * 获取一个缓存内容
+	 * 清空所有数据
+	 *
+	 * @param string $key 缓存键
+	 * @param mix $value 减少的值
 	 */
-	public function get($key)
-	{
+	public function decrease($key, $value=1){
 	
 	}
 	
@@ -45,7 +85,9 @@ class CacheBase
 	 */
 	public function saveBatch($assocArray)
 	{
-	
+		foreach ($assocArray as $key=>$value){
+			$this->add($key, $value);
+		}
 	}
 	
 	/**
@@ -55,7 +97,9 @@ class CacheBase
 	 */
 	public function deleteBatch($keyArray)
 	{
-	
+		foreach ($keyArray as $key){
+			$this->delete($key);
+		}
 	}
 	
 	/**
@@ -65,7 +109,12 @@ class CacheBase
 	 */
 	public function getBatch($keyArray)
 	{
-	
+		$result=array();
+		foreach ($keyArray as $key){
+			$result[$key]=$this->get($key);
+		}
+		
+		return $result;
 	}
 
 	/**

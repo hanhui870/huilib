@@ -17,7 +17,7 @@ class Apc extends \HuiLib\Cache\CacheBase
 	/**
 	 * 保存一个缓存
 	 */
-	public function save($key, $value)
+	public function add($key, $value)
 	{
 	
 	}
@@ -38,4 +38,7 @@ class Apc extends \HuiLib\Cache\CacheBase
 	
 	}
 	
+	public function toString(){
+		return 'apc';
+	}
 }

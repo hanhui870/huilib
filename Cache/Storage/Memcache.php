@@ -9,33 +9,119 @@ namespace HuiLib\Cache\Storage;
  */
 class Memcache extends \HuiLib\Cache\CacheBase
 {
+	/**
+	 * Memcache内部连接
+	 * 
+	 * @var \Memcache
+	 */
+	private $connect;
+	
+	/**
+	 * Memcache库键前缀 防止多实例名称冲突
+	 * 
+	 * @var string
+	 */
+	private $prefix='';
+	
 	protected function __construct($config)
 	{
-	
+		if (empty( $config['host']) || empty($config['port'])) {
+			throw new \HuiLib\Error\Exception ( "Memcache配置信息错误" );
+		}
+		
+		$this->config=$config;
+		if (empty( $config['prefix'] )) {
+			$this->prefix= $config['prefix'];
+		}
+		
+		$this->connect = new \Memcache ();
+		if (!$this->connect->connect ( $config['host'], $config['port'] )){
+			throw new \HuiLib\Error\Exception ( "Memcache连接失败，请确认已安装该拓展" );
+		}
 	}
 	
 	/**
-	 * 保存一个缓存
+	 * 添加一个缓存
+	 * 
+	 * 只能新添加一个值，重复刷新不会覆盖
+	 * 
+	 * @param string $key 缓存键
+	 * @param mix $value 缓存值
+	 * @param string $flag 是否压缩 MEMCACHE_COMPRESSED(2)使用zlib压缩
+	 * @param int $expire 过期时间，0永不过期，最大30天(2592000) 或unix时间戳
 	 */
-	public function save($key, $value)
+	public function add($key, $value, $flag=FALSE, $expire=0)
 	{
+		return $this->connect->add($key, $value);
+	}
 	
+	/**
+	 * 替换一个已存在的缓存
+	 *
+	 * 必须是已存在的，不存在的会导致设置失败
+	 * 
+	 * @param string $key 缓存键
+	 * @param mix $value 缓存值
+	 * @param string $flag 是否压缩 MEMCACHE_COMPRESSED(2)使用zlib压缩
+	 * @param int $expire 过期时间，0永不过期，最大30天(2592000) 或unix时间戳
+	 */
+	public function replace($key, $value, $flag=FALSE, $expire=0)
+	{
+		return $this->connect->replace($key, $value);
 	}
 	
 	/**
 	 * 删除一个缓存
+	 * 
+	 * @param string $key 缓存键
+	 * @param int $timeout 超时时间，多久后删除
 	 */
-	public function delete($key)
+	public function delete($key, $timeout = 0)
 	{
-	
+		return $this->connect->delete($key, $timeout);
 	}
 	
 	/**
 	 * 获取一个缓存内容
+	 * 
+	 * @param string $key 缓存键，支持多键
+	 * @param string $flags 引用，二进制，1位是否序列化，2位是否压缩
 	 */
-	public function get($key)
+	public function get($key, $flags=NULL)
 	{
+		return $this->connect->get($key, $flags);
+	}
 	
+	/**
+	 * 清空所有数据
+	 *
+	 * @param string $key 缓存键
+	 * @param mix $value 增加的值
+	 */
+	public function increase($key, $value=1){
+		return $this->connect->increment($key, $value);
+	}
+	
+	/**
+	 * 清空所有数据
+	 *
+	 * @param string $key 缓存键
+	 * @param mix $value 减少的值
+	 */
+	public function decrease($key, $value=1){
+		return $this->connect->decrement($key, $value);
+	}
+	
+	/**
+	 * 清空所有数据
+	 *
+	 */
+	public function flush(){
+		return $this->connect->flush();
+	}
+	
+	public function toString(){
+		return 'memcache';
 	}
 	
 }

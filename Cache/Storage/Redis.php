@@ -17,7 +17,7 @@ class Redis extends \HuiLib\Cache\CacheBase
 	/**
 	 * 保存一个缓存
 	 */
-	public function save($key, $value)
+	public function add($key, $value)
 	{
 	
 	}
@@ -36,5 +36,9 @@ class Redis extends \HuiLib\Cache\CacheBase
 	public function get($key)
 	{
 	
+	}
+	
+	public function toString(){
+		return 'redis';
 	}
 }

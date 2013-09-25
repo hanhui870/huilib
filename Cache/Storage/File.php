@@ -13,4 +13,8 @@ class File extends \HuiLib\Cache\CacheBase
 	{
 	
 	}
+	
+	public function toString(){
+		return 'file';
+	}
 }
