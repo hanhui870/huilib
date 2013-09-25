@@ -13,7 +13,7 @@ abstract class TestBase
 	private static $instanceCache;
 	
 	//app初始化对象
-	protected $app;
+	protected $appInstance;
 	
 	protected function __construct(){
 		
@@ -33,8 +33,8 @@ abstract class TestBase
 	 * 设置app初始化运行环境
 	 * @param \HuiLib\App\AppBase $app
 	 */
-	public function setApp(\HuiLib\App\AppBase $app){
-		$this->app=$app;
+	public function setApp(\HuiLib\App\AppBase $appInstance){
+		$this->appInstance=$appInstance;
 	}
 	
 	/**

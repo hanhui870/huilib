@@ -14,7 +14,7 @@ class PdoTest extends \HuiLib\Test\TestBase
 	}
 	
 	private function testMysql(){
-		$re=$this->app->getDb()->getConnection()->query("select count(*) from test");
+		$re=$this->appInstance->getDb()->getConnection()->query("select count(*) from test");
 		var_dump($re->fetchAll());
 	}
 
