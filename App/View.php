@@ -20,8 +20,37 @@ class View extends \HuiLib\View\ViewBase
 	public function render($view, $ajaxDelimiter = NULL)
 	{
 		$this->initEngine($view, $ajaxDelimiter);
-		$this->_engineInstance->parse()->writeCompiled();
 		
-		include $this->_engineInstance->getCachePath();
+		$cacheFile=$this->_engineInstance->getCacheFilePath();
+		\HuiLib\Helper\Debug::mark('startRender');
+		if (!file_exists($cacheFile)) {//缓存文件不存在
+			$this->_engineInstance->parse()->writeCompiled();
+			
+		}elseif ($this->_appInstance->configInstance()->getByKey('template.refresh')){//开启模板自动扫描刷新
+			$cacheStamp=filemtime($cacheFile);
+			$tplStamp=filemtime($this->_engineInstance->getTplFilePath());
+			$tplStampList=array($tplStamp);
+			
+			//主模板未更新，检测子模板
+			if ($tplStamp <= $cacheStamp) {
+				$subStampList=$this->_engineInstance->getSubTplStamp();
+				$tplStampList=array_merge($tplStampList, $subStampList);
+			}
+			
+			if (max ( $tplStampList ) > $cacheStamp) {
+				unlink ( $cacheFile );
+				$this->_engineInstance->parse()->writeCompiled();
+			}
+			
+		}elseif ($this->_appInstance->configInstance()->getByKey('template.life')){//配置了自动过期时间
+			$lifeTime=$this->_appInstance->configInstance()->getByKey('template.life');
+			if ( time() - filemtime ( $cacheFile ) >= $lifeTime) {
+				unlink ( $cacheFile );
+				$this->_engineInstance->parse()->writeCompiled();
+			}
+		}
+		\HuiLib\Helper\Debug::elapsed('startRender', 'endRender');
+		
+		include $this->_engineInstance->getCacheFilePath();
 	}
 }

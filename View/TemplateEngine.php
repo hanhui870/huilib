@@ -62,6 +62,20 @@ class TemplateEngine
 	 * @var string
 	 */
 	private $recursiveSubLimit = 3;
+	
+	/**
+	 * 子模板最后更新时间数组
+	 * 
+	 * @var array
+	 */
+	private $subTplStamp=array();
+	
+	/**
+	 * 预获取的模板代码
+	 *
+	 * @var array
+	 */
+	private $preFetchSource=NULL;
 
 	function __construct($view, $ajaxDelimiter = NULL)
 	{
@@ -73,11 +87,13 @@ class TemplateEngine
 		$this->view=$view;
 		$this->ajaxDelimiter = $ajaxDelimiter;
 	}
-
+	
 	/**
-	 * 实际解析模板
+	 * 安全获取模板源代码
+	 * 
+	 * @throws \HuiLib\Error\Exception
 	 */
-	public function parse()
+	private function getSourceCon()
 	{
 		if ($this->viewPath == NULL) {
 			throw new \HuiLib\Error\Exception ( "TemplateEngine: 请设置模板源代码存放目录" );
@@ -93,7 +109,16 @@ class TemplateEngine
 			throw new \HuiLib\Error\Exception ( "TemplateEngine: 模板{$sourceFile}不存在，请确认" );
 		}
 		
-		$source = file_get_contents ( $sourceFile );
+		$this->preFetchSource = file_get_contents ( $sourceFile );
+	}
+
+	/**
+	 * 实际解析模板
+	 */
+	public function parse()
+	{
+		$this->getSourceCon();
+		$source=&$this->preFetchSource;
 		
 		//处理Ajax内容
 		if ($this->ajaxDelimiter) {
@@ -104,7 +129,7 @@ class TemplateEngine
 		$source = $this->appleTemplateRules ( $source );
 		
 		if (empty($source)) {
-			throw new \HuiLib\Error\Exception ( "TemplateEngine: 模板{$sourceFile}解析出来是空的" );
+			throw new \HuiLib\Error\Exception ( "TemplateEngine: 模板".$this->getTplFilePath()."解析出来是空的" );
 		}
 		
 		$this->compiledSource=$source;
@@ -320,6 +345,17 @@ class TemplateEngine
 		
 		return $source;
 	}
+	
+	/**
+	 * 递归检测子模板是否刷新
+	 */
+	public function getSubTplStamp()
+	{
+		$this->getSourceCon();
+		$this->preFetchSource = preg_replace ( "/\{sub\s+([^\}]+)\}/ies", "\$this->procSubSource('\\1')", $this->preFetchSource );
+
+		return $this->subTplStamp;
+	}
 
 	/**
 	 * 加载子模板内容
@@ -333,12 +369,15 @@ class TemplateEngine
 			return '';
 		
 		$viewFilePath = $this->getTplFilePath ( $subview );
-		$this->templateLifeSin [] = filemtime ( $viewFilePath );
+		if (!file_exists($viewFilePath)) {
+			throw new \HuiLib\Error\Exception ( "TemplateEngine: 子模板{$viewFilePath}不存在，请确认" );
+		}
+		$this->subTplStamp[] = filemtime ( $viewFilePath );
 		
 		$source = preg_replace ( '/' . preg_quote ( '<?php' ) . '(.*?)' . preg_quote ( "?>" ) . '[\r\n\s]*/is', '', file_get_contents ( $viewFilePath ) );
 		$level ++;
 		
-		return preg_replace ( "/\{sub\s+([^\}]+)\}/ies", "\$this->loadsub('\\1', $level)", $source );
+		return preg_replace ( "/\{sub\s+([^\}]+)\}/ies", "\$this->procSubSource('\\1', $level)", $source );
 	}
 
 	/**

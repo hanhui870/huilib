@@ -163,7 +163,7 @@ class Engine
 			$this->parse ( $this->viewFilePath, $cache );
 		} else {
 			//模板自动刷新
-			if ($this->v ['config'] ['cfg_viewFilePathrefresh']) {
+			if ($this->v ['config'] ['cfg_tplrefresh']) {
 				$tt_viewFilePath = filemtime ( $this->viewFilePath );
 				$tt_cache = filemtime ( $cache );
 				$this->templateLifeSin [] = $tt_viewFilePath;
@@ -179,7 +179,7 @@ class Engine
 				}
 			} else {
 				//模板间隔刷新
-				if (! empty ( $this->v ['config'] ['viewFilePathcache_life'] ) && $this->v ['time'] - filemtime ( $cache ) >= $this->v ['config'] ['viewFilePathcache_life']) {
+				if (! empty ( $this->v ['config'] ['tplcache_life'] ) && $this->v ['time'] - filemtime ( $cache ) >= $this->v ['config'] ['tplcache_life']) {
 					unlink ( $cache );
 					return $this->buffer ( $temp, $ajaxDelimiter );
 				}
