@@ -14,7 +14,7 @@ class Memcache extends \HuiLib\Cache\CacheBase
 	 * 
 	 * @var \Memcache
 	 */
-	private $connect;
+	protected $connect;
 	
 	/**
 	 * Memcache库键前缀 防止多实例名称冲突
@@ -52,7 +52,7 @@ class Memcache extends \HuiLib\Cache\CacheBase
 	 */
 	public function add($key, $value, $flag=FALSE, $expire=0)
 	{
-		return $this->connect->add($key, $value);
+		return $this->connect->add($key, $value, $flag, $expire);
 	}
 	
 	/**
@@ -67,7 +67,7 @@ class Memcache extends \HuiLib\Cache\CacheBase
 	 */
 	public function replace($key, $value, $flag=FALSE, $expire=0)
 	{
-		return $this->connect->replace($key, $value);
+		return $this->connect->replace($key, $value, $flag, $expire);
 	}
 	
 	/**
@@ -93,7 +93,7 @@ class Memcache extends \HuiLib\Cache\CacheBase
 	}
 	
 	/**
-	 * 清空所有数据
+	 * 给缓存值加上一个数
 	 *
 	 * @param string $key 缓存键
 	 * @param mix $value 增加的值
@@ -103,7 +103,7 @@ class Memcache extends \HuiLib\Cache\CacheBase
 	}
 	
 	/**
-	 * 清空所有数据
+	 * 给缓存值减去一个数
 	 *
 	 * @param string $key 缓存键
 	 * @param mix $value 减少的值
