@@ -129,7 +129,7 @@ abstract class RequestBase
 	 */
 	public function getHostRouteSeg()
 	{
-		if (isset($this->routeInfo[0])) {
+		if (!empty($this->routeInfo[0])) {
 			return $this->routeInfo[0];
 		}else{
 			return '';
@@ -138,13 +138,15 @@ abstract class RequestBase
 
 	/**
 	 * 获取包段路由信息
+	 * 
+	 * @return string 默认index包
 	 */
 	public function getPackageRouteSeg()
 	{
-		if (isset($this->routeInfo[1])) {
+		if (!empty($this->routeInfo[1])) {
 			return $this->routeInfo[1];
 		}else{
-			return '';
+			return 'index';
 		}
 	}
 	
@@ -155,7 +157,7 @@ abstract class RequestBase
 	 */
 	public function getControllerRouteSeg()
 	{
-		if (isset($this->routeInfo[2])) {
+		if (!empty($this->routeInfo[2])) {
 			return $this->routeInfo[2];
 		}else{
 			return 'index';
@@ -169,7 +171,7 @@ abstract class RequestBase
 	 */
 	public function getActionRouteSeg()
 	{
-		if (isset($this->routeInfo[3])) {
+		if (!empty($this->routeInfo[3])) {
 			return $this->routeInfo[3];
 		}else{
 			return 'index';
@@ -181,7 +183,7 @@ abstract class RequestBase
 	 */
 	public function getSubActionRouteSeg()
 	{
-		if (isset($this->routeInfo[4])) {
+		if (!empty($this->routeInfo[4])) {
 			return $this->routeInfo[4];
 		}else{
 			return '';
