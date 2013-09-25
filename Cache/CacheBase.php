@@ -14,13 +14,13 @@ abstract class CacheBase
 	 *
 	 * @var CacheBase
 	 */
-	protected $connect;
+	protected $connect=NULL;
 	
 	/**
 	 * 缓存初始化配置
 	 * @var array
 	 */
-	protected $config;
+	protected $config=NULL;
 	
 	protected function __construct()
 	{

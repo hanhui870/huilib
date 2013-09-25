@@ -10,7 +10,7 @@ namespace HuiLib\Cache\Test;
 class CacheTest extends \HuiLib\Test\TestBase
 {
 	public function run(){
-		$this->testRedis();
+		$this->testApc();
 	}
 	
 	private function testMemcache(){
@@ -45,6 +45,26 @@ class CacheTest extends \HuiLib\Test\TestBase
 		
 		//清空数据
 		//$cache->flush();
+	}
+	
+	private function testApc(){
+		$cache=\HuiLib\Cache\CacheBase::create($this->appInstance->configInstance()->getByKey('cache.apc'));
+		$cache->add('hanhui2', date('Y-m-d H:i:s'));
+		echo $cache->get('hanhui2');
+		
+		//测试数组
+		$cache->replace('array', $this->appInstance->configInstance()->getByKey('cache.memcache'));
+		\HuiLib\Helper\Debug::out ( $cache->get('array') );
+		
+		$cache->add('count', 0);
+		$cache->increase('count');
+		echo $cache->get('count');
+		
+		$cache->replace('replace', 0);
+		$cache->increase('replace');
+		$cache->increase('replace');
+		$cache->increase('replace');
+		echo 'replace:'.$cache->get('replace');
 	}
 
 	protected static function className(){
