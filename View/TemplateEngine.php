@@ -8,15 +8,14 @@ namespace HuiLib\View;
  *   1、Ajax请求获取判断页面: <!--ajax delimiter-->code<!--/ajax delimiter--> 
  *   2、获取子模板: {sub header}，相对于模板目录
  *   3、变量包含: {$var}、/ *{$var}* /(comment in javascript)
- *   	   控制器复制变量保存在var中。数组支持js对象书写方式。
+ *   	   常量输出{CONSTANT}(已经取消@符号)
  *   4、{if}{/if}对应if循环；{loop}{/loop}对应foreach循环；{for}{/for}对应for循环
  *   5、{eval} 对应php的eval函数。
  *   6、{php}在模板执行php代码。
  *   7、<$!--note--$> 会被保留的HTML注释。
- *   8、{block var}{/block} 用于代码块模板文件中前后替换。替换用{blockHolder var}
+ *   8、{block blockname}{/block blockname} 用于代码块模板文件中前后替换。替换用{blockHolder blockname}
  *   9、会清除HTML、JS注释
  *   
- *   TODO template refresh
  * @author hanhui
  * @since 2013/09/21 重写自ylstu模板引擎
  */
@@ -76,7 +75,7 @@ class TemplateEngine
 	}
 
 	/**
-	 * 解析模板
+	 * 实际解析模板
 	 */
 	public function parse()
 	{
@@ -89,7 +88,7 @@ class TemplateEngine
 		}
 		
 		//模板储存地址
-		$sourceFile = $this->getFilePath ();
+		$sourceFile = $this->getTplFilePath ();
 		if (! file_exists ( $sourceFile )) {
 			throw new \HuiLib\Error\Exception ( "TemplateEngine: 模板{$sourceFile}不存在，请确认" );
 		}
@@ -139,7 +138,7 @@ class TemplateEngine
 	 * @param string $view 需要解析的模板
 	 * @return string
 	 */
-	public function getFilePath($view=NULL)
+	public function getTplFilePath($view=NULL)
 	{
 		if ($view===NULL) {
 			$view=$this->view;
@@ -153,20 +152,25 @@ class TemplateEngine
 	 * @param string $view
 	 * @return string
 	 */
-	public function getCachePath($view=NULL)
+	public function getCacheFilePath($view=NULL)
 	{
 		if ($view===NULL) {
 			$view=$this->view;
 		}
 		
-		return $this->cachePath . $this->view . '.view';
+		//Ajax文件
+		if ($this->ajaxDelimiter) {
+			$view.='_'.$this->ajaxDelimiter;
+		}
+		
+		return $this->cachePath . $view . '.view';
 	}
 	
 	/**
 	 * 将解析内容写到磁盘缓存
 	 */
 	public function writeCompiled(){
-		$cacheFile=$this->getCachePath() ;
+		$cacheFile=$this->getCacheFilePath() ;
 		$dirPath=dirname ( $cacheFile );
 		if (! is_dir ( $dirPath )) {
 			if (! mkdir ($dirPath, 0777, 1 )) {
@@ -328,7 +332,7 @@ class TemplateEngine
 		if ($level > $this->recursiveSubLimit)
 			return '';
 		
-		$viewFilePath = $this->getFilePath ( $subview );
+		$viewFilePath = $this->getTplFilePath ( $subview );
 		$this->templateLifeSin [] = filemtime ( $viewFilePath );
 		
 		$source = preg_replace ( '/' . preg_quote ( '<?php' ) . '(.*?)' . preg_quote ( "?>" ) . '[\r\n\s]*/is', '', file_get_contents ( $viewFilePath ) );
