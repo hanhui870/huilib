@@ -130,7 +130,7 @@ abstract class CacheBase
 	public static function create($config)
 	{
 		if (empty ( $config ['adapter'] )) {
-			throw new \HuiLib\Error\Exception ( 'Cache adapter can not be empty!' );
+			throw new \HuiLib\Error\Exception ( 'Cache adapter can not be empty' );
 		}
 		
 		switch ($config ['adapter']) {

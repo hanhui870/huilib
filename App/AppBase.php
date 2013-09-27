@@ -173,7 +173,7 @@ abstract class AppBase
 		$appNamespace=$this->appConfig->getByKey ( 'app.namespace' );
 		
 		if (empty($appNamespace) || !is_string($appNamespace)) {
-			throw new \HuiLib\Error\Exception ( "配置文件应用命名空间{app.namespace}配置错误!" );
+			throw new \HuiLib\Error\Exception ( "配置文件应用命名空间{app.namespace}配置错误" );
 		}
 		
 		return $appNamespace;
