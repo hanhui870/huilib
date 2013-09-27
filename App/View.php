@@ -27,7 +27,7 @@ class View extends \HuiLib\View\ViewBase
 		$this->initEngine($view, $ajaxDelimiter);
 		
 		$cacheFile=$this->_engineInstance->getCacheFilePath();
-		\HuiLib\Helper\Debug::mark('startRender');
+
 		if (!file_exists($cacheFile)) {//缓存文件不存在
 			$this->_engineInstance->parse()->writeCompiled();
 			
@@ -54,7 +54,6 @@ class View extends \HuiLib\View\ViewBase
 				$this->_engineInstance->parse()->writeCompiled();
 			}
 		}
-		\HuiLib\Helper\Debug::elapsed('startRender', 'endRender');
 		
 		include $this->_engineInstance->getCacheFilePath();
 	}
