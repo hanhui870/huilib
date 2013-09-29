@@ -8,22 +8,7 @@ namespace HuiLib\Session\Storage;
  * @since 2013/09/27
  */
 class Redis extends \HuiLib\Session\SessionBase
-{
-	protected $lifeTime=0;
-	
-	protected function __construct($driverConfig)
-	{
-		$this->driver=\HuiLib\Cache\CacheBase::create($driverConfig);
-		if (! $this->driver instanceof \HuiLib\Cache\CacheBase) {
-			throw new \HuiLib\Error\Exception ( 'Session cache driver initialized failed' );
-		}
-		
-		$life=intval(ini_get('session.cookie_lifetime'));
-		if ($life>0) {
-			$this->lifeTime=$life;
-		}
-	}
-	
+{		
 	public function open ( $savePath , $name )
 	{
 	}

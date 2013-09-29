@@ -9,11 +9,6 @@ namespace HuiLib\Session\Storage;
  */
 class Memcache extends \HuiLib\Session\SessionBase
 {
-	protected function __construct($driverConfig)
-	{
-		
-	}
-	
 	public function open ( $savePath , $name )
 	{
 	
@@ -21,12 +16,12 @@ class Memcache extends \HuiLib\Session\SessionBase
 	
 	public function read ( $sessionId )
 	{
-	
+		return $this->driver->get($sessionId);
 	}
 	
 	public function write ( $sessionId , $sessionData )
 	{
-	
+		return $this->driver->add($sessionId, $sessionData, FALSE, $this->lifeTime);
 	}
 	
 	public function close ()

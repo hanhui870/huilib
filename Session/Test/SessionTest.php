@@ -10,13 +10,15 @@ namespace HuiLib\Session\Test;
 class SessionTest extends \HuiLib\Test\TestBase
 {
 	public function run(){
-		$this->testRedis();
+		$this->test();
 	}
 	
-	private function testRedis()
+	private function test()
 	{
 		\HuiLib\Session\SessionBase::create($this->appInstance->configInstance ());
 		$_SESSION['gogogog']='fdsafsda';
+		
+		$_SESSION['timestamp']=time();
 
 		print_r($_SESSION);
 	}
