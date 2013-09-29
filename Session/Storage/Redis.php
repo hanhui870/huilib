@@ -8,7 +8,16 @@ namespace HuiLib\Session\Storage;
  * @since 2013/09/27
  */
 class Redis extends \HuiLib\Session\SessionBase
-{		
+{	
+	/**
+	 * Redis库键前缀 防止多实例名称冲突 
+	 * 
+	 * 默认使用String类型储存
+	 *
+	 * @var string
+	 */
+	private $prefix='';
+	
 	public function open ( $savePath , $name )
 	{
 	}

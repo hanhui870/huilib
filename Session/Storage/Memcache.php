@@ -4,6 +4,8 @@ namespace HuiLib\Session\Storage;
 /**
  * Session Memcache实现
  * 
+ * TODO Session通过prefix隔离命名空间
+ * 
  * @author 祝景法
  * @since 2013/09/27
  */

@@ -19,6 +19,8 @@ class Memcache extends \HuiLib\Cache\CacheBase
 	/**
 	 * Memcache库键前缀 防止多实例名称冲突
 	 * 
+	 * TODO Session通过prefix隔离命名空间
+	 * 
 	 * @var string
 	 */
 	private $prefix='';
