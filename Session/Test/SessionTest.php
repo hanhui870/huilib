@@ -16,10 +16,9 @@ class SessionTest extends \HuiLib\Test\TestBase
 	private function testRedis()
 	{
 		\HuiLib\Session\SessionBase::create($this->appInstance->configInstance ());
-		session_regenerate_id();
-		//$_SESSION['hanhui']='hello baby';
-		
-		//$_SESSION['dddd']=$_SESSION['hanhui'];
+		$_SESSION['gogogog']='fdsafsda';
+
+		print_r($_SESSION);
 	}
 	
 	protected static function className()

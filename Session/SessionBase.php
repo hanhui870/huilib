@@ -26,16 +26,34 @@ class SessionBase implements \SessionHandlerInterface  {
 		
 	}
 
+	/**
+	 * 初始化一个Session
+	 * 
+	 * @see \SessionHandlerInterface::open()
+	 */
 	public function open ( $savePath , $name )
 	{
-	
+		
 	}
 	
+	/**
+	 * 读取一个Session值
+	 * 
+	 * @see \SessionHandlerInterface::read()
+	 */
 	public function read ( $sessionId )
 	{
 	
 	}
 	
+	/**
+	 * 写入一个Session值
+	 * 
+	 * 写入的Session值全部都是通过serialize()处理过的字符串，如果单独处理某个键值，比较麻烦。从这个角度来说，Memcache性能好些。
+	 * 另外，Session都是针对单用户单线程，同个用户登录的Session也不同，无需防并发。
+	 * 
+	 * @see \SessionHandlerInterface::write()
+	 */
 	public function write ( $sessionId , $sessionData )
 	{
 	
@@ -45,7 +63,12 @@ class SessionBase implements \SessionHandlerInterface  {
 	{
 		
 	}
-
+	
+	/**
+	 * 销毁一批过期的Session
+	 * 
+	 * @see \SessionHandlerInterface::destroy()
+	 */
 	public function destroy ( $sessionId )
 	{
 		
