@@ -4,6 +4,9 @@ namespace HuiLib\Session;
 /**
  * Session基础类及工厂函数
  * 
+ * 由于session处理函数回调都是serialize后的数据，不是元数据，因此使用Memcache、Apc之类的更具有优势。
+ * Redis HASH数据结构处理起来要多个步骤。
+ * 
  * @author 祝景法
  * @since 2013/09/27
  */
@@ -26,6 +29,12 @@ class SessionBase implements \SessionHandlerInterface  {
 	 * @var int
 	 */
 	protected $lifeTime=0;
+	
+	/**
+	 * Session key prefix session键前缀，不同于缓存中的前缀
+	 * @var string
+	 */
+	protected static $prefix='';
 	
 	protected function __construct($driverConfig)
 	{
@@ -108,6 +117,11 @@ class SessionBase implements \SessionHandlerInterface  {
 		$driverConfig=$configInstance->getByKey($config ['driver']);
 		if (empty ( $driverConfig )) {
 			throw new \HuiLib\Error\Exception ( 'Session driver config can not be empty' );
+		}
+		
+		//设置session键前缀
+		if (!empty($config ['prefix'] )) {
+			self::$prefix=$config ['prefix'];
 		}
 		
 		switch ($config ['adapter']) {

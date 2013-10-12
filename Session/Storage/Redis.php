@@ -9,27 +9,18 @@ namespace HuiLib\Session\Storage;
  */
 class Redis extends \HuiLib\Session\SessionBase
 {	
-	/**
-	 * Redis库键前缀 防止多实例名称冲突 
-	 * 
-	 * 默认使用String类型储存
-	 *
-	 * @var string
-	 */
-	private $prefix='';
-	
 	public function open ( $savePath , $name )
 	{
 	}
 	
 	public function read ( $sessionId )
 	{
-		return $this->driver->get($sessionId);
+		return $this->driver->get(self::$prefix.$sessionId);
 	}
 	
 	public function write ( $sessionId , $sessionData )
 	{
-		return $this->driver->add($sessionId, $sessionData, $this->lifeTime);
+		return $this->driver->add(self::$prefix.$sessionId, $sessionData, $this->lifeTime);
 	}
 	
 	public function close ()

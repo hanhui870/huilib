@@ -17,9 +17,9 @@ class Memcache extends \HuiLib\Cache\CacheBase
 	protected $connect;
 	
 	/**
-	 * Memcache库键前缀 防止多实例名称冲突
+	 * Memcache库键前缀 防止多应用实例名称冲突
 	 * 
-	 * TODO Session通过prefix隔离命名空间
+	 * 通过prefix隔离命名空间
 	 * 
 	 * @var string
 	 */
@@ -54,7 +54,7 @@ class Memcache extends \HuiLib\Cache\CacheBase
 	 */
 	public function add($key, $value, $flag=FALSE, $expire=0)
 	{
-		return $this->connect->add($key, $value, $flag, $expire);
+		return $this->connect->add($this->prefix.$key, $value, $flag, $expire);
 	}
 	
 	/**
@@ -69,7 +69,7 @@ class Memcache extends \HuiLib\Cache\CacheBase
 	 */
 	public function replace($key, $value, $flag=FALSE, $expire=0)
 	{
-		return $this->connect->replace($key, $value, $flag, $expire);
+		return $this->connect->replace($this->prefix.$key, $value, $flag, $expire);
 	}
 	
 	/**
@@ -80,7 +80,7 @@ class Memcache extends \HuiLib\Cache\CacheBase
 	 */
 	public function delete($key, $timeout = 0)
 	{
-		return $this->connect->delete($key, $timeout);
+		return $this->connect->delete($this->prefix.$key, $timeout);
 	}
 	
 	/**
@@ -91,7 +91,7 @@ class Memcache extends \HuiLib\Cache\CacheBase
 	 */
 	public function get($key, $flags=NULL)
 	{
-		return $this->connect->get($key, $flags);
+		return $this->connect->get($this->prefix.$key, $flags);
 	}
 	
 	/**
@@ -101,7 +101,7 @@ class Memcache extends \HuiLib\Cache\CacheBase
 	 * @param mix $value 增加的值
 	 */
 	public function increase($key, $value=1){
-		return $this->connect->increment($key, $value);
+		return $this->connect->increment($this->prefix.$key, $value);
 	}
 	
 	/**
@@ -111,7 +111,7 @@ class Memcache extends \HuiLib\Cache\CacheBase
 	 * @param mix $value 减少的值
 	 */
 	public function decrease($key, $value=1){
-		return $this->connect->decrement($key, $value);
+		return $this->connect->decrement($this->prefix.$key, $value);
 	}
 	
 	/**

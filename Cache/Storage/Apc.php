@@ -9,10 +9,24 @@ namespace HuiLib\Cache\Storage;
  */
 class Apc extends \HuiLib\Cache\CacheBase
 {
+	/**
+	 * Apc库键前缀 防止多应用实例名称冲突
+	 *
+	 * 通过prefix隔离命名空间
+	 *
+	 * @var string
+	 */
+	private $prefix='';
+	
 	protected function __construct($config)
 	{
 		if (!extension_loaded('apc')) {
 			throw new \HuiLib\Error\Exception ( "PHP环境并不支持Apc拓展，请安装后继续" );
+		}
+		
+		$this->config=$config;
+		if (empty( $config['prefix'] )) {
+			$this->prefix= $config['prefix'];
 		}
 	}
 	
@@ -27,7 +41,7 @@ class Apc extends \HuiLib\Cache\CacheBase
 	 */
 	public function add($key, $value,$expire=0)
 	{
-		return apc_add($key, $value, $expire);
+		return apc_add($this->prefix.$key, $value, $expire);
 	}
 	
 	/**
@@ -41,7 +55,7 @@ class Apc extends \HuiLib\Cache\CacheBase
 	 */
 	public function replace($key, $value, $expire=0)
 	{
-		return apc_store($key, $value, $expire);
+		return apc_store($this->prefix.$key, $value, $expire);
 	}
 	
 	/**
@@ -51,7 +65,7 @@ class Apc extends \HuiLib\Cache\CacheBase
 	 */
 	public function delete($key)
 	{
-		return apc_delete($key);
+		return apc_delete($this->prefix.$key);
 	}
 	
 	/**
@@ -61,7 +75,7 @@ class Apc extends \HuiLib\Cache\CacheBase
 	 */
 	public function get($key)
 	{
-		return apc_fetch($key);
+		return apc_fetch($this->prefix.$key);
 	}
 	
 	/**
@@ -71,7 +85,7 @@ class Apc extends \HuiLib\Cache\CacheBase
 	 * @param mix $value 增加的值
 	 */
 	public function increase($key, $value=1){
-		return apc_inc($key, $value);
+		return apc_inc($this->prefix.$key, $value);
 	}
 	
 	/**
@@ -81,7 +95,7 @@ class Apc extends \HuiLib\Cache\CacheBase
 	 * @param mix $value 减少的值
 	 */
 	public function decrease($key, $value=1){
-		return apc_dec($key, $value);
+		return apc_dec($this->prefix.$key, $value);
 	}
 	
 	/**
