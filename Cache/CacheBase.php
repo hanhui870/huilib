@@ -152,65 +152,57 @@ abstract class CacheBase
 	}
 	
 	/**
-	 * 获取默认缓存实例
+	 * 获取系统默认缓存实例
 	 */
-	public static function getDefault(\HuiLib\Config\ConfigBase $configInstance){
+	public static function getDefault(\HuiLib\Config\ConfigBase $configInstance=NULL){
+		if ($configInstance===NULL) {
+			$configInstance=\HuiLib\Bootstrap::getInstance()->appInstance()->configInstance();
+		}
+		
 		$adapterName=$configInstance->getByKey('cache.defalut');
 		if (empty ($adapterName)) {
 			throw new \HuiLib\Error\Exception ( 'Cache default adapter has not set.' );
 		}
 		
+		return self::staticCreate($adapterName, $configInstance);
+	}
+	
+	/**
+	 * 获取Memcache默认缓存实例
+	 */
+	public static function getMemcache(\HuiLib\Config\ConfigBase $configInstance=NULL){
+		return self::staticCreate('cache.memcache', $configInstance);
+	}
+	
+	/**
+	 * 获取Redis默认缓存实例
+	 */
+	public static function getRedis(\HuiLib\Config\ConfigBase $configInstance=NULL){
+		return self::staticCreate('cache.redis', $configInstance);
+	}
+	
+	/**
+	 * 获取APC默认缓存实例
+	 */
+	public static function getApc(\HuiLib\Config\ConfigBase $configInstance=NULL){
+		return self::staticCreate('cache.apc', $configInstance);
+	}
+	
+	/**
+	 * 获取File默认缓存实例
+	 */
+	public static function getFile(\HuiLib\Config\ConfigBase $configInstance=NULL){
+		return self::staticCreate('cache.file', $configInstance);
+	}
+	
+	private static function staticCreate($adapterName, \HuiLib\Config\ConfigBase $configInstance=NULL){
+		if ($configInstance===NULL) {
+			$configInstance=\HuiLib\Bootstrap::getInstance()->appInstance()->configInstance();
+		}
+		
 		$adapterConfig=$configInstance->getByKey($adapterName);
 		if (empty ( $adapterConfig )) {
-			throw new \HuiLib\Error\Exception ( 'Cache default adapter config has not set.' );
-		}
-		
-		return self::create($adapterConfig);
-	}
-	
-	/**
-	 * 获取默认缓存实例
-	 */
-	public static function getMemcache(\HuiLib\Config\ConfigBase $configInstance){
-		$adapterConfig=$configInstance->getByKey('cache.memcache');
-		if (empty ( $adapterConfig )) {
-			throw new \HuiLib\Error\Exception ( 'Cache Memcache adapter config has not set.' );
-		}
-		
-		return self::create($adapterConfig);
-	}
-	
-	/**
-	 * 获取默认缓存实例
-	 */
-	public static function getRedis(\HuiLib\Config\ConfigBase $configInstance){
-		$adapterConfig=$configInstance->getByKey('cache.redis');
-		if (empty ( $adapterConfig )) {
-			throw new \HuiLib\Error\Exception ( 'Cache Redis adapter config has not set.' );
-		}
-		
-		return self::create($adapterConfig);
-	}
-	
-	/**
-	 * 获取默认缓存实例
-	 */
-	public static function getApc(\HuiLib\Config\ConfigBase $configInstance){
-		$adapterConfig=$configInstance->getByKey('cache.apc');
-		if (empty ( $adapterConfig )) {
-			throw new \HuiLib\Error\Exception ( 'Cache APC adapter config has not set.' );
-		}
-		
-		return self::create($adapterConfig);
-	}
-	
-	/**
-	 * 获取默认缓存实例
-	 */
-	public static function getFile(\HuiLib\Config\ConfigBase $configInstance){
-		$adapterConfig=$configInstance->getByKey('cache.file');
-		if (empty ( $adapterConfig )) {
-			throw new \HuiLib\Error\Exception ( 'Cache File adapter config has not set.' );
+			throw new \HuiLib\Error\Exception ( $adapterName.' adapter config has not set.' );
 		}
 		
 		return self::create($adapterConfig);
