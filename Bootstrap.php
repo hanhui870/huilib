@@ -1,6 +1,5 @@
 <?php
 namespace HuiLib;
-use HuiLib\Loader\AutoLoad;
 
 /**
  * 系统初始化引导文件
@@ -112,16 +111,6 @@ class Bootstrap
 		} else {
 			define ( "APP_ENV", self::DEFAULT_ENV );
 		}
-	}
-	
-	/**
-	 * 初始化异常和错误处理程序
-	 * 
-	 * TODO
-	 */
-	private function initErrorHandle()
-	{
-		
 	}
 
 	/**
