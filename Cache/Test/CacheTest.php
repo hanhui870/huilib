@@ -12,7 +12,7 @@ class CacheTest extends \HuiLib\Test\TestBase
 
 	public function run()
 	{
-		$this->testMemcache ();
+		$this->testStaticInit ();
 	}
 
 	private function testMemcache()
@@ -70,6 +70,37 @@ class CacheTest extends \HuiLib\Test\TestBase
 		$cache->increase ( 'replace' );
 		$cache->increase ( 'replace' );
 		echo 'replace:' . $cache->get ( 'replace' );
+	}
+	
+	/**
+	 * 测试通过静态函数获取
+	 */
+	private function testStaticInit()
+	{
+		$cache=\HuiLib\Cache\CacheBase::getDefault($this->appInstance->configInstance ());
+		echo $cache->toString();
+		$cache->add ( 'hanhui2', date ( 'Y-m-d H:i:s' ) );
+		echo $cache->get ( 'hanhui2' );
+		
+		//测试数组
+		$cache->replace ( 'array', $this->appInstance->configInstance ()->getByKey ( 'cache.memcache' ) );
+		\HuiLib\Helper\Debug::out ( $cache->get ( 'array' ) );
+		
+		$cache->add ( 'count', 0 );
+		$cache->increase ( 'count' );
+		echo $cache->get ( 'count' );
+		
+		$cache=\HuiLib\Cache\CacheBase::getRedis($this->appInstance->configInstance ());
+		echo $cache->toString();
+		
+		$cache=\HuiLib\Cache\CacheBase::getMemcache($this->appInstance->configInstance ());
+		echo $cache->toString();
+		
+		$cache=\HuiLib\Cache\CacheBase::getApc($this->appInstance->configInstance ());
+		echo $cache->toString();
+		
+		$cache=\HuiLib\Cache\CacheBase::getFile($this->appInstance->configInstance ());
+		echo $cache->toString();
 	}
 
 	protected static function className()
