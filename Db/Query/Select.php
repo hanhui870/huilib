@@ -64,6 +64,8 @@ class Select extends \HuiLib\Db\Query
 	protected $union = array ();
 	
 	/**
+	 * 事务更新锁定模式
+	 * 
 	 * @var boolean
 	 */
 	protected $forUpdate = false;
