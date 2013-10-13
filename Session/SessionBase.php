@@ -4,13 +4,16 @@ namespace HuiLib\Session;
 /**
  * Session基础类及工厂函数
  * 
- * 由于session处理函数回调都是serialize后的数据，不是元数据，因此使用Memcache、Apc之类的更具有优势。
- * Redis HASH数据结构处理起来要多个步骤。
+ * 1、数据储存使用Memcache、Apc之类的更具有优势。（由于session处理函数回调都是serialize后的数据，不是元数据）
+ * 2、Session管理使用Redis KV数据库管理元数据，如在线列表、保持登录等功能
+ * 
+ * 清空本访问关联session使用: $_SESSION=array();//使用''无效
  * 
  * @author 祝景法
  * @since 2013/09/27
  */
-class SessionBase implements \SessionHandlerInterface  {
+class SessionBase implements \SessionHandlerInterface  
+{
 	/**
 	 * Session内部连接
 	 *
@@ -36,6 +39,12 @@ class SessionBase implements \SessionHandlerInterface  {
 	 */
 	protected static $prefix='';
 	
+	/**
+	 * Session GC 管理器
+	 * @var \HuiLib\Session\SessionManager
+	 */
+	protected $manager=NULL;
+	
 	protected function __construct($driverConfig)
 	{
 		$this->driver=\HuiLib\Cache\CacheBase::create($driverConfig);
@@ -47,16 +56,25 @@ class SessionBase implements \SessionHandlerInterface  {
 		if ($life>0) {
 			$this->lifeTime=$life;
 		}
+		
+		//session管理器
+		$this->manager=\HuiLib\Session\SessionManager::create();
+		$this->manager->setAdapter($this);
 	}
 
 	/**
 	 * 初始化一个Session
 	 * 
+	 * 每次session访问均有open操作
+	 * 1、更新用户session最后活跃时间
+	 * 2、到期前7天内活跃需延长用户Token cookie生命期，session储存键的生命期（session生命期有写入会自动延长）
+	 * 
 	 * @see \SessionHandlerInterface::open()
 	 */
 	public function open ( $savePath , $name )
 	{
-		
+
+		return true;
 	}
 	
 	/**
@@ -84,7 +102,7 @@ class SessionBase implements \SessionHandlerInterface  {
 	
 	public function close ()
 	{
-		
+		return true;
 	}
 	
 	/**
@@ -94,10 +112,29 @@ class SessionBase implements \SessionHandlerInterface  {
 	 */
 	public function destroy ( $sessionId )
 	{
-		
+		return true;
 	}
 
+	/**
+	 * GC调用接口
+	 * 
+	 * Called randomly by PHP internally when a session starts or when session_start() is invoked.
+	 * 
+	 * @see SessionHandlerInterface::gc()
+	 */
 	public function gc ( $maxlifetime )
+	{
+
+	}
+	
+	/**
+	 * 设置或初始化SessionID
+	 * 
+	 * @param string $token session token
+	 * 
+	 * @see SessionHandlerInterface::gc()
+	 */
+	public function session_id ( $token )
 	{
 		
 	}
