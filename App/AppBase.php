@@ -72,6 +72,9 @@ abstract class AppBase
 	 */
 	public function run()
 	{
+		//初始化Session Test需要独立初始化
+		$this->initSession();
+		
 		$this->request->init();
 		
 		if (method_exists($this->request->controllerInstance(), 'dispatch')) {
@@ -191,6 +194,7 @@ abstract class AppBase
 	 */
 	protected function initSession()
 	{
+		\HuiLib\Session\SessionBase::create($this->configInstance ());
 	}
 
 	/**

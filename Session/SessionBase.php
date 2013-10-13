@@ -106,7 +106,7 @@ class SessionBase implements \SessionHandlerInterface
 	}
 	
 	/**
-	 * 销毁一批过期的Session
+	 * 销毁当前一条Session，不同于GC
 	 * 
 	 * @see \SessionHandlerInterface::destroy()
 	 */
