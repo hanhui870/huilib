@@ -68,7 +68,7 @@ class Redis extends \HuiLib\Cache\CacheBase
 	 */
 	public function replace($key, $value, $expire=0)
 	{
-		return $this->connect->set($key, $value, $expire);
+		return $this->add($key, $value, $expire);
 	}
 	
 	/**

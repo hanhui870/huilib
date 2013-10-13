@@ -12,7 +12,7 @@ class CacheTest extends \HuiLib\Test\TestBase
 
 	public function run()
 	{
-		$this->testStaticInit ();
+		$this->testMemcache ();
 	}
 
 	private function testMemcache()
@@ -25,7 +25,8 @@ class CacheTest extends \HuiLib\Test\TestBase
 		$cache->replace ( 'array', $this->appInstance->configInstance ()->getByKey ( 'cache.memcache' ) );
 		\HuiLib\Helper\Debug::out ( $cache->get ( 'array' ) );
 		
-		$cache->add ( 'count', 0 );
+		$cache->add ( 'count', 0 );//行为每次改为初始化为1
+		$cache->increase ( 'count' );
 		$cache->increase ( 'count' );
 		echo $cache->get ( 'count' );
 	}

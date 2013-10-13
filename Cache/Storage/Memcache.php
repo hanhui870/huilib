@@ -45,7 +45,7 @@ class Memcache extends \HuiLib\Cache\CacheBase
 	/**
 	 * 添加一个缓存
 	 * 
-	 * 只能新添加一个值，重复刷新不会覆盖
+	 * 修改为: 强制设置，强制过期
 	 * 
 	 * @param string $key 缓存键
 	 * @param mix $value 缓存值
@@ -54,13 +54,16 @@ class Memcache extends \HuiLib\Cache\CacheBase
 	 */
 	public function add($key, $value, $flag=FALSE, $expire=0)
 	{
-		return $this->connect->add($this->prefix.$key, $value, $flag, $expire);
+		if (!$this->connect->add($this->prefix.$key, $value, $flag, $expire)) {//只能新添加一个值，重复刷新不会覆盖
+			return $this->connect->replace($this->prefix.$key, $value, $flag, $expire);//必须是已存在的，不存在的会导致设置失败
+		}
+		return true;
 	}
 	
 	/**
 	 * 替换一个已存在的缓存
 	 *
-	 * 必须是已存在的，不存在的会导致设置失败
+	 * 修改为: 强制设置，强制过期
 	 * 
 	 * @param string $key 缓存键
 	 * @param mix $value 缓存值
@@ -69,7 +72,7 @@ class Memcache extends \HuiLib\Cache\CacheBase
 	 */
 	public function replace($key, $value, $flag=FALSE, $expire=0)
 	{
-		return $this->connect->replace($this->prefix.$key, $value, $flag, $expire);
+		return $this->add($key, $value, $flag, $expire);
 	}
 	
 	/**
