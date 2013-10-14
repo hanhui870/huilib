@@ -41,6 +41,6 @@ class Memcache extends \HuiLib\Session\SessionBase
 	{
 		parent::destroy($sessionId);
 		
-		return true;
+		return $this->driver->delete(self::$prefix.$sessionId);
 	}
 }

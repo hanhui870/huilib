@@ -79,6 +79,9 @@ class SessionBase implements \SessionHandlerInterface
 			session_id(\HuiLib\Helper\Utility::geneRandomHash());
 		}
 		
+		//更新session管理器最后活跃
+		$this->manager->update(session_id());
+		
 		return true;
 	}
 	
@@ -117,7 +120,17 @@ class SessionBase implements \SessionHandlerInterface
 	 */
 	public function destroy ( $sessionId )
 	{
-		return true;
+		//清除浏览器session cookie
+		$cookie=\HuiLib\Helper\Cookie::create()->delCookie(ini_get('session.name'));
+		
+		/**
+		 * TODO 将个人资料推送到数据库中的操作 
+		 * 1、因为将要删除实体session储存
+		 * 2、推送操作全部以session中的数据为基础，不能依据目前用户的$_SESSION操作，因为可能是GC触发的
+		 */
+		
+		//从管理列表中剔除一个SessionID
+		return $this->manager->delete(session_id());
 	}
 
 	/**
@@ -129,7 +142,17 @@ class SessionBase implements \SessionHandlerInterface
 	 */
 	public function gc ( $maxlifetime )
 	{
-
+		return $this->manager->gc($maxlifetime);
+	}
+	
+	/**
+	 * 获取session管理器
+	 * 
+	 * @return \HuiLib\Session\SessionManager
+	 */
+	public function getManager ( )
+	{
+		return $this->manager;
 	}
 	
 	/**

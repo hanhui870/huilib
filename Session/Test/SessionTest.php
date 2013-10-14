@@ -16,9 +16,6 @@ class SessionTest extends \HuiLib\Test\TestBase
 	private function test()
 	{
 		\HuiLib\Session\SessionBase::create($this->appInstance->configInstance ());
-		$_SESSION['gogogog']='fdsafsda';
-		
-		$_SESSION['timestamp']=time();
 
 		print_r($_SESSION);
 	}
