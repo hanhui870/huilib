@@ -19,7 +19,7 @@ abstract class AppBase
 	 * 请求对象
 	 * @var \HuiLib\Request\RequestBase
 	 */
-	protected $request;
+	protected $requestInstance;
 	
 	/**
 	 * 响应内容
@@ -37,7 +37,13 @@ abstract class AppBase
 	 * 数据库连接
 	 *  @var \HuiLib\Db\DbBase
 	 */
-	protected static $dbInstance;
+	protected $dbInstance=NULL;
+	
+	/**
+	 * session实例
+	 *  @var \HuiLib\Session\SessionBase
+	 */
+	protected $sessionInstance=NULL;
 
 	/**
 	 * 构造函数
@@ -75,15 +81,15 @@ abstract class AppBase
 		//初始化Session Test需要独立初始化
 		$this->initSession();
 		
-		$this->request->init();
+		$this->requestInstance->init();
 		
-		if (method_exists($this->request->controllerInstance(), 'dispatch')) {
-			$this->request->controllerInstance()->dispatch();
+		if (method_exists($this->requestInstance->controllerInstance(), 'dispatch')) {
+			$this->requestInstance->controllerInstance()->dispatch();
 		}else{
 			throw new \HuiLib\Error\Exception ( "AppBase::run controller dispatch failed!" );
 		}
 		
-		$this->request->controllerInstance()->output();
+		$this->requestInstance->controllerInstance()->output();
 	}
 
 	/**
@@ -142,7 +148,7 @@ abstract class AppBase
 	 */
 	public function requestInstance()
 	{
-		return $this->request;
+		return $this->requestInstance;
 	}
 
 	/**
@@ -152,7 +158,7 @@ abstract class AppBase
 	{
 		$dbSetting = $this->appConfig->getByKey ( 'db' );
 		\HuiLib\Db\DbBase::setConfig ( $dbSetting );
-		self::$dbInstance = \HuiLib\Db\DbBase::createMaster ();
+		$this->dbInstance = \HuiLib\Db\DbBase::createMaster ();
 	}
 
 	/**
@@ -161,11 +167,11 @@ abstract class AppBase
 	 */
 	public function getDb()
 	{
-		if (self::$dbInstance === NULL) {
+		if ($this->dbInstance === NULL) {
 			$this->initDatabse ();
 		}
 		
-		return self::$dbInstance;
+		return $this->dbInstance;
 	}
 
 	/**
@@ -194,7 +200,16 @@ abstract class AppBase
 	 */
 	protected function initSession()
 	{
-		\HuiLib\Session\SessionBase::create($this->configInstance ());
+		$this->sessionInstance=\HuiLib\Session\SessionBase::create($this->configInstance ());
+	}
+	
+	/**
+	 * 返回session对象实例
+	 * @return \HuiLib\Session\SessionBase
+	 */
+	public function sessionInstance()
+	{
+		return $this->sessionInstance;
 	}
 
 	/**
