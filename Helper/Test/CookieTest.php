@@ -18,7 +18,9 @@ class CookieTest extends \HuiLib\Test\TestBase
 		$cookie->enableHttpOnly()->enableP3P();
 		//$cookie->enableSecure();//得在https条件下测试
 		//$cookie->setPath('/index/'); //目录需要在相应目录下测试
-		$cookie->disableHttpOnly()->setLife(0)->setSookie('bbs', time());
+		
+		//超长生命期测试
+		$cookie->disableHttpOnly()->setLife(99999999)->setSookie('bbs', time());
 	}
 	
 	private function testDel(){
