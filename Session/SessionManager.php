@@ -69,6 +69,26 @@ class SessionManager
 	}
 	
 	/**
+	 * 更新一个自动登录session的deadline
+	 *
+	 * @param string $key Hash缓存键
+	 */
+	public function updateAutoLogin($key)
+	{
+		return $this->redis->zAdd(self::MANAGER_AUTOLOGIN, time(), $key);
+	}
+	
+	/**
+	 * 将一个session从AutoLogin列表中移除
+	 *
+	 * @param string $key Hash缓存键
+	 */
+	public function deleteAutoLogin($key)
+	{
+		return $this->redis->zDelete(self::MANAGER_AUTOLOGIN, $key);
+	}
+	
+	/**
 	 * 执行一次session gc操作
 	 * 
 	 * 算法：
