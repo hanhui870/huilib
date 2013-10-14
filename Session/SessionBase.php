@@ -73,7 +73,12 @@ class SessionBase implements \SessionHandlerInterface
 	 */
 	public function open ( $savePath , $name )
 	{
-
+		//初始化，设置个性化40位SessionID
+		if (session_id()=='') {
+			//自定义规则生成session_id的方案，必须在session_open中调用有效
+			session_id(\HuiLib\Helper\Utility::geneRandomHash());
+		}
+		
 		return true;
 	}
 	
@@ -125,18 +130,6 @@ class SessionBase implements \SessionHandlerInterface
 	public function gc ( $maxlifetime )
 	{
 
-	}
-	
-	/**
-	 * 设置或初始化SessionID
-	 * 
-	 * @param string $token session token
-	 * 
-	 * @see SessionHandlerInterface::gc()
-	 */
-	public function session_id ( $token )
-	{
-		
 	}
 	
 	/**
