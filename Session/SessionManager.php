@@ -18,7 +18,7 @@ namespace HuiLib\Session;
 class SessionManager
 {
 	const MANAGER_DATALIST='global:session:gc:manager:datalist';
-	const MANAGER_AUTOLOGIN='global:session:gc:manager:autologin';
+	const MANAGER_DEADLINE='global:session:gc:manager:deadline';
 	
 	/**
 	 * 管理器缓存内部连接
@@ -29,7 +29,7 @@ class SessionManager
 	
 	/**
 	 * Session Connect
-	 * @var \HuiLib\Session\SessionManager
+	 * @var \HuiLib\Session\SessionBase
 	 */
 	protected $connect=NULL;
 	
@@ -69,13 +69,14 @@ class SessionManager
 	}
 	
 	/**
-	 * 更新一个自动登录session的deadline
+	 * 延长一个自动登录session的deadline
 	 *
 	 * @param string $key Hash缓存键
 	 */
-	public function updateAutoLogin($key)
+	public function updateDeadline($key)
 	{
-		return $this->redis->zAdd(self::MANAGER_AUTOLOGIN, time(), $key);
+		$life=$this->connect->getLife();
+		return $this->redis->zAdd(self::MANAGER_DEADLINE, time()+$life, $key);
 	}
 	
 	/**
@@ -83,9 +84,9 @@ class SessionManager
 	 *
 	 * @param string $key Hash缓存键
 	 */
-	public function deleteAutoLogin($key)
+	public function deleteDeadline($key)
 	{
-		return $this->redis->zDelete(self::MANAGER_AUTOLOGIN, $key);
+		return $this->redis->zDelete(self::MANAGER_DEADLINE, $key);
 	}
 	
 	/**
@@ -93,9 +94,12 @@ class SessionManager
 	 * 
 	 * 算法：
 	 * 1、在线列表：将ZSet数据集中最后活跃(<time()-$life)所有垃圾销毁掉
-	 * 2、保持登录：一个月到期后用户还没出来活动(>deadline)，删除保留的cookie
+	 * 2、保持登录：session到期后用户还没出来活动(>deadline)
 	 * 
 	 * 1和2不可能有相交，因为2到期内，会自动延长deadline；销毁前都需要调用session destory()函数
+	 * 
+	 * 原ylstu库操作条件：
+	 * (deadline>0 and deadline<timeNow) or (deadline=0 and ltime=timeNow-keepOline)
 	 *
 	 * @param string $key Hash缓存键
 	 */
