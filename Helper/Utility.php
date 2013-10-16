@@ -38,5 +38,36 @@ class Utility
 		return implode('', $result);
 	}
 	
+	/**
+	 * 将IP转换为数字按255基础换算。
+	 * 
+	 *  经测试，php数值可以超过2^32，这里的最大值也小于该值。
+	 *  
+	 * @param $ip string 四位数字组成的IP
+	 * @return 某ip的对应唯一值，忽略没有意义的前缀0位
+	 */
+	public static function ipToNum($ip) {
+		if (empty ( $ip ))
+			return 0;
+		$ipArray = self::splitIpString ( $ip );
 	
+		return $ipArray ['ip1'] * 255 * 255 * 255 + $ipArray ['ip2'] * 255 * 255 + $ipArray ['ip3'] * 255 + $ipArray ['ip4'];
+	}
+	
+	/**
+	 * 分拆IP
+	 * 
+	 * param $ip string 四位数字组成的IP
+	 */
+	public static function splitIpString($ip) {
+		if (empty ( $ip ))
+			return false;
+
+		$ipNew = array ();
+		list ( $ipNew ['ip1'], $ipNew ['ip2'], $ipNew ['ip3'], $ipNew ['ip4'] ) = @explode ( '.', $ip );
+		$ipNew=array_map('intval', $ipNew);
+		$ipArray [$ip] = $ipNew;
+	
+		return $ipNew;
+	}
 }

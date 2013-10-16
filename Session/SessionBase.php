@@ -4,8 +4,10 @@ namespace HuiLib\Session;
 /**
  * Session基础类及工厂函数
  * 
- * 1、数据储存使用Memcache、Apc之类的更具有优势。（由于session处理函数回调都是serialize后的数据，不是元数据）
+ * 1、数据储存使用Memcache、Apc之类的更具有优势。
+ *     （由于session处理函数回调都是serialize后的数据，不是元数据；单用户单线程，无需防并发）
  * 2、Session管理使用Redis KV数据库管理元数据，如在线列表、保持登录等功能
+ * 3、针对Robots的session_id特殊处理
  * 
  * 清空本访问关联session使用: $_SESSION=array();//使用''无效
  * 
@@ -28,10 +30,12 @@ class SessionBase implements \SessionHandlerInterface
 	protected $config=NULL;
 	
 	/**
-	 * Session生存时间
+	 * Session后端生存时间
+	 * 
+	 * 默认一个月，需要到期前自动延长
 	 * @var int
 	 */
-	protected $lifeTime=0;
+	protected $lifeTime=2592000;
 	
 	/**
 	 * Session key prefix session键前缀，不同于缓存中的前缀
@@ -52,11 +56,6 @@ class SessionBase implements \SessionHandlerInterface
 			throw new \HuiLib\Error\Exception ( 'Session cache driver initialized failed' );
 		}
 		
-		$life=intval(ini_get('session.cookie_lifetime'));
-		if ($life>0) {
-			$this->lifeTime=$life;
-		}
-		
 		//session管理器
 		$this->manager=\HuiLib\Session\SessionManager::create();
 		$this->manager->setAdapter($this);
@@ -67,7 +66,7 @@ class SessionBase implements \SessionHandlerInterface
 	 * 
 	 * 每次session访问均有open操作
 	 * 1、更新用户session最后活跃时间
-	 * 2、到期前7天内活跃需延长用户Token cookie生命期，session储存键的生命期（session生命期有写入会自动延长）
+	 * 2、到期前7天内活跃需延长用户Passport cookie生命期，session储存键的生命期
 	 * 
 	 * @see \SessionHandlerInterface::open()
 	 */
@@ -98,8 +97,7 @@ class SessionBase implements \SessionHandlerInterface
 	/**
 	 * 写入一个Session值
 	 * 
-	 * 写入的Session值全部都是通过serialize()处理过的字符串，如果单独处理某个键值，比较麻烦。从这个角度来说，Memcache性能好些。
-	 * 另外，Session都是针对单用户单线程，同个用户登录的Session也不同，无需防并发。
+	 * session有效期同
 	 * 
 	 * @see \SessionHandlerInterface::write()
 	 */
@@ -153,6 +151,29 @@ class SessionBase implements \SessionHandlerInterface
 	public function getManager ( )
 	{
 		return $this->manager;
+	}
+	
+	/**
+	 * 获取session后端生命期
+	 * 
+	 * @return boolean
+	 */
+	public function getLife ()
+	{
+		return $this->lifeTime;
+	}
+	
+	/**
+	 * 设置session后端生存周期
+	 *
+	 * @param int $life 生存周期长度 默认一个月
+	 */
+	public function setLife($life){
+		if ($life>=0) {
+			$this->lifeTime=$life;
+		}
+	
+		return $this;
 	}
 	
 	/**

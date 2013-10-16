@@ -112,6 +112,44 @@ class Redis extends \HuiLib\Cache\CacheBase
 	}
 	
 	/**
+	 * 使用redis pipeline技术批量插入
+	 * 
+	 * 这是插入到同一个键中的
+	 * 
+	 * @param $key 目标插入的key
+	 * @param Array $dataList 由id, score键数组组成的数组列表
+	 */
+	protected function zsetPipeInsert($key, $dataList){
+		if (empty($key) || !is_array($dataList)) return false;
+	
+		$pipeLine=$this->connect->multi();
+		foreach ($dataList as $unit){
+			$pipeLine->zAdd($key, $unit['score'], $unit['id']);
+		}
+		$pipeLine->exec();
+	
+		return true;
+	}
+	
+	/**
+	 * 批量删除Redis Key
+	 * 
+	 * @param array $keys 键数组
+	 */
+	public function deleteKeys($keys){
+		if (empty($keys)) return false;
+	
+		$pipeLine=$this->connect->multi();
+		foreach ($keys as $key){
+			$pipeLine->del($key);
+		}
+		$pipeLine->exec();
+	
+		return true;
+	}
+	
+	
+	/**
 	 * 清空所有数据
 	 *
 	 */

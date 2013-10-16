@@ -2,10 +2,10 @@
 namespace HuiLib\Helper;
 
 /**
- * Param参数辅助方法
+ * Cookie辅助类
  *
  * @author 祝景法
- * @since 2013/09/19
+ * @since 2013/10/14
  */
 class Cookie
 {
