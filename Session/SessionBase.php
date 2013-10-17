@@ -44,6 +44,12 @@ class SessionBase implements \SessionHandlerInterface
 	protected static $prefix='';
 	
 	/**
+	 * 浏览器端保存cookie权限验证的名称
+	 * @var string
+	 */
+	protected static $authCookieName='';
+	
+	/**
 	 * Session GC 管理器
 	 * @var \HuiLib\Session\SessionManager
 	 */
@@ -75,7 +81,11 @@ class SessionBase implements \SessionHandlerInterface
 		//初始化，设置个性化40位SessionID
 		if (session_id()=='') {
 			//自定义规则生成session_id的方案，必须在session_open中调用有效
-			session_id(\HuiLib\Helper\Utility::geneRandomHash());
+			$sessionId=\HuiLib\Helper\Utility::geneRandomHash();
+			if ($this->read($sessionId)) {//session存在
+				$sessionId=\HuiLib\Helper\Utility::geneRandomHash();//再尝试生成一次
+			}
+			session_id($sessionId);
 		}
 		
 		//更新session管理器最后活跃
@@ -118,17 +128,25 @@ class SessionBase implements \SessionHandlerInterface
 	 */
 	public function destroy ( $sessionId )
 	{
-		//清除浏览器session cookie
-		$cookie=\HuiLib\Helper\Cookie::create()->delCookie(ini_get('session.name'));
+		//清除浏览器session passport cookie; sessionId不用清理 因为长期
+		$cookie=\HuiLib\Helper\Cookie::create()->delCookie(self::$authCookieName);
 		
 		/**
-		 * TODO 将个人资料推送到数据库中的操作 
-		 * 1、因为将要删除实体session储存
-		 * 2、推送操作全部以session中的数据为基础，不能依据目前用户的$_SESSION操作，因为可能是GC触发的
+		 * 将个人资料推送到数据库中的操作 
+		 * 
+		 * 用户触发，不管保持登录，直接清除(在子类触发)
 		 */
+		$this->manager->pushSessionToDb($session);
 		
 		//从管理列表中剔除一个SessionID
-		return $this->manager->delete(session_id());
+		return $this->manager->delete($sessionId);
+	}
+	
+	/**
+	 * 删除session实体数据接口 
+	 */
+	public function delete ( $sessionId )
+	{
 	}
 
 	/**
@@ -196,6 +214,11 @@ class SessionBase implements \SessionHandlerInterface
 		//设置session键前缀
 		if (!empty($config ['prefix'] )) {
 			self::$prefix=$config ['prefix'];
+		}
+		//权限验证名称
+		$authCookie=$configInstance->getByKey('app.session.auth');
+		if (!empty($authCookie )) {
+			self::$authCookieName=$authCookie;
 		}
 		
 		switch ($config ['adapter']) {

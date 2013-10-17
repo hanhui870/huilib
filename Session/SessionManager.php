@@ -33,6 +33,11 @@ class SessionManager
 	 */
 	protected $connect=NULL;
 	
+	/**
+	 * 每次GC最大执行数
+	 */
+	const MAX_GC_PER_ACTION=200;
+	
 	private function __construct()
 	{
 		$this->redis=\HuiLib\Cache\CacheBase::getRedis();
@@ -41,7 +46,7 @@ class SessionManager
 	/**
 	 * 设置Session Connect Adapter
 	 *
-	 * @param string $key Hash缓存键
+	 * @param string $sessionId Hash缓存键
 	 */
 	public function setAdapter(\HuiLib\Session\SessionBase $session)
 	{
@@ -51,42 +56,59 @@ class SessionManager
 	/**
 	 * 更新一个session的最后活跃时间
 	 * 
-	 * @param string $key Hash缓存键
+	 * @param string $sessionId Hash缓存键
 	 */
-	public function update($key)
+	public function update($sessionId)
 	{
-		return $this->redis->zAdd(self::MANAGER_DATALIST, time(), $key);
+		return $this->redis->zAdd(self::MANAGER_DATALIST, time(), $sessionId);
 	}
 	
 	/**
 	 * 删除一个session
 	 *
-	 * @param string $key Hash缓存键
+	 * @param string $sessionId Hash缓存键
 	 */
-	public function delete($key)
+	public function delete($sessionId)
 	{
-		return $this->redis->zDelete(self::MANAGER_DATALIST, $key);
+		return $this->redis->zDelete(self::MANAGER_DATALIST, $sessionId);
+	}
+	
+	/**
+	 * 获取一个session的最近一次操作时间
+	 */
+	public function getLastVisit($sessionId){
+		return $this->redis->zScore(self::MANAGER_DATALIST, $sessionId);
 	}
 	
 	/**
 	 * 延长一个自动登录session的deadline
 	 *
-	 * @param string $key Hash缓存键
+	 * @param string $sessionId Hash缓存键
 	 */
-	public function updateDeadline($key)
+	public function updateDeadline($sessionId)
 	{
+		//Session后端生存时间 默认一个月
 		$life=$this->connect->getLife();
-		return $this->redis->zAdd(self::MANAGER_DEADLINE, time()+$life, $key);
+		return $this->redis->zAdd(self::MANAGER_DEADLINE, time()+$life, $sessionId);
 	}
 	
 	/**
 	 * 将一个session从AutoLogin列表中移除
 	 *
-	 * @param string $key Hash缓存键
+	 * @param string $sessionId Hash缓存键
 	 */
-	public function deleteDeadline($key)
+	public function deleteDeadline($sessionId)
 	{
-		return $this->redis->zDelete(self::MANAGER_DEADLINE, $key);
+		return $this->redis->zDelete(self::MANAGER_DEADLINE, $sessionId);
+	}
+	
+	/**
+	 * 获取一个session的超时时间
+	 * 
+	 * 无数据表示非保持登录用户
+	 */
+	public function getDeadline($sessionId){
+		return $this->redis->zScore(self::MANAGER_DEADLINE, $sessionId);
 	}
 	
 	/**
@@ -96,20 +118,84 @@ class SessionManager
 	 * 1、在线列表：将ZSet数据集中最后活跃(<time()-$life)所有垃圾销毁掉
 	 * 2、保持登录：session到期后用户还没出来活动(>deadline)
 	 * 
-	 * 1和2不可能有相交，因为2到期内，会自动延长deadline；销毁前都需要调用session destory()函数
+	 * 1和2可能相交，保持登录用户超时后清除在线列表；销毁前调用session delete()函数
 	 * 
 	 * 原ylstu库操作条件：
 	 * (deadline>0 and deadline<timeNow) or (deadline=0 and ltime=timeNow-keepOline)
 	 *
-	 * @param string $key Hash缓存键
+	 * @param string $sessionId Hash缓存键
 	 */
 	public function gc($maxlifetime)
 	{
-		echo 'session gc by manager';
+		$gcTime=time();
 		
+		/**
+		 * 获取超过在线时间允许的列表并清理之 limit => array($offset, $count)
+		 * 
+		 * 取出来数据格式 array($sessionID=>score):
+		 * Array([yunk5y093qzlcoij5nhbz49ospyay4rp8yilbxli] => 1379425023)
+		 */
+		$endStamp=$gcTime-$this->connect->getLife();
+		$kickOnline=$this->redis->zRangeByScore(self::MANAGER_DATALIST, 0, $endStamp, array('withscores'=>TRUE, 'limit' => array(0, self::MAX_GC_PER_ACTION)));
+		//print_r($kickOnline);die();
 		
+		if (!empty($kickOnline)) {
+			$redisMulti=$this->redis->multi();
+			foreach ($kickOnline as $sessionId=>$lastVisit ){
+				//删除在线列表中数据
+				$redisMulti->zDelete(self::MANAGER_DATALIST, $sessionId);
+				
+				//删除实体session数据 保持登录标记
+				$session=$this->connect->read($sessionId);
+				if (empty($session)) {
+					//为空，直接删除
+					$this->connect->delete($sessionId);
+					continue;
+				}
+				
+				$session=@unserialize($session);
+				//登录用户，更新到数据
+				if (!empty($session['uid'])) {
+					//触发一次更新资料到数据库表
+					$this->pushSessionToDb($session, $lastVisit);
+						
+					//删除实体数据(保持登录用户标记除外)
+					if (empty($session['autoLogin'])) {
+						$this->connect->delete($sessionId);
+					}
+				}
+			}
+			$redisMulti->exec();
+		}
+		
+		/**
+		 * 处理保持登录过期列表 
+		 * 
+		 * 超过一个月无活动的删除session
+		 */
+		$kickAutoLogin=$this->redis->zRangeByScore(self::MANAGER_DEADLINE, 0, $gcTime, array('withscores'=>TRUE, 'limit' => array(0, self::MAX_GC_PER_ACTION)));
+		//print_r($kickAutoLogin);die();
+		
+		if (!empty($kickAutoLogin)) {
+			$redisMulti=$this->redis->multi();
+			foreach ($kickOnline as $sessionId=>$lastVisit ){
+				//铁定不在线列表中  从保持登录列表删除
+				$redisMulti->zDelete(self::MANAGER_DEADLINE, $sessionId);
+				
+				//删除实体session数据，直接删除，从在线列表剔除时更新资料过
+				$this->connect->delete($sessionId);
+			}
+			$redisMulti->exec();
+		}
 	}
 	
+	/**
+	 * TODO 将session资料更新到用户数据库表
+	 */
+	public function pushSessionToDb($session, $lastVisit){
+		
+	}
+
 	/**
 	 * 创建一个GC实例
 	 */
