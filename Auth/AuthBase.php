@@ -1,5 +1,5 @@
 <?php
-namespace HuiLib\App;
+namespace HuiLib\Auth;
 
 /**
  * 登录验证基础模块
@@ -9,6 +9,51 @@ namespace HuiLib\App;
  */
 class AuthBase
 {
+	private static $instance;
 	
+	private function __construct(){
+		
+	}
 	
+	/**
+	 * 校验过程
+	 */
+	private function authorize(){
+		
+	}
+	
+	/**
+	 * 是否登录
+	 */
+	public function isLogin(){
+	
+	}
+	
+	/**
+	 * 登录操作
+	 */
+	public function login(){
+	
+	}
+	
+	/**
+	 * 退出操作
+	 */
+	public function logout(){
+	
+	}
+	
+	/**
+	 * 获取引导类实例
+	 * @return \HuiLib\Auth\AuthBase
+	 */
+	public static function getInstance()
+	{
+		if (self::$instance == NULL) {
+			self::$instance = new self ();
+		}
+		//检验数据
+		self::$instance->authorize();
+		return self::$instance;
+	}
 }
