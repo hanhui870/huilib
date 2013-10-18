@@ -30,12 +30,13 @@ class SessionBase implements \SessionHandlerInterface
 	protected $config=NULL;
 	
 	/**
-	 * Session后端生存时间
+	 * Session权限信息生存时间
 	 * 
-	 * 默认一个月，需要到期前自动延长
+	 * 默认一个月，前台后台一致。需要到期前自动延长
+	 * App.ini: app.session.authLife
 	 * @var int
 	 */
-	protected $lifeTime=2592000;
+	protected $lifeTime=0;
 	
 	/**
 	 * Session key prefix session键前缀，不同于缓存中的前缀
@@ -232,6 +233,9 @@ class SessionBase implements \SessionHandlerInterface
 				$driver = new \HuiLib\Session\Storage\DbTable ( $driverConfig );
 				break;
 		}
+		
+		//设置后端生命期
+		$driver->setLife($configInstance->getByKey('app.session.authLife'));
 		
 		//注册Session处理函数
 		session_set_save_handler($driver, TRUE);
