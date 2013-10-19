@@ -59,7 +59,7 @@ abstract class ViewBase
 					$error = true;
 					break;
 				}
-				$this->$key = $val;
+				$this->$item = $val;
 			}
 			if ($error) {
 				throw new \HuiLib\Error\Exception ( "赋值给前台的变量不能以下划线开始" );
