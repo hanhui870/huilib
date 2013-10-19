@@ -34,6 +34,12 @@ abstract class AppBase
 	protected $configPath;
 	
 	/**
+	 * 网站全局配置 定位原来数据的setting表
+	 * @var \HuiLib\Config\ConfigBase
+	 */
+	protected $siteConfigInstance=NULL;
+	
+	/**
 	 * 数据库连接
 	 *  @var \HuiLib\Db\DbBase
 	 */
@@ -122,6 +128,21 @@ abstract class AppBase
 	public function configInstance()
 	{
 		return $this->appConfig;
+	}
+	
+	/**
+	 * 返回网站配置实例
+	 * 
+	 * @return \HuiLib\Config\ConfigBase
+	 */
+	public function siteConfigInstance()
+	{
+		if ($this->siteConfigInstance===NULL) {
+			$siteIni=$this->appConfig->getByKey('app.global');
+			$this->siteConfigInstance = new \HuiLib\Config\ConfigBase ( $siteIni );
+		}
+		
+		return $this->siteConfigInstance;
 	}
 	
 	/**

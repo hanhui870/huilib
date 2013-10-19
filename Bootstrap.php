@@ -112,6 +112,13 @@ class Bootstrap
 			define ( "APP_ENV", self::DEFAULT_ENV );
 		}
 	}
+	
+	/**
+	 * 获取允许的服务器环境配置
+	 */
+	public function getAllowEnv(){
+		return $this->allowedEnv;
+	}
 
 	/**
 	 * 获取已创建的应用

@@ -26,6 +26,7 @@ class ConfigBase
 	 * 当前运行环境配置
 	 */
 	private $configEnv;
+	
 	const PARSE_SECTION = true;
 	//ini文件，块解析分隔符
 	const INI_SECTION_SEP = ':';
@@ -36,7 +37,28 @@ class ConfigBase
 	{
 		$this->filePath = $configFile;
 		$this->parse ();
-		$this->mergeConfig ();
+		
+		//检测是否存在服务器环境标签
+		$allowEnvTag=\HuiLib\Bootstrap::getInstance()->getAllowEnv();
+		$existSection=FALSE;
+		foreach ($allowEnvTag as $envTag){
+			if (isset($this->configSource[$envTag])) {
+				$existSection=TRUE;
+			}
+		}
+		
+		/**
+		 * 解析块元素
+		 * 
+		 * 1、存在[production]等标签，根据继承合并块
+		 * 2、不包括环境标签的直接解析数组
+		 */
+		if ($existSection) {
+			$this->mergeSection ();
+		}else{
+			$this->configFinal=$this->getSettingFromBlock ( $this->configSource );
+			$this->configEnv=$this->configFinal;
+		}
 	}
 
 	/**
@@ -61,7 +83,7 @@ class ConfigBase
 	 * 此处数组相加不能使用array_merge_recursive，会导致某键多个值而覆盖不了
 	 * 此处不能使用数组+符号，+符号运算仅限于第一级数组，二级不支持。array_replace_recursive更合适。
 	 */
-	private function mergeConfig()
+	private function mergeSection()
 	{
 		$configGroup = array ();
 		foreach ( $this->configSource as $section => $blockSetting ) {
