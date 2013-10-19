@@ -151,6 +151,12 @@ class Controller
 			$view = ucfirst ( $this->package ) . SEP . ucfirst ( $this->controller ) . SEP . ucfirst ( $this->action );
 		}
 		
+		//有View类型的才像前台赋值配置数据
+		$siteConfig=$this->appInstance->siteConfigInstance()->getByKey();
+		if (!empty($siteConfig)) {
+			$this->view->assign($siteConfig);
+		}
+		
 		$this->view->render ( $view, $ajaxDelimiter );
 	}
 
