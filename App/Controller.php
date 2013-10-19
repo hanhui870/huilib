@@ -156,6 +156,9 @@ class Controller
 		if (!empty($siteConfig)) {
 			$this->view->assign($siteConfig);
 		}
+		//向前台赋值当前程序版本
+		$version=$this->appInstance->configInstance()->getByKey('app.version');
+		$this->view->assign('version', $version);
 		
 		$this->view->render ( $view, $ajaxDelimiter );
 	}
