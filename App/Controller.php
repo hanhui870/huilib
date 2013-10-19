@@ -80,6 +80,16 @@ class Controller
 		$this->appInstance = $appInstance;
 		$this->appConfig = $appInstance->configInstance ();
 		$this->request = $appInstance->requestInstance ();
+		
+		//控制器子类初始化接口
+		$this->init();
+	}
+	
+	/**
+	 * 控制器初始化接口，在dispatch前调用
+	 */
+	protected function init()
+	{
 	}
 
 	/**
@@ -147,6 +157,8 @@ class Controller
 	 */
 	protected function renderView($view = NULL, $ajaxDelimiter = NULL)
 	{
+		$this->preRenderView();
+		
 		if ($view === NULL) {
 			$view = ucfirst ( $this->package ) . SEP . ucfirst ( $this->controller ) . SEP . ucfirst ( $this->action );
 		}
@@ -156,11 +168,24 @@ class Controller
 		if (!empty($siteConfig)) {
 			$this->view->assign($siteConfig);
 		}
-		//向前台赋值当前程序版本
-		$version=$this->appInstance->configInstance()->getByKey('app.version');
-		$this->view->assign('version', $version);
 		
 		$this->view->render ( $view, $ajaxDelimiter );
+		
+		$this->postRenderView();
+	}
+	
+	/**
+	 * 渲染前事件
+	 */
+	protected function preRenderView()
+	{
+	}
+	
+	/**
+	 * 渲染后事件
+	 */
+	protected function postRenderView()
+	{
 	}
 
 	/**
