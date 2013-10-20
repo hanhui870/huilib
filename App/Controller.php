@@ -74,6 +74,10 @@ class Controller
 	 * @var boolean
 	 */
 	protected $autoRender = TRUE;
+	
+	//Ajax状态返回
+	const STATUS_SUCCESS=TRUE;
+	const STATUS_FAIL=FALSE;
 
 	public function __construct(\HuiLib\App\AppBase $appInstance)
 	{
@@ -193,6 +197,34 @@ class Controller
 	 */
 	protected function postRenderView()
 	{
+	}
+	
+	/**
+	 * 输出JSON数据
+	 * 
+	 * @param mix $data 返回数据
+	 * @param boolean $status
+	 * @param string $message 返回代码
+	 * @param int $code 返回代码
+	 */
+	protected function renderJson($data, $status=self::STATUS_SUCCESS, $message='', $code=200)
+	{
+		$result=array();
+		
+		$result['data']=$data;
+		$result['success']=$status;
+		if ($message) {
+			$result['message']=$message;
+		}
+		$result['code']=$code;
+		$json=json_encode ( $result );
+		
+		$callback=\HuiLib\Helper\Param::get('callback', \HuiLib\Helper\Param::TYPE_STRING);
+		if ($callback) {
+			$json=$callback."($json)";
+		}
+		
+		die($json);
 	}
 
 	/**

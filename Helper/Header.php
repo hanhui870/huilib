@@ -9,6 +9,7 @@ namespace HuiLib\Helper;
  */
 class Header
 {
+	const CODE_200 = "HTTP/1.1 200 OK";
 	const CODE_301 = "HTTP/1.1 301 Moved Permanently";
 	const CODE_302 = "HTTP/1.1 302 Found";
 	const CODE_304 = "HTTP/1.1 304 Not Modified";
