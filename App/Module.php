@@ -15,11 +15,19 @@ class Module
 	 */
 	protected $appInstance;
 
-	protected function __construct(\HuiLib\App\AppBase $appInstance)
+	protected function __construct(\HuiLib\App\AppBase $appInstance=NULL)
 	{
+		if ($appInstance===NULL) {
+			$appInstance=\HuiLib\Bootstrap::getInstance()->appInstance();
+		}
 		$this->appInstance=$appInstance;
 	}
 	
-	
+	/**
+	 * 快速创建一个模块实例
+	 */
+	static function create(){
+		return new static();
+	}
 	
 }
