@@ -32,37 +32,51 @@ class ConfigBase
 	 * 
 	 * @var \HuiLib\Cache\CacheBase
 	 */
-	private $cacheAdapter=NULL;
-	
+	private $cacheAdapter = NULL;
 	const PARSE_SECTION = true;
 	//ini文件，块解析分隔符
 	const INI_SECTION_SEP = ':';
 	//ini文件，键解析分隔符
 	const KEY_SEP = '.';
-	const CACHE_PREFIX='cache:';
+	const CACHE_PREFIX = 'cache:';
 
 	function __construct($configFile)
 	{
 		$this->filePath = $configFile;
 		
 		//由于此时
-		$this->cacheAdapter=\HuiLib\Cache\CacheBase::getApcDirectly();
-		$cacheContent=$this->cacheAdapter->get($this->getCacheKey());
+		$this->cacheAdapter = \HuiLib\Cache\CacheBase::getApcDirectly ();
+		$cacheContent = $this->cacheAdapter->get ( $this->getCacheKey () );
 		//print_r($cacheContent);die();
 		
-		if ($cacheContent===FALSE) {
+		if ($cacheContent === FALSE) {//不存在
 			//实际解析文件
 			$this->parse ();
+			
+		} elseif (empty ( $cacheContent ['stamp'] ) || $cacheContent ['stamp']<filemtime($this->filePath)) {//解析错误或配置文件已更新
+			$this->cacheAdapter->delete ( $this->getCacheKey () );
+			$this->parse ();
+			
+		} else {
+			$this->configFinal=$cacheContent ['data'];
+			if ($cacheContent ['section']) {//存在section标记
+				if (isset ( $this->configFinal [APP_ENV] )) {
+					$this->configEnv = $this->configFinal [APP_ENV];
+				} else {
+					$this->configEnv = array ();
+				}
+			}else {
+				$this->configEnv = $this->configFinal;
+			}
 		}
-		$this->parse ();
 	}
-	
+
 	/**
 	 * 返回Cache储存键
 	 */
 	private function getCacheKey()
 	{
-		return self::CACHE_PREFIX.md5( $this->filePath );
+		return self::CACHE_PREFIX . md5 ( $this->filePath );
 	}
 
 	/**
@@ -81,11 +95,11 @@ class ConfigBase
 		}
 		
 		//检测是否存在服务器环境标签
-		$allowEnvTag=\HuiLib\Bootstrap::getInstance()->getAllowEnv();
-		$existSection=FALSE;
-		foreach ($allowEnvTag as $envTag){
-			if (isset($this->configSource[$envTag])) {
-				$existSection=TRUE;
+		$allowEnvTag = \HuiLib\Bootstrap::getInstance ()->getAllowEnv ();
+		$existSection = FALSE;
+		foreach ( $allowEnvTag as $envTag ) {
+			if (isset ( $this->configSource [$envTag] )) {
+				$existSection = TRUE;
 			}
 		}
 		
@@ -97,17 +111,18 @@ class ConfigBase
 		 */
 		if ($existSection) {
 			$this->mergeSection ();
-		}else{
-			$this->configFinal=$this->getSettingFromBlock ( $this->configSource );
-			$this->configEnv=$this->configFinal;
+		} else {
+			$this->configFinal = $this->getSettingFromBlock ( $this->configSource );
+			$this->configEnv = $this->configFinal;
 		}
 		
 		//缓存到缓存服务器
-		$cache=array();
-		$cache['data']=$this->configFinal;
-		$cache['stamp']=filemtime($this->filePath);
+		$cache = array ();
+		$cache ['data'] = $this->configFinal;
+		$cache ['section'] = $existSection;
+		$cache ['stamp'] = filemtime ( $this->filePath );
 		
-		$this->cacheAdapter->add($this->getCacheKey(), $cache);
+		$this->cacheAdapter->add ( $this->getCacheKey (), $cache );
 	}
 
 	/**
@@ -131,7 +146,7 @@ class ConfigBase
 				if (! isset ( $configGroup [$sectionNow] )) {
 					$configGroup [$sectionNow] = $settingTree;
 				} else {
-					$configGroup [$sectionNow]=array_replace_recursive($configGroup[$sectionNow], $settingTree);
+					$configGroup [$sectionNow] = array_replace_recursive ( $configGroup [$sectionNow], $settingTree );
 				}
 				
 				//处理继承的关系
@@ -140,7 +155,7 @@ class ConfigBase
 					if (! isset ( $configGroup [$iterSection] )) {
 						continue;
 					}
-					$configGroup [$sectionNow]=array_replace_recursive($configGroup [$iterSection], $configGroup [$sectionNow]);
+					$configGroup [$sectionNow] = array_replace_recursive ( $configGroup [$iterSection], $configGroup [$sectionNow] );
 				}
 			} else {
 				//无继承分支，类似[production]
@@ -148,7 +163,7 @@ class ConfigBase
 				if (! isset ( $configGroup [$sectionNow] )) {
 					$configGroup [$sectionNow] = $settingTree;
 				} else {
-					$configGroup [$sectionNow]=array_replace_recursive($configGroup[$sectionNow], $settingTree);
+					$configGroup [$sectionNow] = array_replace_recursive ( $configGroup [$sectionNow], $settingTree );
 				}
 			}
 		} //foreach
@@ -235,7 +250,7 @@ class ConfigBase
 		
 		return $valueIter;
 	}
-	
+
 	/**
 	 * 把树形配置重新组合成分隔符间隔的
 	 *
@@ -248,11 +263,11 @@ class ConfigBase
 	 */
 	public function mergeKey($keyConfig)
 	{
-		$mergedConfig=$keyConfig;
+		$mergedConfig = $keyConfig;
 		foreach ( $keyConfig as $childKey => $childConfig ) {
-			$this->foreachKeyRecurse($childConfig, $childKey, $mergedConfig);
+			$this->foreachKeyRecurse ( $childConfig, $childKey, $mergedConfig );
 		}
-	
+		
 		return $mergedConfig;
 	}
 
@@ -263,19 +278,18 @@ class ConfigBase
 	 * @param string $parentKey 父键
 	 * @param array $parentResult 递归解析父类
 	 */
-	private function foreachKeyRecurse($childConfig,  $parentKey, &$parentResult = array())
+	private function foreachKeyRecurse($childConfig, $parentKey, &$parentResult = array())
 	{
 		if (is_array ( $childConfig )) {
-			foreach ($childConfig as  $secKey => $secConfig){
-				unset($parentResult[$parentKey]);
-				$parentResult[$parentKey.self::KEY_SEP.$secKey]=$secConfig;
+			foreach ( $childConfig as $secKey => $secConfig ) {
+				unset ( $parentResult [$parentKey] );
+				$parentResult [$parentKey . self::KEY_SEP . $secKey] = $secConfig;
 			}
-			foreach ($parentResult as $mergedKey => $secConfig){
-				$this->foreachKeyRecurse($secConfig, $mergedKey, $parentResult);
+			foreach ( $parentResult as $mergedKey => $secConfig ) {
+				$this->foreachKeyRecurse ( $secConfig, $mergedKey, $parentResult );
 			}
-			
 		} else {
-			$parentResult[$parentKey]=$childConfig;
+			$parentResult [$parentKey] = $childConfig;
 		}
 	}
 
@@ -296,8 +310,9 @@ class ConfigBase
 		
 		return NULL;
 	}
-	
-	public function toArray(){
-		return $this->getBySection();
+
+	public function toArray()
+	{
+		return $this->getBySection ();
 	}
 }
