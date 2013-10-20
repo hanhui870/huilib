@@ -279,7 +279,9 @@ class Query
 	/**
 	 * 直接发起默认数据库请求
 	 * 
-	 * @return \HuiLib\Db\Query
+	 * 注意：非类同名构造函数
+	 * 
+	 * @return \HuiLib\Db\Result
 	 */
 	public function query()
 	{
