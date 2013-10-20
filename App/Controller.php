@@ -154,9 +154,16 @@ class Controller
 
 	/**
 	 * 渲染
+	 * 
+	 * 在autoRender关闭的情况下
 	 */
 	protected function renderView($view = NULL, $ajaxDelimiter = NULL)
 	{
+		//关闭自动渲染情况下可能未初始化
+		if ($this->view===NULL) {
+			$this->initView();
+		}
+		
 		$this->preRenderView();
 		
 		if ($view === NULL) {
