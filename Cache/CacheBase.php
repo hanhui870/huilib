@@ -3,6 +3,8 @@ namespace HuiLib\Cache;
 
 /**
  * 缓存功能基础类
+ * 
+ * Cache模块接口行为：add强制覆盖添加；addnx不存在才添加
  *
  * @author 祝景法
  * @since 2013/09/15
@@ -29,19 +31,22 @@ abstract class CacheBase
 	/**
 	 * 保存一个缓存
 	 * 
+	 * 强制设置，强制过期
+	 * 
 	 * @param string $key 缓存键
 	 * @param mix $value 缓存值
 	 */
 	public abstract function add($key, $value);
 	
 	/**
-	 * 保存一个缓存
-	 * 
-	 * 默认调用add版本，类似memcache有独立实现的，可以覆盖
+	 * 添加一个新的缓存
+	 *
+	 * 如果这个key已经存在返回FALSE
+	 *
+	 * @param string $key 缓存键
+	 * @param mix $value 缓存值
 	 */
-	public function replace($key, $value){
-		return $this->add($key, $value);
-	}
+	public abstract function addnx($key, $value);
 	
 	/**
 	 * 删除一个缓存
@@ -186,6 +191,17 @@ abstract class CacheBase
 	 */
 	public static function getApc(\HuiLib\Config\ConfigBase $configInstance=NULL){
 		return self::staticCreate('cache.apc', $configInstance);
+	}
+	
+	/**
+	 * 获取专门储存Config资源的APC实例
+	 * 
+	 * 因为最早config还没初始化，所以不能获取配置文件中的
+	 */
+	public static function getApcDirectly(){
+		$config=array('adapter'=>'apc', 'prefix'=>'global:');
+		
+		return self::create($config);
 	}
 	
 	/**

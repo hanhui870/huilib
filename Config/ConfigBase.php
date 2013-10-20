@@ -27,38 +27,42 @@ class ConfigBase
 	 */
 	private $configEnv;
 	
+	/**
+	 * 缓存接口 默认Apc cache
+	 * 
+	 * @var \HuiLib\Cache\CacheBase
+	 */
+	private $cacheAdapter=NULL;
+	
 	const PARSE_SECTION = true;
 	//ini文件，块解析分隔符
 	const INI_SECTION_SEP = ':';
 	//ini文件，键解析分隔符
 	const KEY_SEP = '.';
+	const CACHE_PREFIX='cache:';
 
 	function __construct($configFile)
 	{
 		$this->filePath = $configFile;
+		
+		//由于此时
+		$this->cacheAdapter=\HuiLib\Cache\CacheBase::getApcDirectly();
+		$cacheContent=$this->cacheAdapter->get($this->getCacheKey());
+		//print_r($cacheContent);die();
+		
+		if ($cacheContent===FALSE) {
+			//实际解析文件
+			$this->parse ();
+		}
 		$this->parse ();
-		
-		//检测是否存在服务器环境标签
-		$allowEnvTag=\HuiLib\Bootstrap::getInstance()->getAllowEnv();
-		$existSection=FALSE;
-		foreach ($allowEnvTag as $envTag){
-			if (isset($this->configSource[$envTag])) {
-				$existSection=TRUE;
-			}
-		}
-		
-		/**
-		 * 解析块元素
-		 * 
-		 * 1、存在[production]等标签，根据继承合并块
-		 * 2、不包括环境标签的直接解析数组
-		 */
-		if ($existSection) {
-			$this->mergeSection ();
-		}else{
-			$this->configFinal=$this->getSettingFromBlock ( $this->configSource );
-			$this->configEnv=$this->configFinal;
-		}
+	}
+	
+	/**
+	 * 返回Cache储存键
+	 */
+	private function getCacheKey()
+	{
+		return self::CACHE_PREFIX.md5( $this->filePath );
 	}
 
 	/**
@@ -75,6 +79,35 @@ class ConfigBase
 		if (! is_array ( $this->configSource )) {
 			throw new \HuiLib\Error\Exception ( "Config ini file parsed Exception!" );
 		}
+		
+		//检测是否存在服务器环境标签
+		$allowEnvTag=\HuiLib\Bootstrap::getInstance()->getAllowEnv();
+		$existSection=FALSE;
+		foreach ($allowEnvTag as $envTag){
+			if (isset($this->configSource[$envTag])) {
+				$existSection=TRUE;
+			}
+		}
+		
+		/**
+		 * 解析块元素
+		 *
+		 * 1、存在[production]等标签，根据继承合并块
+		 * 2、不包括环境标签的直接解析数组
+		 */
+		if ($existSection) {
+			$this->mergeSection ();
+		}else{
+			$this->configFinal=$this->getSettingFromBlock ( $this->configSource );
+			$this->configEnv=$this->configFinal;
+		}
+		
+		//缓存到缓存服务器
+		$cache=array();
+		$cache['data']=$this->configFinal;
+		$cache['stamp']=filemtime($this->filePath);
+		
+		$this->cacheAdapter->add($this->getCacheKey(), $cache);
 	}
 
 	/**

@@ -31,9 +31,9 @@ class Apc extends \HuiLib\Cache\CacheBase
 	}
 	
 	/**
-	 * 添加一个缓存
+	 * 强制添加一个缓存
 	 *
-	 * 仅在缓存变量不存在的情况下缓存变量到数据存储中 
+	 * 修改为: 强制设置，强制过期
 	 *
 	 * @param string $key 缓存键
 	 * @param mix $value 缓存值
@@ -41,21 +41,21 @@ class Apc extends \HuiLib\Cache\CacheBase
 	 */
 	public function add($key, $value,$expire=0)
 	{
-		return apc_add($this->prefix.$key, $value, $expire);
+		return apc_store($this->prefix.$key, $value, $expire);
 	}
 	
 	/**
-	 * 替换一个已存在的缓存
+	 * 添加一个新的缓存
 	 *
-	 * 缓存一个变量到APC中 会替换旧值
+	 * 仅在缓存变量不存在的情况下缓存变量到数据存储中
 	 *
 	 * @param string $key 缓存键
 	 * @param mix $value 缓存值
 	 * @param int $expire 过期时间，0永不过期
 	 */
-	public function replace($key, $value, $expire=0)
+	public function addnx($key, $value,$expire=0)
 	{
-		return apc_store($this->prefix.$key, $value, $expire);
+		return apc_add($this->prefix.$key, $value, $expire);
 	}
 	
 	/**
