@@ -72,6 +72,7 @@ class Apc extends \HuiLib\Cache\CacheBase
 	 * 获取一个缓存内容
 	 *
 	 * @param string $key 缓存键，支持多键
+	 * @return mix or false not exist
 	 */
 	public function get($key)
 	{
