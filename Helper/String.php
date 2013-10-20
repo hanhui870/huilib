@@ -72,7 +72,7 @@ class String
 	{
 		if (is_array ( $string )) {
 			foreach ( $string as $k => $v ) {
-				$string [$k] = self::zjsuaddslashes ( $v );
+				$string [$k] = self::addslashes ( $v );
 			}
 		} else {
 			$string = addslashes ( $string );
