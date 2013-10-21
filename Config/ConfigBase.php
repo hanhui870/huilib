@@ -61,12 +61,12 @@ class ConfigBase
 			$this->configFinal=$cacheContent ['data'];
 			if ($cacheContent ['section']) {//存在section标记
 				if (isset ( $this->configFinal [APP_ENV] )) {
-					$this->configEnv = $this->configFinal [APP_ENV];
+					$this->configEnv = &$this->configFinal [APP_ENV];
 				} else {
 					$this->configEnv = array ();
 				}
 			}else {
-				$this->configEnv = $this->configFinal;
+				$this->configEnv = &$this->configFinal;
 			}
 		}
 	}
@@ -110,10 +110,15 @@ class ConfigBase
 		 * 2、不包括环境标签的直接解析数组
 		 */
 		if ($existSection) {
-			$this->mergeSection ();
+			$this->configFinal = $this->mergeSection ();
+			if (isset ( $this->configFinal [APP_ENV] )) {
+				$this->configEnv = &$this->configFinal [APP_ENV];
+			} else {
+				$this->configEnv = array ();
+			}
 		} else {
 			$this->configFinal = $this->getSettingFromBlock ( $this->configSource );
-			$this->configEnv = $this->configFinal;
+			$this->configEnv = &$this->configFinal;
 		}
 		
 		//缓存到缓存服务器
@@ -168,13 +173,7 @@ class ConfigBase
 			}
 		} //foreach
 		
-
-		$this->configFinal = $configGroup;
-		if (isset ( $configGroup [APP_ENV] )) {
-			$this->configEnv = $configGroup [APP_ENV];
-		} else {
-			$this->configEnv = array ();
-		}
+		return $configGroup;
 	}
 
 	/**

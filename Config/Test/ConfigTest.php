@@ -22,7 +22,7 @@ class ConfigTest extends \HuiLib\Test\TestBase
 		$config->setByKey('app.domain', 'testOverwrite');
 		$config->setByKey('webRun.cookie.pre', 'Asia/BeiJin');
 		$config->setByKey('webRun.cookie.host.name', 'baichi');
-		print_r($config->getByKey());
+		print_r($config->toArray());
 		
 	}
 	
