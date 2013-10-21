@@ -48,6 +48,8 @@ abstract class ViewBase
 
 	/**
 	 * 向前端赋值一个变量
+	 * 
+	 * 强制赋值，会覆盖已经写入的变量值
 	 */
 	public function assign($key, $value = NULL)
 	{
