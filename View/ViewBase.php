@@ -53,12 +53,40 @@ abstract class ViewBase
 	 */
 	public function assign($key, $value = NULL)
 	{
+		return $this->finishAssign($key, $value, TRUE);
+	}
+	
+	/**
+	 * 飞覆盖向前端赋值一个变量
+	 *
+	 * 不会会覆盖已经写入的变量值 $overwrite:false
+	 */
+	public function assignIfNotExist($key, $value = NULL)
+	{
+		return $this->finishAssign($key, $value, FALSE);
+	}
+	
+	/**
+	 * 实际赋值流程的方法
+	 * 
+	 * @param mix $key
+	 * @param string $value
+	 * @param string $overwrite 是否覆盖
+	 */
+	protected function finishAssign($key, $value = NULL, $overwrite=TRUE){
 		if (is_string ( $key )) {
 			// 根据字符串名称赋值
 			if ('_' == substr ( $key, 0, 1 )) {
 				throw new \HuiLib\Error\Exception ( "赋值给前台的变量不能以下划线开始" );
 			}
-			$this->$key = $value;
+			if ($overwrite) {
+				$this->$key = $value;
+			}else{
+				if (!isset($this->$key)) {
+					$this->$key = $value;
+				}
+			}
+			
 		} elseif (is_array ( $key )) {
 			// 通过关联字符串赋值
 			$error = false;
@@ -67,7 +95,13 @@ abstract class ViewBase
 					$error = true;
 					break;
 				}
-				$this->$item = $val;
+				if ($overwrite) {
+					$this->$item = $val;
+				}else{
+					if (!isset($this->$item)) {
+						$this->$item = $val;
+					}
+				}
 			}
 			if ($error) {
 				throw new \HuiLib\Error\Exception ( "赋值给前台的变量不能以下划线开始" );
