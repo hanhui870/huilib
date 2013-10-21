@@ -49,6 +49,16 @@ class Param
 	}
 	
 	/**
+	 * 获取REQUEST参数
+	 *
+	 * @param string $key
+	 */
+	public static function request($key, $type=self::TYPE_NONE)
+	{
+		return isset($_REQUEST[$key]) ?  self::typeCheck($_REQUEST[$key], $type) : self::typeCheck(NULL, $type);
+	}
+	
+	/**
 	 * 获取Cookie参数
 	 *
 	 * @param string $key
