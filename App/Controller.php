@@ -202,20 +202,20 @@ class Controller
 	/**
 	 * 输出JSON数据
 	 * 
+	 * JSON数据结构:{"data":{},"success":true,"message":"","code":200}
+	 * 
 	 * @param mix $data 返回数据
 	 * @param boolean $status
 	 * @param string $message 返回代码
-	 * @param int $code 返回代码
+	 * @param int $code 返回代码 0代表一切正常
 	 */
-	protected function renderJson($data, $status=self::STATUS_SUCCESS, $message='', $code=200)
+	protected function renderJson($data, $status=self::STATUS_SUCCESS, $message='', $code=0)
 	{
 		$result=array();
 		
 		$result['data']=$data;
 		$result['success']=$status;
-		if ($message) {
-			$result['message']=$message;
-		}
+		$result['message']=$message;
 		$result['code']=$code;
 		$json=json_encode ( $result );
 		
@@ -225,6 +225,33 @@ class Controller
 		}
 		
 		die($json);
+	}
+	
+	/**
+	 * 直接将结果集作为数组输出
+	 * 
+	 * @param array $result
+	 */
+	protected function renderJsonResult($result)
+	{
+		 $code=0;
+		 $status=self::STATUS_SUCCESS;
+		 $message='';
+		 
+		 if (isset($result['code'])) {
+		 	$code=$result['code'];
+		 	unset($result['code']);
+		 }
+		 if (isset($result['success'])) {
+		 	$status=$result['success'];
+		 	unset($result['success']);
+		 }
+		 if (isset($result['message'])) {
+		 	$message=$result['message'];
+		 	unset($result['message']);
+		 }
+		 
+		 $this->renderJson($result, $status, $message, $code);
 	}
 
 	/**
