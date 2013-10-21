@@ -47,6 +47,12 @@ class Controller
 	protected $appConfig;
 	
 	/**
+	 * 网站全局配置对象
+	 * @var \HuiLib\Config\ConfigBase
+	 */
+	protected $siteConfig=NULL;
+	
+	/**
 	 * 请求对象
 	 * @var \HuiLib\Request\RequestBase
 	 */
@@ -182,12 +188,6 @@ class Controller
 			$view = ucfirst ( $this->package ) . SEP . ucfirst ( $this->controller ) . SEP . ucfirst ( $this->action );
 		}
 		
-		//有View类型的才像前台赋值配置数据
-		$siteConfig=$this->appInstance->siteConfigInstance()->getByKey();
-		if (!empty($siteConfig)) {
-			$this->view->assign($siteConfig);
-		}
-		
 		$this->view->render ( $view, $ajaxDelimiter );
 		
 		$this->postRenderView();
@@ -198,6 +198,11 @@ class Controller
 	 */
 	protected function preRenderView()
 	{
+		//有View类型的才像前台赋值配置数据
+		$this->initSiteConfig();
+		if (!empty($this->siteConfig)) {
+			$this->view->assign($this->siteConfig->getByKey());
+		}
 	}
 	
 	/**
@@ -288,6 +293,16 @@ class Controller
 	{
 		if ($this->view===NULL) {
 			$this->view = new \HuiLib\App\View ( $this->appInstance );
+		}
+	}
+	
+	/**
+	 * 初始化网站配置实例
+	 */
+	protected function initSiteConfig()
+	{
+		if ($this->siteConfig===NULL) {
+			$this->siteConfig = $this->appInstance->siteConfigInstance();
 		}
 	}
 
