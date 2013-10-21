@@ -179,6 +179,11 @@ class ConfigBase
 
 	/**
 	 * 块配置
+	 * 
+	 * array_merge_recursive:如果输入的数组中有相同的字符串键名，则这些值会被合并到一个数组中去，这将递归下去，
+	 * 因此如果一个值本身是一个数组，本函数将按照相应的条目把它合并为另一个数组。然而，如果数组具有相同的数组键名，
+	 * 后一个值将不会覆盖原来的值，而是附加到后面。 
+	 * 
 	 * @param array $blockSetting
 	 * @return array
 	 */
@@ -196,6 +201,9 @@ class ConfigBase
 
 	/**
 	 * 把键值转换成嵌套数组值
+	 * 
+	 * 数组 + 运算符附加右边数组元素，但是不会覆盖重复的键值。
+	 * 
 	 * @param string $key
 	 * @param string $value
 	 */
@@ -249,6 +257,39 @@ class ConfigBase
 		}
 		
 		return $valueIter;
+	}
+	
+	/**
+	 * 通过键获取配置块，默认在当前运行环境下
+	 *
+	 * 支持获取方法，支持不同粒度：
+	 * setByKey('webRun')
+	 * setByKey('webRun.cookie')
+	 * setByKey('webRun.cookie.pre')
+	 *
+	 * 设置仅针对当前环境的临时改动，并不会保存到APC缓存。
+	 * 允许递归设置引用，如果全部地址处理确实可以。
+	 *
+	 * @param string $key 要获取的配置键
+	 * @param string $value 要设置的值
+	 * 
+	 * @return mix 空值返回array(),便于用于返回值遍历
+	 */
+	public function setByKey($key, $value)
+	{
+		$keyPath = explode ( self::KEY_SEP, $key );
+		
+		$valueIter = &$this->configEnv;
+		foreach ( $keyPath as $keyIter ) {
+			if (!isset ( $valueIter [$keyIter] )) {
+				$valueIter [$keyIter] = array ();
+			}
+			$valueIter = &$valueIter [$keyIter];
+		}
+		
+		$valueIter=$value;
+	
+		return $this;
 	}
 
 	/**
