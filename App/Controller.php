@@ -75,6 +75,13 @@ class Controller
 	 */
 	protected $autoRender = TRUE;
 	
+	/**
+	 * 是否Ajax请求
+	 * 
+	 * @var boolean
+	 */
+	protected $ajax = FALSE;
+	
 	//Ajax状态返回
 	const STATUS_SUCCESS=TRUE;
 	const STATUS_FAIL=FALSE;
@@ -84,6 +91,9 @@ class Controller
 		$this->appInstance = $appInstance;
 		$this->appConfig = $appInstance->configInstance ();
 		$this->request = $appInstance->requestInstance ();
+		
+		//是否Ajax请求
+		$this->ajax=\HuiLib\Helper\Param::isXmlHttpRequest();
 		
 		//控制器子类初始化接口
 		$this->init();
