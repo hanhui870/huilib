@@ -44,6 +44,12 @@ class Controller
 	 * @var \HuiLib\App\AppBase
 	 */
 	protected $appInstance;
+	
+	/**
+	 * 网站配置实例
+	 * 
+	 * @var \HuiLib\Config\ConfigBase
+	 */
 	protected $appConfig;
 	
 	/**
