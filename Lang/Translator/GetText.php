@@ -38,7 +38,7 @@ class GetText extends LangBase {
 	 * @throws Zend_Translation_Exception
 	 * @return array
 	 */
-	protected function loadTranslationData($filename, $locale, array $options = array())
+	protected function loadTranslationData($filename, $locale)
 	{
 		$this->data      = array();
 		$this->bigEndian = false;
