@@ -1,5 +1,5 @@
 <?php
-namespace HuiLib\Lang;
+namespace HuiLib\Lang\Translator;
 
 /**
  * 语言翻译类
@@ -7,13 +7,29 @@ namespace HuiLib\Lang;
  * @author Zend Framework 1.1
  * @since 2013/09/24
  */
-class GetText extends LangBase {
+class GetText extends \HuiLib\Lang\LangBase  {
+	const FILE_EXT='.mo';
+	
 	// Internal variables
 	private $bigEndian   = false;
 	private $file        = false;
 	private $adapterInfo = array();
-	private $data        = array();
+	protected $data        = array();
 
+	/**
+	 * 实际加载翻译文件的接口
+	 * 
+	 * @see \HuiLib\Lang\LangBase::loadLang()
+	 */
+	public function loadLang($locale){
+		parent::loadLang($locale);
+		$filePath=$this->localPath.$locale.self::FILE_EXT;
+		
+		$this->loadTranslationData($filePath, $locale);
+		
+		return $this;
+	}
+	
 	/**
 	 * Read values from the MO file
 	 *
