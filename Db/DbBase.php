@@ -16,47 +16,27 @@ abstract class DbBase
 	 * 
 	 * @var \PDO
 	 */
-	protected $connection;
+	protected $connection=NULL;
 	
 	/**
 	 * 数据库驱动 如mysql
 	 */
-	protected $driver;
+	protected $driver=NULL;
 	
 	/**
 	 * 数据库主从配置
 	 */
-	private static $config;
+	private static $config=NULL;
 
 	/**
-	 * 获取数据库连接，便于直接查询
-	 */
-	public function getConnection()
-	{
-		return $this->connection;
-	}
-	
-	/**
-	 * 获取具体配置驱动实例
-	 */
-	public function getDriver()
-	{
-		return $this->driver;
-	}
-	
-	/**
-	 * 设置数据库配置
-	 * @param array $config
-	 */
-	public static function setConfig($config){
-		self::$config=$config;
-	}
-	
-	/**
 	 * 创建DB Master实例
+	 * 
+	 * 可以直接调用创建默认主库连接
 	 */
 	public static function createMaster()
 	{
+		self::initConfig();
+		
 		if (empty(self::$config['master'])) {
 			throw new \HuiLib\Error\Exception('Db master config can not be empty!');
 		}
@@ -66,9 +46,13 @@ abstract class DbBase
 	
 	/**
 	 * 创建DB Slave实例
+	 * 
+	 * 可以直接调用创建默认从库连接
 	 */
 	public static function createSlave($slaveNode=NULL)
 	{
+		self::initConfig();
+		
 		if (empty(self::$config['slave'])) {
 			throw new \HuiLib\Error\Exception('Empty slave config!');
 		}
@@ -104,6 +88,42 @@ abstract class DbBase
 		
 		return $adapter;
 	} 
+	
+	/**
+	 * 获取数据库连接，便于直接查询
+	 */
+	public function getConnection()
+	{
+		return $this->connection;
+	}
+	
+	/**
+	 * 获取具体配置驱动实例
+	 */
+	public function getDriver()
+	{
+		return $this->driver;
+	}
+	
+	/**
+	 * 设置数据库配置
+	 *
+	 * @param array $config
+	 */
+	public static function setConfig($config){
+		self::$config=$config;
+	}
+	
+	/**
+	 * 设置数据库配置
+	 * @param array $config
+	 */
+	protected static function initConfig(){
+		if (self::$config===NULL) {
+			$configInstance=\HuiLib\Bootstrap::getInstance()->appInstance()->configInstance();
+			self::$config=$configInstance->getByKey('db');
+		}
+	}
 	
 	/**
 	 * 开启一个事务

@@ -78,7 +78,7 @@ class Query
 		
 		//未提供adapter，使用默认
 		if ($adapter===NULL) {
-			$adapter=\HuiLib\Bootstrap::getInstance()->appInstance()->getDb();
+			$adapter=\HuiLib\Db\DbBase::createMaster();
 		}
 		
 		if (! $adapter instanceof \HuiLib\Db\DbBase) {

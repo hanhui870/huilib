@@ -166,9 +166,7 @@ abstract class AppBase
 	 * 
 	 * 先在之类初始化请求，然后父类初始化配置
 	 */
-	protected abstract function initRequest()
-	{
-	}
+	protected abstract function initRequest();
 	
 	/**
 	 * 返回请求对象实例
@@ -177,21 +175,6 @@ abstract class AppBase
 	public function requestInstance()
 	{
 		return $this->requestInstance;
-	}
-
-	/**
-	 * 获取数据库连接
-	 * @return \HuiLib\Db\Pdo\PdoBase
-	 */
-	public function getDb()
-	{
-		if ($this->dbInstance === NULL) {
-			$dbSetting = $this->appConfig->getByKey ( 'db' );
-			\HuiLib\Db\DbBase::setConfig ( $dbSetting );
-			$this->dbInstance = \HuiLib\Db\DbBase::createMaster ();
-		}
-		
-		return $this->dbInstance;
 	}
 
 	/**
