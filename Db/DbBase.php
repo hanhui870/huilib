@@ -41,7 +41,7 @@ abstract class DbBase
 			throw new \HuiLib\Error\Exception('Db master config can not be empty!');
 		}
 
-		return self::doingCreate(self::$config['master']);
+		return self::create(self::$config['master']);
 	}
 	
 	/**
@@ -66,13 +66,13 @@ abstract class DbBase
 			throw new \HuiLib\Error\Exception('Specified slave config is empty!');
 		}
 		
-		return self::doingCreate($dbConfig);
+		return self::create($dbConfig);
 	}
 	
 	/**
 	 * 创建DB实例 DB factory方法
 	 */
-	private static function doingCreate($dbConfig){
+	public static function create($dbConfig){
 		if (empty($dbConfig['adapter'])) {
 			throw new \HuiLib\Error\Exception('Db adapter can not be empty!');
 		}
