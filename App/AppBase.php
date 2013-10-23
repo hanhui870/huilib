@@ -50,6 +50,13 @@ abstract class AppBase
 	 *  @var \HuiLib\Session\SessionBase
 	 */
 	protected $sessionInstance=NULL;
+	
+	/**
+	 * 翻译国际化功能
+	 * 
+	 *  @var \HuiLib\Lang\LangBase 
+	 */
+	protected $langInstance=NULL;
 
 	/**
 	 * 构造函数
@@ -159,7 +166,7 @@ abstract class AppBase
 	 * 
 	 * 先在之类初始化请求，然后父类初始化配置
 	 */
-	protected function initRequest()
+	protected abstract function initRequest()
 	{
 	}
 	
@@ -173,23 +180,15 @@ abstract class AppBase
 	}
 
 	/**
-	 * 初始化数据库连接
-	 */
-	protected function initDatabse()
-	{
-		$dbSetting = $this->appConfig->getByKey ( 'db' );
-		\HuiLib\Db\DbBase::setConfig ( $dbSetting );
-		$this->dbInstance = \HuiLib\Db\DbBase::createMaster ();
-	}
-
-	/**
 	 * 获取数据库连接
 	 * @return \HuiLib\Db\Pdo\PdoBase
 	 */
 	public function getDb()
 	{
 		if ($this->dbInstance === NULL) {
-			$this->initDatabse ();
+			$dbSetting = $this->appConfig->getByKey ( 'db' );
+			\HuiLib\Db\DbBase::setConfig ( $dbSetting );
+			$this->dbInstance = \HuiLib\Db\DbBase::createMaster ();
 		}
 		
 		return $this->dbInstance;
@@ -207,13 +206,6 @@ abstract class AppBase
 		}
 		
 		return $appNamespace;
-	}
-
-	/**
-	 * 初始化缓存资源
-	 */
-	protected function initCache()
-	{
 	}
 
 	/**
