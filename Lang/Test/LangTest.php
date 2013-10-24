@@ -15,7 +15,8 @@ class LangTest extends \HuiLib\Test\TestBase
 	
 	private function test(){
 		$lang=\HuiLib\Lang\LangBase::getDefault();
-		echo $lang->translate('client.csrf.hack');
+		//测试时具体写入子串
+		echo $lang->translate();
 	}
 
 	protected static function className(){

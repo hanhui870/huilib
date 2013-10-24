@@ -41,6 +41,16 @@ abstract class LangBase
 	 * @var string
 	 */
 	const FILE_EXT = '';
+	
+	/**
+	 * 默认语言
+	 * 
+	 * wordpress:多国语言列表：
+	 * http://codex.wordpress.org/zh-cn:%E5%A4%9A%E5%9B%BD%E8%AF%AD%E8%A8%80%E6%89%8B%E5%86%8C
+	 * 
+	 * @var string
+	 */
+	const DEFAULT_LOCALE='zh-cn';
 
 	protected function __construct($config)
 	{
@@ -131,5 +141,15 @@ abstract class LangBase
 		}
 		
 		return self::$defaultInstance;
+	}
+	
+	/**
+	 * 获取调用HuiLib库的翻译实例
+	 * 
+	 * 默认存在Lang/I18N目录下
+	 */
+	public static function getHuiLibLang()
+	{
+		$adapter=array('adapter'=>'gettext', 'path'=>SYS_PATH.'Lang'.SEP, 'default'=>self::DEFAULT_LOCALE);
 	}
 }
