@@ -14,9 +14,9 @@ class LangTest extends \HuiLib\Test\TestBase
 	}
 	
 	private function test(){
-		$lang=\HuiLib\Lang\LangBase::getDefault();
+		$lang=\HuiLib\Lang\LangBase::getHuiLibLang();
 		//测试时具体写入子串
-		echo $lang->translate();
+		echo $lang->translate('HuiLib.lang.test');
 	}
 
 	protected static function className(){

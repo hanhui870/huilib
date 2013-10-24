@@ -19,6 +19,13 @@ abstract class LangBase
 	protected static $defaultInstance = NULL;
 	
 	/**
+	 * 默认HuiLib翻译实例
+	 *
+	 * @var LangBase
+	 */
+	protected static $huiLibInstance = NULL;
+	
+	/**
 	 * 翻译文件存放目录
 	 * @var string
 	 */
@@ -148,8 +155,16 @@ abstract class LangBase
 	 * 
 	 * 默认存在Lang/I18N目录下
 	 */
-	public static function getHuiLibLang()
+	public static function getHuiLibLang($lang=NULL)
 	{
-		$adapter=array('adapter'=>'gettext', 'path'=>SYS_PATH.'Lang'.SEP, 'default'=>self::DEFAULT_LOCALE);
+		$adapter=array('adapter'=>'gettext', 'path'=>SYS_PATH.'Lang'.SEP.'I18N'.SEP, 'default'=>self::DEFAULT_LOCALE);
+		self::$huiLibInstance = self::create ( $adapter );
+		if ($lang) {
+			self::$huiLibInstance->loadLang ( $lang );
+		}else{
+			self::$huiLibInstance->loadLang ( $adapter ['default'] );
+		}
+		
+		return self::$huiLibInstance;
 	}
 }
