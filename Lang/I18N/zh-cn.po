@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: HuiLib框架翻译\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-10-24 23:51+0800\n"
-"PO-Revision-Date: 2013-10-24 23:51+0800\n"
+"PO-Revision-Date: 2013-10-26 01:35+0800\n"
 "Last-Translator: 祝景法 <zhujingfa@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -18,5 +18,5 @@ msgstr ""
 
 #: D:\webDeveloper\HuiLib/Lang/Test/LangTest.php:19
 msgid "HuiLib.lang.test"
-msgstr "HuiLib框架自带lang组件测试。"
+msgstr "%sHuiLib框架%s自带lang组件%d测试%0.2f。"
 

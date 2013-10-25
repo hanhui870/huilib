@@ -90,7 +90,16 @@ abstract class LangBase
 	public function translate($token)
 	{
 		if (isset($this->data[$this->locale][$token])) {
-			return $this->data[$this->locale][$token];
+			$params=func_get_args();
+			//第一个参数是$token，剔除
+			array_shift($params);
+			
+			$stringResult=$this->data[$this->locale][$token];
+			if (count($params)>0) {
+				$stringResult=vsprintf($stringResult, $params);
+			}
+
+			return $stringResult;
 		}else{
 			return $token;
 		}
