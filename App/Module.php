@@ -14,6 +14,12 @@ class Module
 	 * @var \HuiLib\App\AppBase
 	 */
 	protected $appInstance;
+	
+	/**
+	 * 应用主域名
+	 * @var \HuiLib\Lang\LangBase
+	 */
+	protected $langInstace = NULL;
 
 	protected function __construct(\HuiLib\App\AppBase $appInstance=NULL)
 	{
@@ -21,6 +27,18 @@ class Module
 			$appInstance=\HuiLib\Bootstrap::getInstance()->appInstance();
 		}
 		$this->appInstance=$appInstance;
+	}
+	
+	/**
+	 * 获取翻译实例
+	 */
+	protected function getLang()
+	{
+		if ($this->langInstace===NULL) {
+			$this->langInstace=\HuiLib\Lang\LangBase::getDefault();
+		}
+	
+		return $this->langInstace;
 	}
 	
 	/**

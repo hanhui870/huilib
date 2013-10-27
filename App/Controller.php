@@ -94,6 +94,12 @@ class Controller
 	 */
 	protected $ajax = FALSE;
 	
+	/**
+	 * 应用主域名
+	 * @var \HuiLib\Lang\LangBase
+	 */
+	protected $langInstace = NULL;
+	
 	//Ajax状态返回
 	const STATUS_SUCCESS=TRUE;
 	const STATUS_FAIL=FALSE;
@@ -359,6 +365,18 @@ class Controller
 	public function setSubAction($subAction)
 	{
 		$this->subAction = $subAction;
+	}
+	
+	/**
+	 * 获取翻译实例
+	 */
+	protected function getLang()
+	{
+		if ($this->langInstace===NULL) {
+			$this->langInstace=\HuiLib\Lang\LangBase::getDefault();
+		}
+	
+		return $this->langInstace;
 	}
 	
 	public function __call($name, $arguments)
