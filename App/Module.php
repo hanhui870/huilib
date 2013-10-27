@@ -20,6 +20,12 @@ class Module
 	 * @var \HuiLib\Lang\LangBase
 	 */
 	protected $langInstace = NULL;
+	
+	/**
+	 * 网站全局配置对象
+	 * @var \HuiLib\Config\ConfigBase
+	 */
+	protected $siteConfig=NULL;
 
 	protected function __construct(\HuiLib\App\AppBase $appInstance=NULL)
 	{
@@ -39,6 +45,17 @@ class Module
 		}
 	
 		return $this->langInstace;
+	}
+	
+	/**
+	 * 初始化网站配置实例
+	 */
+	protected function getSiteConfig()
+	{
+		if ($this->siteConfig===NULL) {
+			$this->siteConfig = $this->appInstance->siteConfigInstance();
+		}
+		return $this->siteConfig;
 	}
 	
 	/**
