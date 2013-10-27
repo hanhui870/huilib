@@ -229,19 +229,19 @@ class Controller
 	 * 
 	 * JSON数据结构:{"data":{},"success":true,"message":"","code":200}
 	 * 
-	 * @param mix $data 返回数据
 	 * @param boolean $status
 	 * @param string $message 返回代码
 	 * @param int $code 返回代码 0代表一切正常
+	 * @param mix $data 返回数据
 	 */
-	protected function renderJson($data, $status=self::STATUS_SUCCESS, $message='', $code=0)
+	protected function renderJson($status=self::STATUS_SUCCESS, $message='', $code=0, $data=array())
 	{
 		$result=array();
 		
-		$result['data']=$data;
 		$result['success']=$status;
 		$result['message']=$message;
 		$result['code']=$code;
+		$result['data']=$data;
 		$json=json_encode ( $result );
 		
 		$callback=\HuiLib\Helper\Param::get('callback', \HuiLib\Helper\Param::TYPE_STRING);
@@ -276,7 +276,7 @@ class Controller
 		 	unset($result['message']);
 		 }
 		 
-		 $this->renderJson($result, $status, $message, $code);
+		 $this->renderJson($status, $message, $code, $result);
 	}
 
 	/**
