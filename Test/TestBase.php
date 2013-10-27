@@ -30,6 +30,20 @@ abstract class TestBase
 	}
 	
 	/**
+	 * 执行断言
+	 * 
+	 * @param mix $runResult 实际运行结果
+	 * @param mix $expected 期望结果
+	 */
+	public function assert($runResult, $expected=FALSE){
+		if ($runResult===$expected) {
+			echo '<br>True</br>';
+		}else{
+			echo '<br>Expected:<span style="color:green">'.var_export($expected, 1).'</span>， RunResult:<span style="color:red">'.var_export($runResult, 1).'</span></br>';
+		}
+	}
+	
+	/**
 	 * 设置app初始化运行环境
 	 * @param \HuiLib\App\AppBase $app
 	 */
