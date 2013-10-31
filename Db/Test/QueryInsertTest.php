@@ -10,15 +10,20 @@ namespace HuiLib\Db\Test;
 class QueryInsertTest extends \HuiLib\Test\TestBase
 {
 	public function run(){
-		$this->testDup();
+		$this->testKvInsert();
 	}
 	
 	/**
 	 * 测试
 	 */
 	private function test(){
-		$insert=\HuiLib\Db\Query::Insert()->table('test')->fields(array('id','test'))->values(array(time(), 'fdafa\'\\dfdas'));
-		$insert->query();
+		//insert into test (field1, field2) values ('fvalue1', 'fvalue2') ;
+		$insert=\HuiLib\Db\Query::Insert()->table('test')->fields(array('field1','field2'))->values(array('fvalue1', 'fvalue2'));
+		
+		//insert into test (field1, field2) values ('fvalue1', 'fvalue2'), ('fvalue11', 'fvalue22') ;
+		$insert->values(array('fvalue11', 'fvalue22'));
+		
+		//$insert->query();
 		echo $insert->toString();
 	}
 	
@@ -26,8 +31,9 @@ class QueryInsertTest extends \HuiLib\Test\TestBase
 	 * KV测试
 	 */
 	private function testKvInsert(){
-		$insert=\HuiLib\Db\Query::Insert()->table('test')->kvInsert(array('test'=>'zhujingfa'))->values(array('after kvInsert", me\' to'));
-		$insert->query();
+		//insert into test (field1, field2) values ('fvalue1', 'fvalue2'), ('fvalue11', 'fvalue22') ;
+		$insert=\HuiLib\Db\Query::Insert()->table('test')->kvInsert(array('field1'=>'fvalue1', 'field2'=>'fvalue2'))->values(array('fvalue11', 'fvalue22'), array('fvalue11', 'fvalue22'));
+		//$insert->query();
 		echo $insert->toString();
 	}
 	
@@ -35,12 +41,10 @@ class QueryInsertTest extends \HuiLib\Test\TestBase
 	 * 测试
 	 */
 	private function testDup(){
-		$insert=\HuiLib\Db\Query::Insert()->table('test')->enableDuplicate(true)->fields(array('id','test'))->dupFields(array('id','test', 'num'))
-		->values(array(time(), 'fdafa\'\\dfdas1'))
-		->values(array(time(), 'fdafa\'\\dfdas2'), array('test'=>'fdafa\'\\dfdas', array('plain'=>'num=num+1')))
-		->values(array(time()+rand(1, 5), 'fdafa\'\\dfdas3'))
-		->values(array(1379180480, 'fdafa\'\\dfdas4'), array('num'=>array('plain'=>'num=num+1')));
-		$insert->query();
+		//insert into test set field1='fvalue1', field2='fvalue2' on duplicate key update field1='newfvalue1', num=num+1 ;
+		$insert=\HuiLib\Db\Query::Insert()->table('test')->enableDuplicate(true)->fields(array('field1','field2'))->dupFields(array('field1', 'num'))
+		->values(array('fvalue1', 'fvalue2'), array('field2'=>'newfvalue1', array('plain'=>'num=num+1')));
+		//$insert->query();
 		echo $insert->toString();
 	}
 
