@@ -116,6 +116,8 @@ class Where
 	
 	/**
 	 * 渲染Plain语句
+	 * 
+	 * 未严格过滤输入，可能导致被攻击，尽量少用。
 	 */
 	private function renderPlain(){
 		return $this->plainWhere;
