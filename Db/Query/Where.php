@@ -125,6 +125,8 @@ class Where
 	
 	/**
 	 * 渲染Quote语句
+	 * 
+	 * TODO 引号中的问号问题，目前尽量传递进的占位符短小
 	 */
 	private function renderQuote(){
 		return str_ireplace('?', self::$query->escape($this->placeBind), $this->placeHolder);
