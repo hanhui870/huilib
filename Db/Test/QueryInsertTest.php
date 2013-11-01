@@ -10,7 +10,7 @@ namespace HuiLib\Db\Test;
 class QueryInsertTest extends \HuiLib\Test\TestBase
 {
 	public function run(){
-		$this->testKvInsert();
+		$this->test();
 	}
 	
 	/**
@@ -18,12 +18,13 @@ class QueryInsertTest extends \HuiLib\Test\TestBase
 	 */
 	private function test(){
 		//insert into test (field1, field2) values ('fvalue1', 'fvalue2') ;
-		$insert=\HuiLib\Db\Query::Insert()->table('test')->fields(array('field1','field2'))->values(array('fvalue1', 'fvalue2'));
+		$insert=\HuiLib\Db\Query::Insert()->table('test.test')->fields(array('field1','field2'))->values(array('fvalue1', 'fvalue2'));
 		
 		//insert into test (field1, field2) values ('fvalue1', 'fvalue2'), ('fvalue11', 'fvalue22') ;
 		$insert->values(array('fvalue11', 'fvalue22'));
 		
-		//$insert->query();
+		$insert->query();
+		echo $insert->affectedRow();
 		echo $insert->toString();
 	}
 	
