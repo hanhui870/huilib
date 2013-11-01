@@ -9,7 +9,19 @@ namespace HuiLib\Helper;
  */
 class DateTime
 {
-	public static function format($time = 0, $format = 0)
+	const YMDHIS=1;
+	const YMDHI=2;
+	const MDHIS=3;
+	const HI=4;
+	const YMD=6;
+	const TEXT_YMD=9;
+	const WEEK=100;
+	//农历
+	const LUNAR_DAY=10;
+	//有好模式
+	const READABLE=1000;
+
+	public static function format($format = self::YMDHIS, $time = 0)
 	{
 		if (! $time) $time = time ();
 		
@@ -27,7 +39,7 @@ class DateTime
 				return date ( "H:i", $time );
 				break;
 			case 5 :
-				if (date ( 'Y', $_g ['time'] ) > date ( "Y", $time )) {
+				if (date ( 'Y', time()) > date ( "Y", $time )) {
 					return date ( "Y-m-d", $time ); // 为排版 前一年不显示具体时间
 				} else {
 					return date ( "m-d H:i", $time );
@@ -35,9 +47,6 @@ class DateTime
 				break;
 			case 6 :
 				return date ( "Y-m-d", $time );
-				break;
-			case 8 :
-				return date ( "Ym", $time ); // 资讯保存
 				break;
 			case 9 :
 				return date ( "Y年m月d日", $time );
