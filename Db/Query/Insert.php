@@ -305,6 +305,16 @@ class Insert extends \HuiLib\Db\Query
 	}
 	
 	/**
+	 * 最后一个插入操作的ID
+	 *
+	 * @return int 最后一个插入操作的ID
+	 */
+	public function lastInsertId()
+	{
+		return $this->adapter->getConnection()->lastInsertId();
+	}
+	
+	/**
 	 * 编译成SQL语句
 	 */
 	protected function compile()
