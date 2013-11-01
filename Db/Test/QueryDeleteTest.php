@@ -19,8 +19,9 @@ class QueryDeleteTest extends \HuiLib\Test\TestBase
 	 * 测试
 	 */
 	private function test(){
-		$delete=\HuiLib\Db\Query::delete()->table('test')->where(Where::createPair('id', '2'))->limit(10);
-		echo $delete->query();
+		//delete from tableTest where (id='2') limit 10 ;
+		$delete=\HuiLib\Db\Query::delete()->table('tableTest')->where(Where::createPair('id', '2'))->limit(10);
+		//echo $delete->query();
 		echo $delete->toString();
 	}
 
