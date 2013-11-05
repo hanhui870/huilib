@@ -14,6 +14,10 @@ class AutoStaticParamTest extends \HuiLib\Test\TestBase
 	}
 	
 	private function test(){
+		echo "\nCall Staticly:\n";
+		TestClass::create('first', 'second');
+		
+		echo "\nCall Directly:\n";
 		new TestClass('first', 'second');
 	}
 

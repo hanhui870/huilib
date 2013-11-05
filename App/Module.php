@@ -27,12 +27,30 @@ class Module
 	 */
 	protected $siteConfig=NULL;
 
-	protected function __construct(\HuiLib\App\AppBase $appInstance=NULL)
+	protected function __construct()
 	{
-		if ($appInstance===NULL) {
-			$appInstance=\HuiLib\Bootstrap::getInstance()->appInstance();
+	}
+	
+	/**
+	 * 获取应用实例
+	 */
+	protected function getAppInstace()
+	{
+		if ($this->appInstance===NULL) {
+			$this->appInstance=\HuiLib\Bootstrap::getInstance()->appInstance();
 		}
+	
+		return $this->appInstance;
+	}
+	
+	/**
+	 * 设置应用实例
+	 */
+	public function setAppInstance(\HuiLib\App\AppBase $appInstance=NULL)
+	{
 		$this->appInstance=$appInstance;
+		
+		return $this;
 	}
 	
 	/**
