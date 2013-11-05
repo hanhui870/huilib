@@ -81,11 +81,10 @@ abstract class LangBase
 	/**
 	 * 请求一个翻译结果
 	 * 
-	 * TODO 传递可变参数的处理
-	 * 
 	 * 翻译失败返回token内容
 	 * 
 	 * @param string $token
+	 * @param mix $param 支持传递更多参数
 	 */
 	public function translate($token)
 	{
