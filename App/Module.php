@@ -71,7 +71,7 @@ class Module
 	protected function getSiteConfig()
 	{
 		if ($this->siteConfig===NULL) {
-			$this->siteConfig = $this->appInstance->siteConfigInstance();
+			$this->siteConfig = $this->getAppInstace()->siteConfigInstance();
 		}
 		return $this->siteConfig;
 	}
