@@ -42,10 +42,24 @@ class Model
 	}
 	
 	/**
-	 * 快速创建一个模块实例
+	 * 快速创建一个Model实例
+	 *
+	 * 原理：创建对象的灵活获取参数是从第0个开始的。一般函数是从第一个开始的。
+	 *
+	 * @param mix $param 支持传递参数，最多5个，其他空字符串代替
 	 */
 	static function create(){
-		return new static();
-	}
 	
+		$paramCount=func_num_args();
+	
+		if (!$paramCount) {
+			return new static();
+		}else{
+			$params=func_get_args();
+			//最多5个，其他空字符串代替
+			list($param1, $param2, $param3, $param4, $param5)=array_pad($params, 5, '');
+				
+			return new static($param1, $param2, $param3, $param4, $param5);
+		}
+	}
 }
