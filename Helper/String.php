@@ -44,7 +44,7 @@ class String
 	 */
 	public static function strlen($string)
 	{
-		return mb_strlen ( $string, self::$charset );
+		return mb_strlen ( $string, self::DEFAULT_CHARSET );
 	}
 
 	/**
