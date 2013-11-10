@@ -36,13 +36,7 @@ abstract class LangBase
 	 * @var string
 	 */
 	protected $locale;
-	
-	/**
-	 * 加载后的翻译文件缓存
-	 * @var array
-	 */
-	protected $data= array();
-	
+
 	/**
 	 * 翻译文件名拓展
 	 * @var string
@@ -83,21 +77,21 @@ abstract class LangBase
 	 * 
 	 * 翻译失败返回token内容
 	 * 
-	 * @param string $token
+	 * @param string $token 传递给之类的解析
 	 * @param mix $param 支持传递更多参数
 	 */
 	public function translate($token)
 	{
-		if (isset($this->data[$this->locale][$token])) {
+		$stringResult=$this->getTokenString($token);
+		if ($stringResult!==$token) {
 			$params=func_get_args();
 			//第一个参数是$token，剔除
 			array_shift($params);
-			
-			$stringResult=$this->data[$this->locale][$token];
+
 			if (count($params)>0) {
 				$stringResult=vsprintf($stringResult, $params);
 			}
-
+		
 			return $stringResult;
 		}else{
 			return $token;
@@ -110,12 +104,13 @@ abstract class LangBase
 	 * @param array $config 配置
 	 * @return \HuiLib\Lang\LangBase
 	 */
-	public static function create($config)
+	public static function create($config, $lang=NULL)
 	{
 		if (empty ( $config ['adapter'] )) {
 			throw new \HuiLib\Error\Exception ( 'Lang adapter can not be empty' );
 		}
 		
+		$adapter=NULL;
 		switch ($config ['adapter']) {
 			case 'gettext' :
 				$adapter = new \HuiLib\Lang\Translator\GetText ( $config );
@@ -123,6 +118,12 @@ abstract class LangBase
 			case 'ini' :
 				$adapter = new \HuiLib\Lang\Translator\Ini ( $config );
 				break;
+		}
+		
+		if ($lang) {
+			$adapter->loadLang ( $lang );
+		}else{
+			$adapter->loadLang ( $config ['default'] );
 		}
 		
 		return $adapter;
@@ -148,13 +149,8 @@ abstract class LangBase
 			throw new \HuiLib\Error\Exception ( 'Lang default adapter has not set.' );
 		}
 
-		self::$defaultInstance = self::create ( $config );
-		if ($lang) {
-			self::$defaultInstance->loadLang ( $lang );
-		}else{
-			self::$defaultInstance->loadLang ( $config ['default'] );
-		}
-		
+		self::$defaultInstance = self::create ( $config, $lang );
+
 		return self::$defaultInstance;
 	}
 	
@@ -175,4 +171,11 @@ abstract class LangBase
 		
 		return self::$huiLibInstance;
 	}
+	
+	/**
+	 * 返回一个翻译字符串结构
+	 *
+	 * @param string $token 传递给之类的解析
+	 */
+	protected abstract function getTokenString($token);
 }

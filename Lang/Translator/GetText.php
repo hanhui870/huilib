@@ -14,7 +14,12 @@ class GetText extends \HuiLib\Lang\LangBase  {
 	private $bigEndian   = false;
 	private $file        = false;
 	private $adapterInfo = array();
-	protected $data        = array();
+	
+	/**
+	 * 加载后的翻译文件缓存
+	 * @var array
+	 */
+	protected $data= array();
 
 	/**
 	 * 实际加载翻译文件的接口
@@ -28,6 +33,20 @@ class GetText extends \HuiLib\Lang\LangBase  {
 		$this->loadTranslationData($filePath, $locale);
 		
 		return $this;
+	}
+	
+	/**
+	 * 返回一个翻译字符串结构
+	 *
+	 * @param string $token 传递给之类的解析
+	 */
+	protected function getTokenString($token)
+	{
+		if (isset($this->data[$this->locale][$token])) {
+			return parent::translate($this->data[$this->locale][$token]);
+		}else{
+			return $token;
+		}
 	}
 	
 	/**
