@@ -12,12 +12,19 @@ use HuiLib\Log\LogBase;
 class LogTest extends \HuiLib\Test\TestBase
 {
 	public function run(){
-		$this->test();
+		$this->testFile();
 	}
 	
 	private function test(){
 		$log=LogBase::getMysql();
 		$log->setType(LogBase::TYPE_USERERROR);
+		$log->setIdentify('PHPFrameTest');
+		echo $log->add('sorry, db falied');
+	}
+	
+	private function testFile(){
+		$log=LogBase::getFile();
+		$log->setType(LogBase::TYPE_DBERROR);
 		$log->setIdentify('PHPFrameTest');
 		echo $log->add('sorry, db falied');
 	}

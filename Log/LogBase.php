@@ -125,7 +125,7 @@ abstract class LogBase
 	 */
 	public static function getFile(\HuiLib\Config\ConfigBase $configInstance = NULL)
 	{
-		return self::staticCreate ( 'cache.memcache', $configInstance );
+		return self::staticCreate ( 'log.file', $configInstance );
 	}
 
 	/**
