@@ -18,8 +18,8 @@ class View extends \HuiLib\View\ViewBase
 	 * 渲染输出
 	 * 
 	 * 3种模板刷新更新机制：
-	 * 1、配置template.refresh，(子)模板有修改会自动刷新，较耗资源适合开发环境
-	 * 2、配置template.life，缓存操作生存期限后，自动删除重建
+	 * 1、配置webRun.view.refresh，(子)模板有修改会自动刷新，较耗资源适合开发环境
+	 * 2、配置webRun.view.life，缓存操作生存期限后，自动删除重建
 	 * 3、统一通过管理后台，刷新模板缓存
 	 */
 	public function render($view, $ajaxDelimiter = NULL)
@@ -31,7 +31,7 @@ class View extends \HuiLib\View\ViewBase
 		if (!file_exists($cacheFile)) {//缓存文件不存在
 			$this->_engineInstance->parse()->writeCompiled();
 			
-		}elseif ($this->_appInstance->configInstance()->getByKey('template.refresh')){//开启模板自动扫描刷新
+		}elseif ($this->_appInstance->configInstance()->getByKey('webRun.view.refresh')){//开启模板自动扫描刷新
 			$cacheStamp=filemtime($cacheFile);
 			$tplStamp=filemtime($this->_engineInstance->getTplFilePath());
 			$tplStampList=array($tplStamp);
@@ -47,8 +47,8 @@ class View extends \HuiLib\View\ViewBase
 				$this->_engineInstance->parse()->writeCompiled();
 			}
 			
-		}elseif ($this->_appInstance->configInstance()->getByKey('template.life')){//配置了自动过期时间
-			$lifeTime=$this->_appInstance->configInstance()->getByKey('template.life');
+		}elseif ($this->_appInstance->configInstance()->getByKey('webRun.view.life')){//配置了自动过期时间
+			$lifeTime=$this->_appInstance->configInstance()->getByKey('webRun.view.life');
 			if ( time() - filemtime ( $cacheFile ) >= $lifeTime) {
 				unlink ( $cacheFile );
 				$this->_engineInstance->parse()->writeCompiled();
