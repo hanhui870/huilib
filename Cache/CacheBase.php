@@ -48,9 +48,6 @@ abstract class CacheBase
 			case 'apc' :
 				$adapter = new \HuiLib\Cache\Storage\Apc ( $config );
 				break;
-			case 'file' :
-				$adapter = new \HuiLib\Cache\Storage\File ( $config );
-				break;
 		}
 	
 		return $adapter;
@@ -102,13 +99,6 @@ abstract class CacheBase
 		$config=array('adapter'=>'apc', 'prefix'=>'global:');
 	
 		return self::create($config);
-	}
-	
-	/**
-	 * 获取File默认缓存实例
-	 */
-	public static function getFile(\HuiLib\Config\ConfigBase $configInstance=NULL){
-		return self::staticCreate('cache.file', $configInstance);
 	}
 	
 	private static function staticCreate($adapterName, \HuiLib\Config\ConfigBase $configInstance=NULL){
