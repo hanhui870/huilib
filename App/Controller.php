@@ -367,6 +367,26 @@ class Controller
 		$this->subAction = $subAction;
 	}
 	
+	public function getPackage()
+	{
+		return $this->package;
+	}
+	
+	public function getController()
+	{
+		return $this->controller;
+	}
+	
+	public function getAction()
+	{
+		return $this->action;
+	}
+	
+	public function getSubAction()
+	{
+		return $this->subAction;
+	}
+	
 	/**
 	 * 获取翻译实例
 	 */
