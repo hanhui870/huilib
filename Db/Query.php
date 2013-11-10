@@ -328,13 +328,9 @@ class Query
 	 */
 	public function escape($value)
 	{
-		if (empty($value)) {
-			return '';
-		}
 		$this->setAdapter();
 		
 		if (is_array($value)) {
-			
 			$inArray=array();
 			foreach ($value as $item){
 				$inArray[]=$this->adapter->getConnection()->quote($item);
