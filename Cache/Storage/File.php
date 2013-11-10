@@ -3,6 +3,8 @@ namespace HuiLib\Cache\Storage;
 
 /**
  * File基础类
+ * 
+ * TODO File级缓存
  *
  * @author 祝景法
  * @since 2013/09/15
