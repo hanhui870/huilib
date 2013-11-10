@@ -4,8 +4,9 @@ namespace HuiLib;
 /**
  * 系统初始化引导文件
  * 
- * SYS_PATH 库根目录
- * APP_PATH 应用根目录
+ * SYS_PATH 系统根目录，在库和应用目录上一级
+ * LIB_PATH 库根目录，约定库目录在系统目录下
+ * APP_PATH 应用根目录，约定应用目录在系统目录下
  * WWW_PATH 网页根目录
  * APP_ENV 当前应用执行环境，匹配相关配置
  * RUN_METHOD 应用执行方式web || bin
@@ -69,7 +70,8 @@ class Bootstrap
 		define ( 'URL_SEP', '/' );
 		//命名空间分隔符
 		define ( 'NAME_SEP', '\\' );
-		define ( 'SYS_PATH', dirname ( __FILE__ ) . SEP );
+		define ( 'LIB_PATH', dirname ( __FILE__ ) . SEP );
+		define ( 'SYS_PATH', dirname ( LIB_PATH ) . SEP );
 		
 		if (! defined ( 'APP_PATH' ) || ! defined ( 'WWW_PATH' )) {
 			throw new \Exception ( "Please define Constant var APP_PATH & WWW_PATH  in the entry!" );
@@ -81,7 +83,7 @@ class Bootstrap
 	 */
 	private function initLoader()
 	{
-		include_once SYS_PATH . 'Loader/AutoLoad.php';
+		include_once LIB_PATH . 'Loader/AutoLoad.php';
 		self::$loadInstance = \HuiLib\Loader\AutoLoad::getInstance ();
 		spl_autoload_register ( array (self::$loadInstance, 'loadClass' ) );
 	}

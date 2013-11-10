@@ -14,7 +14,7 @@ class AutoLoad
 
 	private function __construct()
 	{
-		$this->addSpace ( "HuiLib", SYS_PATH );
+		$this->addSpace ( "HuiLib", LIB_PATH );
 	}
 
 	/**

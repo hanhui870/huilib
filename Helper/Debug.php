@@ -62,7 +62,7 @@ class Debug
 			if (empty ( $trace ['file'] ))
 				break;
 			$temp = array ();
-			$temp ['file'] = str_ireplace ( array(SYS_PATH, SEP), array('', '/'), $trace ['file'] );
+			$temp ['file'] = str_ireplace ( array(LIB_PATH, SEP), array('', '/'), $trace ['file'] );
 			$temp ['line'] = $trace ['line'];
 			$temp ['function'] = $trace ['function'];
 			$traceResult [] = $temp;

@@ -165,7 +165,7 @@ abstract class LangBase
 	 */
 	public static function getHuiLibLang($lang=NULL)
 	{
-		$adapter=array('adapter'=>'gettext', 'path'=>SYS_PATH.'Lang'.SEP.'I18N'.SEP, 'default'=>self::DEFAULT_LOCALE);
+		$adapter=array('adapter'=>'gettext', 'path'=>LIB_PATH.'Lang'.SEP.'I18N'.SEP, 'default'=>self::DEFAULT_LOCALE);
 		self::$huiLibInstance = self::create ( $adapter );
 		if ($lang) {
 			self::$huiLibInstance->loadLang ( $lang );
