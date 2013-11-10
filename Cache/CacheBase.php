@@ -37,6 +37,7 @@ abstract class CacheBase
 			throw new \HuiLib\Error\Exception ( 'Cache adapter can not be empty' );
 		}
 	
+		$adapter=NULL;
 		switch ($config ['adapter']) {
 			case 'redis' :
 				$adapter = new \HuiLib\Cache\Storage\Redis ( $config );

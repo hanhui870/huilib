@@ -77,6 +77,7 @@ abstract class DbBase
 			throw new \HuiLib\Error\Exception('Db adapter can not be empty!');
 		}
 
+		$adapter=NULL;
 		switch ($dbConfig['adapter']){
 			case 'pdo':
 				$adapter=new \HuiLib\Db\Pdo\PdoBase($dbConfig);
