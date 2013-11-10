@@ -223,14 +223,11 @@ class SessionBase implements \SessionHandlerInterface
 		}
 		
 		switch ($config ['adapter']) {
-			case 'redis' :
-				$driver = new \HuiLib\Session\Storage\Redis ( $driverConfig );
-				break;
 			case 'memcache' :
 				$driver = new \HuiLib\Session\Storage\Memcache ( $driverConfig );
 				break;
-			case 'dbtable' :
-				$driver = new \HuiLib\Session\Storage\DbTable ( $driverConfig );
+			case 'redis' :
+				$driver = new \HuiLib\Session\Storage\Redis ( $driverConfig );
 				break;
 		}
 		
