@@ -9,8 +9,14 @@ namespace HuiLib\Db;
  */
 class Result
 {
-	//默认结果集获取方式
-	const DEFAULT_FETCH_STYLE=\PDO::FETCH_ASSOC;
+	//结果集获取方式
+	const ARRAY_FETCH=\PDO::FETCH_ASSOC;
+	const OBJECT_FETCH=\PDO::FETCH_OBJ;
+	
+	/**
+	 * 当前对象正在执行的获取风格
+	 */
+	protected $fetchStyle=self::ARRAY_FETCH;
 	
 	/**
 	 * prepare->execute bind 查询
@@ -63,13 +69,13 @@ class Result
 	 * @throws \HuiLib\Error\Exception
 	 * @return array|object
 	 */
-	public function fetchAll($fetchStyle=self::DEFAULT_FETCH_STYLE)
+	public function fetchAll()
 	{
 		if ($this->innerStatment==NULL) {
-			throw new \HuiLib\Error\Exception ('execute查询，必须先调用Query::prepare');
+			throw new \HuiLib\Error\Exception ('fetchAll必须先调用Query::query');
 		}
 	
-		return $this->innerStatment->fetchAll($fetchStyle);
+		return $this->innerStatment->fetchAll($this->fetchStyle);
 	}
 	
 	/**
@@ -78,13 +84,43 @@ class Result
 	 * @throws \HuiLib\Error\Exception
 	 * @return array|object
 	 */
-	public function fetch($fetchStyle=self::DEFAULT_FETCH_STYLE)
+	public function fetch()
 	{
 		if ($this->innerStatment==NULL) {
-			throw new \HuiLib\Error\Exception ('execute查询，必须先调用Query::prepare');
+			throw new \HuiLib\Error\Exception ('fetch必须先调用Query::query');
 		}
 	
-		return $this->innerStatment->fetch($fetchStyle);
+		return $this->innerStatment->fetch($this->fetchStyle);
+	}
+	
+	/**
+	 * 通过字段编号获取单条数据的单个字段值
+	 * 
+	 * 默认获取的是第一个字段
+	 * 
+	 * @param int $columnNumber
+	 * @throws \HuiLib\Error\Exception
+	 * @return array|object
+	 */
+	public function fetchColumn($columnNumber=0)
+	{
+		if ($this->innerStatment==NULL) {
+			throw new \HuiLib\Error\Exception ('fetchColumn须先调用Query::query');
+		}
+	
+		return $this->innerStatment->fetchColumn($columnNumber);
+	}
+	
+	public function setObjectFetchStyle(){
+		$this->fetchStyle=self::OBJECT_FETCH;
+		
+		return $this;
+	}
+	
+	public function setArrayFetchStyle(){
+		$this->fetchStyle=self::ARRAY_FETCH;
+		
+		return $this;
 	}
 	
 	/**

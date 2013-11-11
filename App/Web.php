@@ -24,7 +24,6 @@ class Web extends AppBase
 	protected function initRequest()
 	{
 		$this->requestInstance=new \HuiLib\Request\Http($this);
-		parent::initRequest();
 		
 		return $this->requestInstance;
 	}

@@ -78,7 +78,7 @@ class Query
 		
 		//未提供adapter，使用默认
 		if ($adapter===NULL) {
-			$adapter=\HuiLib\Bootstrap::getInstance()->appInstance()->getDb();
+			$adapter=\HuiLib\Db\DbBase::createMaster();
 		}
 		
 		if (! $adapter instanceof \HuiLib\Db\DbBase) {
@@ -279,7 +279,9 @@ class Query
 	/**
 	 * 直接发起默认数据库请求
 	 * 
-	 * @return \HuiLib\Db\Query
+	 * 注意：非类同名构造函数
+	 * 
+	 * @return \HuiLib\Db\Result
 	 */
 	public function query()
 	{
@@ -326,13 +328,9 @@ class Query
 	 */
 	public function escape($value)
 	{
-		if (empty($value)) {
-			return '';
-		}
 		$this->setAdapter();
 		
 		if (is_array($value)) {
-			
 			$inArray=array();
 			foreach ($value as $item){
 				$inArray[]=$this->adapter->getConnection()->quote($item);

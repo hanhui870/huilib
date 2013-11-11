@@ -41,6 +41,14 @@ class Memcache extends \HuiLib\Session\SessionBase
 	{
 		parent::destroy($sessionId);
 		
+		return $this->delete($sessionId);
+	}
+	
+	/**
+	 * 删除session实体数据接口
+	 */
+	public function delete ( $sessionId )
+	{
 		return $this->driver->delete(self::$prefix.$sessionId);
 	}
 }

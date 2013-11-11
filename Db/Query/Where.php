@@ -116,6 +116,8 @@ class Where
 	
 	/**
 	 * 渲染Plain语句
+	 * 
+	 * 未严格过滤输入，可能导致被攻击，尽量少用。
 	 */
 	private function renderPlain(){
 		return $this->plainWhere;
@@ -123,6 +125,8 @@ class Where
 	
 	/**
 	 * 渲染Quote语句
+	 * 
+	 * TODO 引号中的问号问题，目前尽量传递进的占位符短小
 	 */
 	private function renderQuote(){
 		return str_ireplace('?', self::$query->escape($this->placeBind), $this->placeHolder);

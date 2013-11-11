@@ -45,6 +45,12 @@ class Insert extends \HuiLib\Db\Query
 	 * @var array();
 	 */
 	protected $dupValues;
+	
+	/**
+	 * 插入的结果statment，便于查询影响行数
+	 * @var \HuiLib\Db\Result;
+	 */
+	protected $statment=NULL;
 
 	/**
 	 * 设置待插入的字段
@@ -296,12 +302,26 @@ class Insert extends \HuiLib\Db\Query
 	/**
 	 * 直接发起默认数据库请求
 	 *
-	 * @return int 插入操作影响行数
+	 * @return int 最后一个插入操作的ID
 	 */
 	public function query()
 	{
-		$stmt=parent::query();
-		return $stmt->rowCount();
+		$this->statment=parent::query();
+		return $this->adapter->getConnection()->lastInsertId();
+	}
+	
+	/**
+	 * 获取插入操作影响行数
+	 *
+	 * @return int 最后一个插入操作的ID
+	 */
+	public function affectedRow()
+	{
+		if (!$this->statment) {
+			return 0;
+		}else{
+			return $this->statment->rowCount();
+		}
 	}
 	
 	/**

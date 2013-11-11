@@ -49,6 +49,16 @@ class Param
 	}
 	
 	/**
+	 * 获取REQUEST参数
+	 *
+	 * @param string $key
+	 */
+	public static function request($key, $type=self::TYPE_NONE)
+	{
+		return isset($_REQUEST[$key]) ?  self::typeCheck($_REQUEST[$key], $type) : self::typeCheck(NULL, $type);
+	}
+	
+	/**
 	 * 获取Cookie参数
 	 *
 	 * @param string $key
@@ -90,6 +100,13 @@ class Param
 	 */
 	public static function getScriptUrl(){
 		return self::server('SCRIPT_URL', self::TYPE_STRING);
+	}
+	
+	/**
+	 * 获取当前被访问的页面完整网址
+	 */
+	public static function getRequestUrl(){
+		return self::getScheme().'://'.self::server('HTTP_HOST', self::TYPE_STRING).self::server('REQUEST_URI', self::TYPE_STRING);
 	}
 	
 	/**

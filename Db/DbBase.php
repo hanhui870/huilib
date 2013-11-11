@@ -16,18 +16,80 @@ abstract class DbBase
 	 * 
 	 * @var \PDO
 	 */
-	protected $connection;
+	protected $connection=NULL;
 	
 	/**
 	 * 数据库驱动 如mysql
 	 */
-	protected $driver;
+	protected $driver=NULL;
 	
 	/**
 	 * 数据库主从配置
 	 */
-	private static $config;
+	private static $config=NULL;
 
+	/**
+	 * 创建DB Master实例
+	 * 
+	 * 可以直接调用创建默认主库连接
+	 */
+	public static function createMaster()
+	{
+		self::initConfig();
+		
+		if (empty(self::$config['master'])) {
+			throw new \HuiLib\Error\Exception('Db master config can not be empty!');
+		}
+
+		return self::create(self::$config['master']);
+	}
+	
+	/**
+	 * 创建DB Slave实例
+	 * 
+	 * 可以直接调用创建默认从库连接
+	 */
+	public static function createSlave($slaveNode=NULL)
+	{
+		self::initConfig();
+		
+		if (empty(self::$config['slave'])) {
+			throw new \HuiLib\Error\Exception('Empty slave config!');
+		}
+		
+		$slaveConfig=self::$config['slave'];
+		if (empty($slaveNode)) {
+			$dbConfig=$slaveConfig[array_rand($slaveConfig)];
+		}elseif (isset(self::$slaveConfig[$slaveNode])){
+			$dbConfig=self::$slaveConfig[$slaveNode];
+		}else{
+			throw new \HuiLib\Error\Exception('Specified slave config is empty!');
+		}
+		
+		return self::create($dbConfig);
+	}
+	
+	/**
+	 * 创建DB实例 DB factory方法
+	 */
+	public static function create($dbConfig){
+		if (empty($dbConfig['adapter'])) {
+			throw new \HuiLib\Error\Exception('Db adapter can not be empty!');
+		}
+
+		$adapter=NULL;
+		switch ($dbConfig['adapter']){
+			case 'pdo':
+				$adapter=new \HuiLib\Db\Pdo\PdoBase($dbConfig);
+				break;
+			case 'mongo':
+		
+				break;
+		}
+		
+		return $adapter;
+	} 
+	
 	/**
 	 * 获取数据库连接，便于直接查询
 	 */
@@ -46,6 +108,7 @@ abstract class DbBase
 	
 	/**
 	 * 设置数据库配置
+	 *
 	 * @param array $config
 	 */
 	public static function setConfig($config){
@@ -53,57 +116,15 @@ abstract class DbBase
 	}
 	
 	/**
-	 * 创建DB Master实例
+	 * 设置数据库配置
+	 * @param array $config
 	 */
-	public static function createMaster()
-	{
-		if (empty(self::$config['master'])) {
-			throw new \HuiLib\Error\Exception('Db master config can not be empty!');
+	protected static function initConfig(){
+		if (self::$config===NULL) {
+			$configInstance=\HuiLib\Bootstrap::getInstance()->appInstance()->configInstance();
+			self::$config=$configInstance->getByKey('db');
 		}
-
-		return self::doingCreate(self::$config['master']);
 	}
-	
-	/**
-	 * 创建DB Slave实例
-	 */
-	public static function createSlave($slaveNode=NULL)
-	{
-		if (empty(self::$config['slave'])) {
-			throw new \HuiLib\Error\Exception('Empty slave config!');
-		}
-		
-		$slaveConfig=self::$config['slave'];
-		if (empty($slaveNode)) {
-			$dbConfig=$slaveConfig[array_rand($slaveConfig)];
-		}elseif (isset(self::$slaveConfig[$slaveNode])){
-			$dbConfig=self::$slaveConfig[$slaveNode];
-		}else{
-			throw new \HuiLib\Error\Exception('Specified slave config is empty!');
-		}
-		
-		return self::doingCreate($dbConfig);
-	}
-	
-	/**
-	 * 创建DB实例 DB factory方法
-	 */
-	private static function doingCreate($dbConfig){
-		if (empty($dbConfig['adapter'])) {
-			throw new \HuiLib\Error\Exception('Db adapter can not be empty!');
-		}
-
-		switch ($dbConfig['adapter']){
-			case 'pdo':
-				$adapter=new \HuiLib\Db\Pdo\PdoBase($dbConfig);
-				break;
-			case 'mongo':
-		
-				break;
-		}
-		
-		return $adapter;
-	} 
 	
 	/**
 	 * 开启一个事务

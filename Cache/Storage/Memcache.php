@@ -61,18 +61,18 @@ class Memcache extends \HuiLib\Cache\CacheBase
 	}
 	
 	/**
-	 * 替换一个已存在的缓存
+	 * 添加一个不存在的缓存
 	 *
-	 * 修改为: 强制设置，强制过期
+	 * 如果这个key已经存在返回FALSE
 	 * 
 	 * @param string $key 缓存键
 	 * @param mix $value 缓存值
 	 * @param string $flag 是否压缩 MEMCACHE_COMPRESSED(2)使用zlib压缩
 	 * @param int $expire 过期时间，0永不过期，最大30天(2592000) 或unix时间戳
 	 */
-	public function replace($key, $value, $flag=FALSE, $expire=0)
+	public function addnx($key, $value, $flag=FALSE, $expire=0)
 	{
-		return $this->add($key, $value, $flag, $expire);
+		return $this->connect->add($this->prefix.$key, $value, $flag, $expire);
 	}
 	
 	/**

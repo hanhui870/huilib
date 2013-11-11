@@ -44,7 +44,7 @@ class String
 	 */
 	public static function strlen($string)
 	{
-		return mb_strlen ( $string, self::$charset );
+		return mb_strlen ( $string, self::DEFAULT_CHARSET );
 	}
 
 	/**
@@ -72,7 +72,7 @@ class String
 	{
 		if (is_array ( $string )) {
 			foreach ( $string as $k => $v ) {
-				$string [$k] = self::zjsuaddslashes ( $v );
+				$string [$k] = self::addslashes ( $v );
 			}
 		} else {
 			$string = addslashes ( $string );

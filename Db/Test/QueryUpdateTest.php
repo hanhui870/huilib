@@ -19,9 +19,13 @@ class QueryUpdateTest extends \HuiLib\Test\TestBase
 	 * 测试
 	 */
 	private function test(){
-		$update=\HuiLib\Db\Query::update()->table('test')->where(Where::createPair('id', '16'))
-		->sets(array('test'=>'zzzzzzzzzzzzzzzzzzzzzzz', 'num'=>array('plain'=>'num=num+1')));
-		$update->query();
+		//update tableTest set field1='fvalue1', num=num+1 where (id='16') ;
+		$update=\HuiLib\Db\Query::update()->table('tableTest')->where(Where::createPair('id', '16'));
+		$update->sets(array(
+				'field1'=>'fvalue1',//KV模式
+				'num'=>array('plain'=>'num=num+1') //Plain模式
+		));
+		//$update->query();
 		echo $update->toString();
 	}
 

@@ -1,5 +1,5 @@
 <?php
-namespace HuiLib\Lang;
+namespace HuiLib\Lang\Translator;
 
 /**
  * 语言翻译类
@@ -7,13 +7,48 @@ namespace HuiLib\Lang;
  * @author Zend Framework 1.1
  * @since 2013/09/24
  */
-class GetText extends LangBase {
+class GetText extends \HuiLib\Lang\LangBase  {
+	const FILE_EXT='.mo';
+	
 	// Internal variables
 	private $bigEndian   = false;
 	private $file        = false;
 	private $adapterInfo = array();
-	private $data        = array();
+	
+	/**
+	 * 加载后的翻译文件缓存
+	 * @var array
+	 */
+	protected $data= array();
 
+	/**
+	 * 实际加载翻译文件的接口
+	 * 
+	 * @see \HuiLib\Lang\LangBase::loadLang()
+	 */
+	public function loadLang($locale){
+		parent::loadLang($locale);
+		$filePath=$this->localPath.$locale.self::FILE_EXT;
+		
+		$this->loadTranslationData($filePath, $locale);
+		
+		return $this;
+	}
+	
+	/**
+	 * 返回一个翻译字符串结构
+	 *
+	 * @param string $token 传递给之类的解析
+	 */
+	protected function getTokenString($token)
+	{
+		if (isset($this->data[$this->locale][$token])) {
+			return parent::translate($this->data[$this->locale][$token]);
+		}else{
+			return $token;
+		}
+	}
+	
 	/**
 	 * Read values from the MO file
 	 *
@@ -38,7 +73,7 @@ class GetText extends LangBase {
 	 * @throws Zend_Translation_Exception
 	 * @return array
 	 */
-	protected function loadTranslationData($filename, $locale, array $options = array())
+	protected function loadTranslationData($filename, $locale)
 	{
 		$this->data      = array();
 		$this->bigEndian = false;

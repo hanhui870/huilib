@@ -12,7 +12,7 @@ class CacheTest extends \HuiLib\Test\TestBase
 
 	public function run()
 	{
-		$this->testStaticInit ();
+		$this->testMemcache ();
 	}
 
 	private function testMemcache()

@@ -34,6 +34,12 @@ abstract class AppBase
 	protected $configPath;
 	
 	/**
+	 * 网站全局配置 定位原来数据的setting表
+	 * @var \HuiLib\Config\ConfigBase
+	 */
+	protected $siteConfigInstance=NULL;
+	
+	/**
 	 * 数据库连接
 	 *  @var \HuiLib\Db\DbBase
 	 */
@@ -44,6 +50,13 @@ abstract class AppBase
 	 *  @var \HuiLib\Session\SessionBase
 	 */
 	protected $sessionInstance=NULL;
+	
+	/**
+	 * 翻译国际化功能
+	 * 
+	 *  @var \HuiLib\Lang\LangBase 
+	 */
+	protected $langInstance=NULL;
 
 	/**
 	 * 构造函数
@@ -125,6 +138,21 @@ abstract class AppBase
 	}
 	
 	/**
+	 * 返回网站配置实例
+	 * 
+	 * @return \HuiLib\Config\ConfigBase
+	 */
+	public function siteConfigInstance()
+	{
+		if ($this->siteConfigInstance===NULL) {
+			$siteIni=$this->appConfig->getByKey('app.global');
+			$this->siteConfigInstance = new \HuiLib\Config\ConfigBase ( $siteIni );
+		}
+		
+		return $this->siteConfigInstance;
+	}
+	
+	/**
 	 * 返回启动器实例
 	 * @return \HuiLib\Bootstrap
 	 */
@@ -138,9 +166,7 @@ abstract class AppBase
 	 * 
 	 * 先在之类初始化请求，然后父类初始化配置
 	 */
-	protected function initRequest()
-	{
-	}
+	protected abstract function initRequest();
 	
 	/**
 	 * 返回请求对象实例
@@ -149,29 +175,6 @@ abstract class AppBase
 	public function requestInstance()
 	{
 		return $this->requestInstance;
-	}
-
-	/**
-	 * 初始化数据库连接
-	 */
-	protected function initDatabse()
-	{
-		$dbSetting = $this->appConfig->getByKey ( 'db' );
-		\HuiLib\Db\DbBase::setConfig ( $dbSetting );
-		$this->dbInstance = \HuiLib\Db\DbBase::createMaster ();
-	}
-
-	/**
-	 * 获取数据库连接
-	 * @return \HuiLib\Db\Pdo\PdoBase
-	 */
-	public function getDb()
-	{
-		if ($this->dbInstance === NULL) {
-			$this->initDatabse ();
-		}
-		
-		return $this->dbInstance;
 	}
 
 	/**
@@ -186,13 +189,6 @@ abstract class AppBase
 		}
 		
 		return $appNamespace;
-	}
-
-	/**
-	 * 初始化缓存资源
-	 */
-	protected function initCache()
-	{
 	}
 
 	/**

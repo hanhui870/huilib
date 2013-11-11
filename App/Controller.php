@@ -44,7 +44,19 @@ class Controller
 	 * @var \HuiLib\App\AppBase
 	 */
 	protected $appInstance;
+	
+	/**
+	 * 网站配置实例
+	 * 
+	 * @var \HuiLib\Config\ConfigBase
+	 */
 	protected $appConfig;
+	
+	/**
+	 * 网站全局配置对象
+	 * @var \HuiLib\Config\ConfigBase
+	 */
+	protected $siteConfig=NULL;
 	
 	/**
 	 * 请求对象
@@ -74,12 +86,42 @@ class Controller
 	 * @var boolean
 	 */
 	protected $autoRender = TRUE;
+	
+	/**
+	 * 是否Ajax请求
+	 * 
+	 * @var boolean
+	 */
+	protected $ajax = FALSE;
+	
+	/**
+	 * 应用主域名
+	 * @var \HuiLib\Lang\LangBase
+	 */
+	protected $langInstace = NULL;
+	
+	//Ajax状态返回
+	const STATUS_SUCCESS=TRUE;
+	const STATUS_FAIL=FALSE;
 
 	public function __construct(\HuiLib\App\AppBase $appInstance)
 	{
 		$this->appInstance = $appInstance;
 		$this->appConfig = $appInstance->configInstance ();
 		$this->request = $appInstance->requestInstance ();
+		
+		//是否Ajax请求
+		$this->ajax=\HuiLib\Helper\Param::isXmlHttpRequest();
+		
+		//控制器子类初始化接口
+		$this->init();
+	}
+	
+	/**
+	 * 控制器初始化接口，在dispatch前调用
+	 */
+	protected function init()
+	{
 	}
 
 	/**
@@ -144,14 +186,97 @@ class Controller
 
 	/**
 	 * 渲染
+	 * 
+	 * 在autoRender关闭的情况下
 	 */
 	protected function renderView($view = NULL, $ajaxDelimiter = NULL)
 	{
+		//关闭自动渲染情况下可能未初始化
+		$this->initView();
+		
+		$this->preRenderView();
+		
 		if ($view === NULL) {
 			$view = ucfirst ( $this->package ) . SEP . ucfirst ( $this->controller ) . SEP . ucfirst ( $this->action );
 		}
 		
 		$this->view->render ( $view, $ajaxDelimiter );
+		
+		$this->postRenderView();
+	}
+	
+	/**
+	 * 渲染前事件
+	 */
+	protected function preRenderView()
+	{
+		//有View类型的才像前台赋值配置数据
+		$this->initSiteConfig();
+		if (!empty($this->siteConfig)) {
+			$this->view->assign($this->siteConfig->getByKey());
+		}
+	}
+	
+	/**
+	 * 渲染后事件
+	 */
+	protected function postRenderView()
+	{
+	}
+	
+	/**
+	 * 输出JSON数据
+	 * 
+	 * JSON数据结构:{"data":{},"success":true,"message":"","code":200}
+	 * 
+	 * @param boolean $status
+	 * @param string $message 返回代码
+	 * @param int $code 返回代码 0代表一切正常
+	 * @param mix $data 返回数据
+	 */
+	protected function renderJson($status=self::STATUS_SUCCESS, $message='', $code=0, $data=array())
+	{
+		$result=array();
+		
+		$result['success']=$status;
+		$result['message']=$message;
+		$result['code']=$code;
+		$result['data']=$data;
+		$json=json_encode ( $result );
+		
+		$callback=\HuiLib\Helper\Param::get('callback', \HuiLib\Helper\Param::TYPE_STRING);
+		if ($callback) {
+			$json=$callback."($json)";
+		}
+		
+		die($json);
+	}
+	
+	/**
+	 * 直接将结果集作为数组输出
+	 * 
+	 * @param array $result
+	 */
+	protected function renderJsonResult($result)
+	{
+		 $code=0;
+		 $status=self::STATUS_SUCCESS;
+		 $message='';
+		 
+		 if (isset($result['code'])) {
+		 	$code=$result['code'];
+		 	unset($result['code']);
+		 }
+		 if (isset($result['success'])) {
+		 	$status=$result['success'];
+		 	unset($result['success']);
+		 }
+		 if (isset($result['message'])) {
+		 	$message=$result['message'];
+		 	unset($result['message']);
+		 }
+		 
+		 $this->renderJson($status, $message, $code, $result);
 	}
 
 	/**
@@ -178,7 +303,19 @@ class Controller
 	 */
 	protected function initView()
 	{
-		$this->view = new \HuiLib\App\View ( $this->appInstance );
+		if ($this->view===NULL) {
+			$this->view = new \HuiLib\App\View ( $this->appInstance );
+		}
+	}
+	
+	/**
+	 * 初始化网站配置实例
+	 */
+	protected function initSiteConfig()
+	{
+		if ($this->siteConfig===NULL) {
+			$this->siteConfig = $this->appInstance->siteConfigInstance();
+		}
 	}
 
 	/**
@@ -228,6 +365,38 @@ class Controller
 	public function setSubAction($subAction)
 	{
 		$this->subAction = $subAction;
+	}
+	
+	public function getPackage()
+	{
+		return $this->package;
+	}
+	
+	public function getController()
+	{
+		return $this->controller;
+	}
+	
+	public function getAction()
+	{
+		return $this->action;
+	}
+	
+	public function getSubAction()
+	{
+		return $this->subAction;
+	}
+	
+	/**
+	 * 获取翻译实例
+	 */
+	protected function getLang()
+	{
+		if ($this->langInstace===NULL) {
+			$this->langInstace=\HuiLib\Lang\LangBase::getDefault();
+		}
+	
+		return $this->langInstace;
 	}
 	
 	public function __call($name, $arguments)
