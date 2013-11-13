@@ -203,6 +203,9 @@ class Controller
 		$this->view->render ( $view, $ajaxDelimiter );
 		
 		$this->postRenderView();
+		
+		//renderView渲染输出后结束
+		exit();
 	}
 	
 	/**
