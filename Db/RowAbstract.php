@@ -15,4 +15,22 @@ class RowAbstract extends \HuiLib\App\Model
 	 */
 	protected $data=array();
 	
+	public function __construct($data)
+	{
+	
+	}
+	
+	/**
+	 * 返回对象的数组表示
+	 * @return multitype:
+	 */
+	public function toArray()
+	{
+		return $this->data;
+	}
+	
+	public function __get()
+	{
+		
+	}
 }
