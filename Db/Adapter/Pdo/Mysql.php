@@ -1,5 +1,5 @@
 <?php
-namespace HuiLib\Db\Pdo;
+namespace HuiLib\Db\Adapter\Pdo;
 
 /**
  * Pdo Mysql类

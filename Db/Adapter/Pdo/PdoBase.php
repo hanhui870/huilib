@@ -1,5 +1,5 @@
 <?php
-namespace HuiLib\Db\Pdo;
+namespace HuiLib\Db\Adapter\Pdo;
 
 /**
  * Pdo初始化类
@@ -20,7 +20,7 @@ class PdoBase extends \HuiLib\Db\DbBase
 			
 			//设置字符集
 			if(isset($dbConfig['charset'])){
-				$driverClass='\HuiLib\Db\Pdo\\'.ucfirst($dbConfig['driver']);
+				$driverClass='\HuiLib\Db\Adapter\Pdo\\'.ucfirst($dbConfig['driver']);
 				$this->driver=new $driverClass();
 				$this->connection->query($this->driver->charset($dbConfig['charset']));
 			}

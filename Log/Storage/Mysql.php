@@ -23,7 +23,7 @@ class Mysql extends \HuiLib\Log\LogBase
 		}
 		
 		$this->driver = DbBase::create ( $driverConfig );
-		if (! $this->driver instanceof \HuiLib\Db\Pdo\PdoBase) {
+		if (! $this->driver instanceof \HuiLib\Db\Adapter\Pdo\PdoBase) {
 			throw new \HuiLib\Error\Exception ( 'Log mysql driver initialized failed' );
 		}
 		
