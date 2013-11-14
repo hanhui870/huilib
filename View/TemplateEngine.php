@@ -8,7 +8,8 @@ namespace HuiLib\View;
  *   1、Ajax请求获取判断页面: <!--ajax delimiter-->code<!--/ajax delimiter--> 
  *   2、获取子模板: {sub header}，相对于模板目录
  *   3、变量包含: {$var}、/ *{$var}* /(comment in javascript)
- *   	   常量输出{CONSTANT}(已经取消@符号)
+ *   	   常量输出 {CONSTANT}(已经取消@符号)
+ *   	   支持对象 $user->name => $this->user->name
  *   4、{if}{/if}对应if循环；{loop}{/loop}对应foreach循环；{for}{/for}对应for循环
  *   5、{eval} 对应php的eval函数。
  *   6、{php}在模板执行php代码。
@@ -270,7 +271,7 @@ class TemplateEngine
 	/*
 	 * 变量处理函数
 	 * 
-	 * 先处理变量 按官方正则匹配
+	 * 先处理变量，支持对象 按官方正则匹配
 	* $svar.config.site_name => $this->svar['config']['site_name']
 	* $name => $this->name
 	* $user->name => $this->user->name
