@@ -136,4 +136,20 @@ class Utility
 			return $keyc . str_replace ( '=', '', base64_encode ( $result ) );
 		}
 	}
+	
+	/**
+	 * 密码关键信息隐藏，隐藏中间的密码
+	 * 
+	 * @param string $password 密码信息
+	 */
+	public static function censorPassword($password) {
+		if (empty ( $password ))
+			return false;
+	
+		$length = \HuiLib\Helper\String::strlen( $password );
+		if ($length < 6)
+			return '******';
+	
+		return \HuiLib\Helper\String::substr( $password, 0, 2 ) . str_repeat ( '*', $length > 10 ? 6 : $length - 4 ) . \HuiLib\Helper\String::substr ( $password, - 2, 2 );
+	}
 }

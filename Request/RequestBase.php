@@ -80,9 +80,10 @@ abstract class RequestBase
 		$this->package=$this->getPackageRouteSeg();
 		$this->controller=$this->getControllerRouteSeg();
 		
-		$controllerClass=NAME_SEP.$this->appInstance->getAppNamespace().NAME_SEP.'Controller'.NAME_SEP.ucfirst($this->package).NAME_SEP.ucfirst($this->controller);
+		$controllerClass=NAME_SEP.'Controller'.NAME_SEP.ucfirst($this->package).NAME_SEP.ucfirst($this->controller);
 		try {
 			$this->controllerInstance=new $controllerClass($this->appInstance);
+			
 			$this->controllerInstance->setPackage($this->package);
 			$this->controllerInstance->setController($this->controller);
 			$this->controllerInstance->setHost($this->host);
@@ -97,7 +98,7 @@ abstract class RequestBase
 				$route->route();
 			}else{
 				//TODO Message display
-				throw new \HuiLib\Error\Exception("该页面不可访问");
+				throw new \HuiLib\Error\Exception("该页面不可访问:".$exception->getMessage());
 			}
 		}
 	}
