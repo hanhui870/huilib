@@ -109,4 +109,9 @@ class TableAbstract extends \HuiLib\App\Model
 		}
 		return $delete->where($where)->query();
 	}
+	
+	protected function rowObject($data)
+	{
+		
+	}
 }

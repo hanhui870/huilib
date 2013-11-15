@@ -80,7 +80,7 @@ abstract class DbBase
 		$adapter=NULL;
 		switch ($dbConfig['adapter']){
 			case 'pdo':
-				$adapter=new \HuiLib\Db\Pdo\PdoBase($dbConfig);
+				$adapter=new \HuiLib\Db\Adapter\Pdo\PdoBase($dbConfig);
 				break;
 			case 'mongo':
 		
