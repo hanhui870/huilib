@@ -99,7 +99,17 @@ class Param
 	 * 获取重写基准路径
 	 */
 	public static function getScriptUrl(){
-		return self::server('SCRIPT_URL', self::TYPE_STRING);
+	    if (isset( $_SERVER ['SCRIPT_URL'] )){
+	        return self::server('SCRIPT_URL', self::TYPE_STRING);
+	    }else{
+	        $requestUri = isset ( $_SERVER ['REQUEST_URI'] ) ? $_SERVER ['REQUEST_URI'] : '';
+	        if (strpos($requestUri, '?')!==FALSE){
+	            $scriptUrl=substr($requestUri, 1, strpos($requestUri, '?')-1);
+	        }else{
+	            $scriptUrl=substr($requestUri, 1);
+	        }
+	        return $scriptUrl;
+	    }
 	}
 	
 	/**
