@@ -89,7 +89,7 @@ class Param
 	}
 	
 	/**
-	 * 获取页面请假参数
+	 * 获取页面请求参数
 	 */
 	public static function getQueryString(){
 		return self::server('QUERY_STRING', self::TYPE_STRING);
