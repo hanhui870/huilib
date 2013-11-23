@@ -97,6 +97,8 @@ class Param
 	
 	/**
 	 * 获取重写基准路径
+	 * 
+	 * eg. [SCRIPT_URL] => /fdsafdas/fsdafdsa/fsdafsda
 	 */
 	public static function getScriptUrl(){
 	    if (isset( $_SERVER ['SCRIPT_URL'] )){
@@ -104,9 +106,9 @@ class Param
 	    }else{
 	        $requestUri = isset ( $_SERVER ['REQUEST_URI'] ) ? $_SERVER ['REQUEST_URI'] : '';
 	        if (strpos($requestUri, '?')!==FALSE){
-	            $scriptUrl=substr($requestUri, 1, strpos($requestUri, '?')-1);
+	            $scriptUrl=substr($requestUri, 0, strpos($requestUri, '?')-1);
 	        }else{
-	            $scriptUrl=substr($requestUri, 1);
+	            $scriptUrl=$requestUri;
 	        }
 	        return $scriptUrl;
 	    }
