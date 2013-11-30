@@ -119,6 +119,21 @@ abstract class AppBase
 		//执行
 		$instance->run ();
 	}
+	
+	/**
+	 * 工具集执行入口
+	 */
+	public function runTool()
+	{
+		$queryString = \HuiLib\Helper\Param::getQueryString ();
+	
+		//初始化测试库
+		$instance = $queryString::getInstance ();
+		$instance->setApp ( $this );
+	
+		//执行
+		$instance->run ();
+	}
 
 	/**
 	 * 初始化启动配置
