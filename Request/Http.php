@@ -22,6 +22,8 @@ class Http extends RequestBase
 	 * [SCRIPT_URI] => http://iyunlin/fdsafdas/fsdafdsa/fsdafsda
 	 * [REQUEST_URI] => /fdsafdas/fsdafdsa/fsdafsda?hello=fsdfsda
 	 * [QUERY_STRING] => hello=fsdfsda
+	 * 
+	 * TODO:不是所有服务器都有配置SCRIPT_URL，使用REQUEST_URI更靠谱
 	 */
 	protected $scriptUrl=NULL;
 	

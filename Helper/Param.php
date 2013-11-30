@@ -89,7 +89,7 @@ class Param
 	}
 	
 	/**
-	 * 获取页面请假参数
+	 * 获取页面请求参数
 	 */
 	public static function getQueryString(){
 		return self::server('QUERY_STRING', self::TYPE_STRING);
@@ -97,9 +97,21 @@ class Param
 	
 	/**
 	 * 获取重写基准路径
+	 * 
+	 * eg. [SCRIPT_URL] => /fdsafdas/fsdafdsa/fsdafsda
 	 */
 	public static function getScriptUrl(){
-		return self::server('SCRIPT_URL', self::TYPE_STRING);
+	    if (isset( $_SERVER ['SCRIPT_URL'] )){
+	        return self::server('SCRIPT_URL', self::TYPE_STRING);
+	    }else{
+	        $requestUri = isset ( $_SERVER ['REQUEST_URI'] ) ? $_SERVER ['REQUEST_URI'] : '';
+	        if (strpos($requestUri, '?')!==FALSE){
+	            $scriptUrl=substr($requestUri, 0, strpos($requestUri, '?')-1);
+	        }else{
+	            $scriptUrl=$requestUri;
+	        }
+	        return $scriptUrl;
+	    }
 	}
 	
 	/**
