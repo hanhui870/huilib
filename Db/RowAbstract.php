@@ -82,27 +82,64 @@ class RowAbstract extends \HuiLib\App\Model
 	
 	/**
 	 * 保存修改后的值
-	 * @return boolean
+	 * 
+	 * @return int
 	 */
 	public function save()
 	{
+		$query=$this->getQuery();
+		
+		if ($this->newRow) {
+			return $this->data[$this->primaryId]=$query->query();
+		}else{
+			return $query->query();
+		}
+	}
+	
+	/**
+	 * 获取修改的SQL语句
+	 *
+	 * @return boolean
+	 */
+	public function getSaveSql()
+	{
+		return $this->getQuery()->toString();
+	}
+	
+	/**
+	 * 获取Query更新对象
+	 * 
+	 * @throws Exception
+	 * @return Query
+	 */
+	protected function getQuery()
+	{
 		$tableInstance=$this->tableInstance;
-
+		
 		if ($tableInstance===NULL || $tableInstance::TABLE===NULL) {
 			throw new Exception('Table class constant TABLE has not been set.');
 		}
 		
 		$table=$tableInstance::TABLE;
 		if ($this->newRow) {//新行
-			unset($this->data[$this->primaryId]);
-			return $this->data[$this->primaryId]=Query::insert($table)->kvInsert($this->data)->query();
-			
+			//可以设置为默认值0，自动增长的也会自动更新；不然有些非自动增长的会有问题
+			//unset($this->data[$this->primaryId]);
+			$insert=Query::insert($table);
+			if ($this->dbAdapter!==NULL) {
+				$insert->setAdapter($this->dbAdapter);
+			}
+			return $insert->kvInsert($this->data);
+				
 		}else{
 			if (!$this->editData){
 				throw new Exception('Table row editData has not been set.');
 			}
 			$primaryValue=$this->oldPrimaryIdValue===NULL ? $this->data[$this->primaryId] : $this->oldPrimaryIdValue;
-			return Query::update($table)->sets($this->editData)->where(Where::createPair($this->primaryId, $primaryValue))->query();
+			$update=Query::update($table);
+			if ($this->dbAdapter!==NULL) {
+				$update->setAdapter($this->dbAdapter);
+			}
+			return $update->sets($this->editData)->where(Where::createPair($this->primaryId, $primaryValue));
 		}
 	}
 	
