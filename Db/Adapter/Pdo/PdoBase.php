@@ -9,6 +9,13 @@ namespace HuiLib\Db\Adapter\Pdo;
  */
 class PdoBase extends \HuiLib\Db\DbBase
 {	
+	/**
+	 * 数据库连接
+	 *
+	 * @var \PDO
+	 */
+	protected $connection=NULL;
+	
 	protected function __construct($dbConfig)
 	{
 		try {

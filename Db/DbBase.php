@@ -13,8 +13,6 @@ abstract class DbBase
 {
 	/**
 	 * 数据库连接
-	 * 
-	 * @var \PDO
 	 */
 	protected $connection=NULL;
 	
