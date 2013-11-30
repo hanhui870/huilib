@@ -14,6 +14,7 @@ use HuiLib\Db\Query\Where;
  */
 class TableAbstract extends \HuiLib\App\Model
 {
+	const TABLE=NULL;
 	protected $rowClass='\HuiLib\Db\RowAbstract';
 
 	/**
@@ -114,15 +115,16 @@ class TableAbstract extends \HuiLib\App\Model
 	}
 	
 	/**
-	 * 通过关联数据插入某表一行数据
+	 * 创建新的一行
 	 *
-	 * @param array $dataArray 插入数组
 	 * @return \HuiLib\Db\RowAbstract
 	 */
 	public function createRow()
 	{
 		$rowClass=$this->rowClass;
-		return $rowClass::createNewRow();
+		$rowInstance=$rowClass::createNewRow();
+		$rowInstance->setTable($this);
+		return $rowInstance;
 	}
 	
 	/**
@@ -131,10 +133,16 @@ class TableAbstract extends \HuiLib\App\Model
 	 * @param array $data 结果数据
 	 * @return \HuiLib\Db\RowAbstract
 	 */
-	protected function rowObject(array $data)
+	protected function rowObject($data)
 	{
+		if ($data===FALSE) {
+			return NULL;
+		}
+		
 		$rowClass=$this->rowClass;
-		return $rowClass::create($data);
+		$rowInstance=$rowClass::create($data);
+		$rowInstance->setTable($this);
+		return $rowInstance;
 	}
 	
 	/**
