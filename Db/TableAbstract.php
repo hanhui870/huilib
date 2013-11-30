@@ -14,12 +14,14 @@ use HuiLib\Db\Query\Where;
  */
 class TableAbstract extends \HuiLib\App\Model
 {
+	protected $rowClass='\HuiLib\Db\RowAbstract';
 
 	/**
 	 * 通过单个Field获取单条记录
 	 * 
 	 * @param string $field
 	 * @param string $value
+	 * @return \HuiLib\Db\RowAbstract
 	 */
 	protected function getRowByField($field, $value)
 	{
@@ -27,7 +29,8 @@ class TableAbstract extends \HuiLib\App\Model
 		if ($this->dbAdapter!==NULL) {
 			$select->setAdapter($this->dbAdapter);
 		}
-		return $select->where ( Where::createPair ( $field, $value ) )->limit ( 1 )->query ()->fetch ();
+
+		return $this->rowObject($select->where ( Where::createPair ( $field, $value ) )->limit ( 1 )->query ()->fetch ());
 	}
 
 	/**
@@ -110,7 +113,36 @@ class TableAbstract extends \HuiLib\App\Model
 		return $delete->where($where)->query();
 	}
 	
-	protected function rowObject($data)
+	/**
+	 * 通过关联数据插入某表一行数据
+	 *
+	 * @param array $dataArray 插入数组
+	 * @return \HuiLib\Db\RowAbstract
+	 */
+	public function createRow()
+	{
+		$rowClass=$this->rowClass;
+		return $rowClass::createNewRow();
+	}
+	
+	/**
+	 * 返回行数据对象
+	 * 
+	 * @param array $data 结果数据
+	 * @return \HuiLib\Db\RowAbstract
+	 */
+	protected function rowObject(array $data)
+	{
+		$rowClass=$this->rowClass;
+		return $rowClass::create($data);
+	}
+	
+	/**
+	 * 返回行列表数据对象
+	 * 
+	 * @param array $dataList
+	 */
+	protected function rowSetObject(array $dataList)
 	{
 		
 	}
