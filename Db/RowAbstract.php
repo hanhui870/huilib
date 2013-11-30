@@ -2,6 +2,8 @@
 namespace HuiLib\Db;
 
 use HuiLib\Error\Exception;
+use HuiLib\Db\TableAbstract;
+use HuiLib\Db\Query\Where;
 
 /**
  * 数据行类
@@ -42,6 +44,18 @@ class RowAbstract extends \HuiLib\App\Model
 	protected $primaryId=NULL;
 	
 	/**
+	 * 主键原值字段 如果修改过主键
+	 * @var string
+	 */
+	protected $oldPrimaryIdValue=NULL;
+	
+	/**
+	 * 对应表类
+	 * @var \HuiLib\Db\TableAbstract 
+	 */
+	protected $tableInstance=NULL;
+	
+	/**
 	 * 是否是新行
 	 * @var boolean
 	 */
@@ -72,9 +86,31 @@ class RowAbstract extends \HuiLib\App\Model
 	 */
 	public function save()
 	{
+		$tableInstance=$this->tableInstance;
+
+		if ($tableInstance===NULL || $tableInstance::TABLE===NULL) {
+			throw new Exception('Table class constant TABLE has not been set.');
+		}
 		
-		
-		return true;
+		$table=$tableInstance::TABLE;
+		if ($this->newRow) {//新行
+			unset($this->data[$this->primaryId]);
+			return $this->data[$this->primaryId]=Query::insert($table)->kvInsert($this->data)->query();
+			
+		}else{
+			$primaryValue=$this->oldPrimaryIdValue===NULL ? $this->data[$this->primaryId] : $this->oldPrimaryIdValue;
+			return Query::update($table)->sets($this->editData)->where(Where::createPair($this->primaryId, $primaryValue))->query();
+		}
+	}
+	
+	/**
+	 * 返回对象的数组表示
+	 * @return array
+	 */
+	public function setTable(TableAbstract $tableInstance)
+	{
+		$this->tableInstance=$tableInstance;
+		return $this;
 	}
 	
 	/**
@@ -105,7 +141,14 @@ class RowAbstract extends \HuiLib\App\Model
 	public function __set($key, $value)
 	{
 		if (isset($this->data[$key])) {
+			$this->originalData[$key]=$this->data[$key];
 			$this->data[$key]=$value;
+			$this->editData[$key]=$value;
+			
+			//修改主键值，支持但不建议修改
+			if ($key == $this->primaryId) {
+				$this->oldPrimaryIdValue=$this->originalData[$key];
+			}
 			return TRUE;
 		}
 		return FALSE;
