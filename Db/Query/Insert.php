@@ -94,7 +94,7 @@ class Insert extends \HuiLib\Db\Query
 	 * eg.
 	 * array('fieldValue1', 'fieldValue2', 'fieldValue3', 'fieldValue4', ...)
 	 * 
-	 * eg dupValues. 直接设置的，必须以关联数组形式，不然调用默认value数组
+	 * eg dupValues. 先enableDuplicate(true)，必须以关联数组形式直接设置，默认使用value数组
 	 * array('field1'=>'value1', 'field2'=>'value2', 'field3'=>'value3' ...) //insert set
 	 * array('num'=>array('plain'=>'num=num+1')) //duplicate update 浏览量+1
 	 * 

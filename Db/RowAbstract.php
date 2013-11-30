@@ -98,13 +98,16 @@ class RowAbstract extends \HuiLib\App\Model
 			return $this->data[$this->primaryId]=Query::insert($table)->kvInsert($this->data)->query();
 			
 		}else{
+			if (!$this->editData){
+				throw new Exception('Table row editData has not been set.');
+			}
 			$primaryValue=$this->oldPrimaryIdValue===NULL ? $this->data[$this->primaryId] : $this->oldPrimaryIdValue;
 			return Query::update($table)->sets($this->editData)->where(Where::createPair($this->primaryId, $primaryValue))->query();
 		}
 	}
 	
 	/**
-	 * 返回对象的数组表示
+	 * 设置表类实例
 	 * @return array
 	 */
 	public function setTable(TableAbstract $tableInstance)

@@ -14,7 +14,16 @@ use HuiLib\Db\Query\Where;
  */
 class TableAbstract extends \HuiLib\App\Model
 {
+	/**
+	 * 表名
+	 * @var string
+	 */
 	const TABLE=NULL;
+	
+	/**
+	 * 表行类名
+	 * @var string
+	 */
 	protected $rowClass='\HuiLib\Db\RowAbstract';
 
 	/**
@@ -24,7 +33,7 @@ class TableAbstract extends \HuiLib\App\Model
 	 * @param string $value
 	 * @return \HuiLib\Db\RowAbstract
 	 */
-	protected function getRowByField($field, $value)
+	public function getRowByField($field, $value)
 	{
 		$select=Query::select ( static::TABLE );
 		if ($this->dbAdapter!==NULL) {
@@ -42,13 +51,13 @@ class TableAbstract extends \HuiLib\App\Model
 	 * @param int $limit 取多少条
 	 * @param int $offset 从第几条开始
 	 */
-	protected function getListByField($field, $value, $limit, $offset = 0)
+	public function getListByField($field, $value, $limit, $offset = 0)
 	{
 		$select=Query::select ( static::TABLE );
 		if ($this->dbAdapter!==NULL) {
 			$select->setAdapter($this->dbAdapter);
 		}
-		return $select->where ( Where::createPair ( $field, $value ) )->limit ( $limit )->offset ( $offset )->query ()->fetchAll ();
+		return $this->rowSetObject($select->where ( Where::createPair ( $field, $value ) )->limit ( $limit )->offset ( $offset )->query ()->fetchAll ());
 	}
 
 	/**
@@ -58,7 +67,7 @@ class TableAbstract extends \HuiLib\App\Model
 	 * @param string $value
 	 * @param string $column 要获取的字段，是字段名，不是column序号
 	 */
-	protected function getColumnByField($field, $value, $column)
+	public function getColumnByField($field, $value, $column)
 	{
 		$select=Query::select ( static::TABLE );
 		if ($this->dbAdapter!==NULL) {
@@ -150,8 +159,15 @@ class TableAbstract extends \HuiLib\App\Model
 	 * 
 	 * @param array $dataList
 	 */
-	protected function rowSetObject(array $dataList)
+	protected function rowSetObject($dataList)
 	{
-		
+		if ($dataList===FALSE) {
+			return NULL;
+		}
+
+		$rowSetInstance=\HuiLib\Db\RowSet::create($dataList);
+		$rowSetInstance->setRowClass($this->rowClass);
+		$rowSetInstance->setTable($this);
+		return $rowSetInstance;
 	}
 }
