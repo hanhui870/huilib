@@ -23,6 +23,7 @@ class QueryUpdateTest extends \HuiLib\Test\TestBase
 		$update=\HuiLib\Db\Query::update()->table('tableTest')->where(Where::createPair('id', '16'));
 		$update->sets(array(
 				'field1'=>'fvalue1',//KV模式
+				'field2'=>'fvalue2',//KV模式
 				'num'=>array('plain'=>'num=num+1') //Plain模式
 		));
 		//$update->query();
