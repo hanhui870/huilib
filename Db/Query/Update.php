@@ -94,10 +94,10 @@ class Update extends \HuiLib\Db\Query
 
 		$sets=array();
 		foreach ( $this->sets as $keyString=>$value ) {
-			if (is_string($value)) {//key=>value 形式
-				$sets[]=$keyString.'='.$this->escape($value);
-			}elseif (is_array($value) && isset($value['plain'])){
+			if (is_array($value) && isset($value['plain'])) {//key=>value 形式 不能使用is_string会把数字等略掉
 				$sets[]=$value['plain'];//num=num+1等，特殊形式
+			}else{
+				$sets[]=$keyString.'='.$this->escape($value);
 			}
 		}
 	
