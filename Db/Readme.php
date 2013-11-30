@@ -59,7 +59,7 @@ $insert->values(array('fvalue11', 'fvalue22')); //附加 前面的
 
 //2.2.2 关联数组插入模式
 //insert into test (field1, field2) values ('fvalue1', 'fvalue2'), ('fvalue11', 'fvalue22') ;
-$insert->kvInsert(array('field1'=>'fvalue1', 'field2'=>'fvalue2'))->values(array('fvalue11', 'fvalue22'), array('fvalue11', 'fvalue22'));
+$insert->kvInsert(array('field1'=>'fvalue1', 'field2'=>'fvalue2'))->values(array('fvalue11', 'fvalue22'));
 
 //2.2.3 Duplicate Key Update模式
 //需要注意dupFields和dupValues的关联性，弱耦合
