@@ -61,6 +61,12 @@ class RowAbstract extends \HuiLib\App\Model
 	 */
 	protected $newRow=FALSE;
 	
+	/**
+	 * 存在主键冲突是否覆盖
+	 * @var boolean
+	 */
+	protected $duplicateCreate=FALSE;
+	
 	protected function __construct(array $data)
 	{
 		parent::__construct();
@@ -128,6 +134,9 @@ class RowAbstract extends \HuiLib\App\Model
 			if ($this->dbAdapter!==NULL) {
 				$insert->setAdapter($this->dbAdapter);
 			}
+			if ($this->duplicateCreate) {
+				$insert->enableDuplicate();
+			}
 			return $insert->kvInsert($this->data);
 				
 		}else{
@@ -150,6 +159,17 @@ class RowAbstract extends \HuiLib\App\Model
 	public function setTable(TableAbstract $tableInstance)
 	{
 		$this->tableInstance=$tableInstance;
+		return $this;
+	}
+	
+	/**
+	 * 存在主键冲突时覆盖创建新行
+	 * 
+	 * @return array
+	 */
+	public function enableDupliateCreate()
+	{
+		$this->duplicateCreate=TRUE;
 		return $this;
 	}
 	

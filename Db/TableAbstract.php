@@ -21,6 +21,12 @@ class TableAbstract extends \HuiLib\App\Model
 	const TABLE=NULL;
 	
 	/**
+	 * 存在相同主键行是否覆盖
+	 */
+	const CREATE_DUPLICATE=TRUE;//覆盖
+	const CREATE_NO_DUPLICATE=FALSE;//不覆盖
+	
+	/**
 	 * 表行类名
 	 * @var string
 	 */
@@ -126,13 +132,17 @@ class TableAbstract extends \HuiLib\App\Model
 	/**
 	 * 创建新的一行
 	 *
+	 * @param boolean $duplicate 创建是否覆盖相同主键的值
 	 * @return \HuiLib\Db\RowAbstract
 	 */
-	public function createRow()
+	public function createRow($duplicate=self::CREATE_NO_DUPLICATE)
 	{
 		$rowClass=$this->rowClass;
 		$rowInstance=$rowClass::createNewRow();
 		$rowInstance->setTable($this);
+		if ($duplicate) {
+			$rowInstance->enableDupliateCreate();
+		}
 		return $rowInstance;
 	}
 	
