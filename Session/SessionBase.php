@@ -137,7 +137,7 @@ class SessionBase implements \SessionHandlerInterface
 		 * 
 		 * 用户触发，不管保持登录，直接清除(在子类触发)
 		 */
-		$this->manager->pushSessionToDb($session);
+		$this->manager->pushSessionToDb($this->read($sessionId), $this->manager->getLastVisit($sessionId));
 		
 		//从管理列表中剔除一个SessionID
 		return $this->manager->delete($sessionId);
@@ -180,6 +180,16 @@ class SessionBase implements \SessionHandlerInterface
 	public function getLife ()
 	{
 		return $this->lifeTime;
+	}
+	
+	/**
+	 * 获取session配置
+	 *
+	 * @return array
+	 */
+	public function getConfig ()
+	{
+		return $this->config;
 	}
 	
 	/**

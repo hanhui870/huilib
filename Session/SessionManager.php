@@ -1,16 +1,20 @@
 <?php 
 namespace HuiLib\Session;
 
+use HuiLib\Error\Exception;
+
 /**
  * Session GC 管理类
  * 
- * 使用Redis HASH结构作为数据储存，因此必须启用Redis缓存
+ * 使用Redis ZSet结构作为数据储存，因此必须启用Redis缓存
  * 
  * Session管理要点：
  * 1、ZSet:在线列表，最近在单位时间内活跃的用户，比如半小时（不能太长，以前2小时没意义，除了数量上，没其他意义）
  *      超过时间执行GC，更新用户资料，删除Session数据
  * 2、ZSet:保持状态登录用户列表及维护（有AutoLogin cookie标记），根据deadline(最后存活时间)，超过1个月没活动后删除。
  *      删除后用户自动退出登录。（是否登录以是否存在session为依据）
+ *      
+ * 假设：session储存是永久的，因为像Memcache，重启、关机可能导致登录会话丢失
  * 
  * @author 祝景法
  * @since 2013/10/13
@@ -46,7 +50,7 @@ class SessionManager
 	/**
 	 * 设置Session Connect Adapter
 	 *
-	 * @param string $sessionId Hash缓存键
+	 * @param string $sessionId session缓存键
 	 */
 	public function setAdapter(\HuiLib\Session\SessionBase $session)
 	{
@@ -56,7 +60,7 @@ class SessionManager
 	/**
 	 * 更新一个session的最后活跃时间
 	 * 
-	 * @param string $sessionId Hash缓存键
+	 * @param string $sessionId session缓存键
 	 */
 	public function update($sessionId)
 	{
@@ -66,7 +70,7 @@ class SessionManager
 	/**
 	 * 删除一个session
 	 *
-	 * @param string $sessionId Hash缓存键
+	 * @param string $sessionId session缓存键
 	 */
 	public function delete($sessionId)
 	{
@@ -83,7 +87,7 @@ class SessionManager
 	/**
 	 * 延长一个自动登录session的deadline
 	 *
-	 * @param string $sessionId Hash缓存键
+	 * @param string $sessionId session缓存键
 	 */
 	public function updateDeadline($sessionId)
 	{
@@ -95,7 +99,7 @@ class SessionManager
 	/**
 	 * 将一个session从AutoLogin列表中移除
 	 *
-	 * @param string $sessionId Hash缓存键
+	 * @param string $sessionId session缓存键
 	 */
 	public function deleteDeadline($sessionId)
 	{
@@ -123,7 +127,7 @@ class SessionManager
 	 * 原ylstu库操作条件：
 	 * (deadline>0 and deadline<timeNow) or (deadline=0 and ltime=timeNow-keepOline)
 	 *
-	 * @param string $sessionId Hash缓存键
+	 * @param string $sessionId session缓存键
 	 */
 	public function gc($maxlifetime)
 	{
@@ -190,10 +194,19 @@ class SessionManager
 	}
 	
 	/**
-	 * TODO 将session资料更新到用户数据库表
+	 * 将session资料更新到用户数据库表
+	 * 
+	 * @param array $session 用户session数据
+	 * @param int $lastVisit 上次访问
 	 */
 	public function pushSessionToDb($session, $lastVisit){
+		$config=$this->connect->getConfig();
+		if (!isset($config['model']) || !class_exists($config['model'])) {
+			throw new Exception('App.ini setting of valid session.model has not been set.');
+		}
 		
+		$modelClass=$config['model'];
+		return $modelInstance=$modelClass::create()->pushToDb($session, $lastVisit);
 	}
 
 	/**
