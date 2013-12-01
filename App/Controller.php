@@ -214,7 +214,7 @@ class Controller
 	protected function preRenderView()
 	{
 		//有View类型的才像前台赋值配置数据
-		$this->initSiteConfig();
+		$this->getSiteConfig();
 		if (!empty($this->siteConfig)) {
 			$this->view->assign($this->siteConfig->getByKey());
 		}
@@ -314,11 +314,12 @@ class Controller
 	/**
 	 * 初始化网站配置实例
 	 */
-	protected function initSiteConfig()
+	protected function getSiteConfig()
 	{
 		if ($this->siteConfig===NULL) {
 			$this->siteConfig = $this->appInstance->siteConfigInstance();
 		}
+		return $this->siteConfig;
 	}
 
 	/**
