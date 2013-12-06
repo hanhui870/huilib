@@ -4,6 +4,7 @@ namespace HuiLib\Db\Adapter\Pdo;
 /**
  * Pdo初始化类
  *
+ * @FIXME Pdo链接端口问题 其实也是DSN规范化问题，可以将DSN定义转移到具体后端Driver中。driver初始化也有问题，是必须的。
  * @author 祝景法
  * @since 2013/08/25
  */
