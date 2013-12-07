@@ -9,11 +9,30 @@ namespace HuiLib\Db\Adapter\Pdo;
  */
 class Mysql
 {
+	protected static $allowDsnField=array('host', 'port', 'dbname', 'unix_socket');
 
 	public function __construct()
 	{
 	}
 
+	/**
+	 * 返回Pdo定义语句
+	 *
+	 * @param array $config 数据库配置
+	 */
+	public function getDsn($dbConfig)
+	{
+		$dsn=array();
+		
+		foreach ($dbConfig as $key=>$value){
+			if (in_array($key, self::$allowDsnField)) {
+				$dsn[]=$key.'='.$value;
+			}
+		}
+		
+		return $dbConfig['driver'].':'.implode(';', $dsn);
+	}
+	
 	/**
 	 * 生成字符集语句
 	 * 
