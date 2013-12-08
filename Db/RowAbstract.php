@@ -93,15 +93,19 @@ class RowAbstract extends \HuiLib\App\Model
 	 */
 	public function save()
 	{
-		$query=$this->getQuery();
+		$query=$this->getSaveQuery();
 		
+		$this->onBeforeSave();
 		if ($this->newRow) {
-			return $this->data[$this->primaryId]=$query->query();
+			$result=$this->data[$this->primaryId]=$query->query();
 		}else{
-			return $query->query();
+			$result=$query->query();
 		}
+		$this->onAfterSave();
+		
+		return $result;
 	}
-	
+
 	/**
 	 * 获取修改的SQL语句
 	 *
@@ -109,8 +113,23 @@ class RowAbstract extends \HuiLib\App\Model
 	 */
 	public function getSaveSql()
 	{
-		return $this->getQuery()->toString();
+		return $this->getSaveQuery()->toString();
 	}
+	
+	/**
+	 * 保存前事件绑定
+	 */
+	protected function onBeforeSave()
+	{
+	}
+	
+	/**
+	 * 保存后事件绑定
+	 */
+	protected function onAfterSave()
+	{
+	}
+	
 	
 	/**
 	 * 获取Query更新对象
@@ -118,7 +137,7 @@ class RowAbstract extends \HuiLib\App\Model
 	 * @throws Exception
 	 * @return Query
 	 */
-	protected function getQuery()
+	protected function getSaveQuery()
 	{
 		$tableInstance=$this->tableInstance;
 		
@@ -128,15 +147,20 @@ class RowAbstract extends \HuiLib\App\Model
 		
 		$table=$tableInstance::TABLE;
 		if ($this->newRow) {//新行
-			//可以设置为默认值0，自动增长的也会自动更新；不然有些非自动增长的会有问题
-			//unset($this->data[$this->primaryId]);
+			// primaryId 可以设置为默认值0，自动增长的也会自动更新；不然有些非自动增长的会有问题
 			$insert=Query::insert($table);
 			if ($this->dbAdapter!==NULL) {
 				$insert->setAdapter($this->dbAdapter);
 			}
+			
 			if ($this->duplicateCreate) {
 				$insert->enableDuplicate();
+				//dup的时候要注意去除主键为0的情况
+				$duplicate=$this->data;
+				unset($duplicate[$this->primaryId]);
+				$insert->dupFields(array_keys($duplicate));
 			}
+			
 			return $insert->kvInsert($this->data);
 				
 		}else{
@@ -187,6 +211,47 @@ class RowAbstract extends \HuiLib\App\Model
 		$rowNew=new static(static::$initData);
 		$rowNew->newRow=TRUE;
 		return $rowNew;
+	}
+	
+	/**
+	 * 删除一个值
+	 *
+	 * @return int
+	 */
+	public function delete()
+	{
+		$tableInstance=$this->tableInstance;
+	
+		if ($tableInstance===NULL || $tableInstance::TABLE===NULL) {
+			throw new Exception('Table class constant TABLE has not been set.');
+		}
+	
+		$delete=Query::delete($tableInstance::TABLE);
+		if ($this->dbAdapter!==NULL) {
+			$delete->setAdapter($this->dbAdapter);
+		}
+	
+		$delete->where(Where::createPair($this->primaryId, $this->data[$this->primaryId]));
+
+		$this->onBeforeDelete();
+		$result=$delete->query();
+		$this->onAfterDelete();
+		
+		return $result;
+	}
+	
+	/**
+	 * 删除前事件绑定
+	 */
+	protected function onBeforeDelete()
+	{
+	}
+	
+	/**
+	 * 删除后事件绑定
+	 */
+	protected function onAfterDelete()
+	{
 	}
 	
 	public function __get($key)

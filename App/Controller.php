@@ -129,7 +129,7 @@ class Controller
 	 */
 	public function dispatch()
 	{
-		$this->preDispatch ();
+		$this->onBeforeDispatch ();
 		
 		if ($this->useView) {
 			$this->initView ();
@@ -140,7 +140,7 @@ class Controller
 		$action=$this->action.'Action';
 		$this->$action();
 		
-		$this->postDispatch ();
+		$this->onAfterDispatch ();
 		
 		//渲染模板，自动触发或方法中调用
 		if ($this->useView && $this->autoRender) {
@@ -173,14 +173,14 @@ class Controller
 	/**
 	 * 请求派发前事件
 	 */
-	protected function preDispatch()
+	protected function onBeforeDispatch()
 	{
 	}
 
 	/**
 	 * 请求派发后事件
 	 */
-	protected function postDispatch()
+	protected function onAfterDispatch()
 	{
 	}
 
