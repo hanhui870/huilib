@@ -14,5 +14,5 @@ interface ModelInterface
 	 * @param array $session
 	 * @param int $lastVisit
 	 */
-	abstract public function pushToDb($session, $lastVisit);
+	public function pushToDb($session, $lastVisit);
 }
