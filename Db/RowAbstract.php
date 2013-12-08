@@ -241,6 +241,31 @@ class RowAbstract extends \HuiLib\App\Model
 	}
 	
 	/**
+	 * 通过关联数组设置行对象
+	 * 
+	 * 带默认值初始化
+	 *
+	 * @return array $data Key/Value关联行对象设置数组
+	 */
+	public function data($data)
+	{
+		if (static::$initData===NULL || !is_array(static::$initData)) {
+			throw new Exception('Row class static var $initData has not been set.');
+		}
+		
+		foreach (static::$initData as $key=>$value){
+			if (isset($data[$key])) {//data值初始化
+				$this->data[$key]=$data[$key];
+				
+			}elseif (!isset($this->data[$key])){//默认值初始化
+				$this->data[$key]=$value;
+			}
+		}
+		
+		return $this;
+	}
+	
+	/**
 	 * 删除前事件绑定
 	 */
 	protected function onBeforeDelete()
