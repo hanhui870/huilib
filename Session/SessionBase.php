@@ -33,7 +33,7 @@ class SessionBase implements \SessionHandlerInterface
 	 * Session权限信息生存时间
 	 * 
 	 * 默认一个月，前台后台一致。需要到期前自动延长
-	 * App.ini: app.session.authLife
+	 * App.ini: session.authLife
 	 * @var int
 	 */
 	protected $lifeTime=0;
@@ -227,7 +227,7 @@ class SessionBase implements \SessionHandlerInterface
 			self::$prefix=$config ['prefix'];
 		}
 		//权限验证名称
-		$authCookie=$configInstance->getByKey('app.session.auth');
+		$authCookie=$configInstance->getByKey('session.auth');
 		if (!empty($authCookie )) {
 			self::$authCookieName=$authCookie;
 		}
@@ -240,9 +240,12 @@ class SessionBase implements \SessionHandlerInterface
 				$driver = new \HuiLib\Session\Storage\Redis ( $driverConfig );
 				break;
 		}
+
+		//保存session配置信息
+		$driver->config=$config;
 		
 		//设置后端生命期
-		$driver->setLife($configInstance->getByKey('app.session.authLife'));
+		$driver->setLife($configInstance->getByKey('session.authLife'));
 		
 		//注册Session处理函数
 		session_set_save_handler($driver, TRUE);
