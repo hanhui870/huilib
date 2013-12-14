@@ -9,7 +9,7 @@ namespace HuiLib\Session;
  * 2、Session管理使用Redis KV数据库管理元数据，如在线列表、保持登录等功能
  * 3、针对Robots的session_id特殊处理
  * 
- * 清空本访问关联session使用: $_SESSION=array();//使用''无效
+ * 清空本访问关联session使用: $_SESSION=array();//使用$_SESSION=''无效
  * 
  * @author 祝景法
  * @since 2013/09/27
@@ -119,6 +119,7 @@ class SessionBase implements \SessionHandlerInterface
 	
 	public function close ()
 	{
+		print_r($_SESSION);die();
 		return true;
 	}
 	
@@ -131,13 +132,6 @@ class SessionBase implements \SessionHandlerInterface
 	{
 		//清除浏览器session passport cookie; sessionId不用清理 因为长期
 		$cookie=\HuiLib\Helper\Cookie::create()->delCookie(self::$authCookieName);
-		
-		/**
-		 * 将个人资料推送到数据库中的操作 
-		 * 
-		 * 用户触发，不管保持登录，直接清除(在子类触发)
-		 */
-		$this->manager->pushSessionToDb($this->read($sessionId), $this->manager->getLastVisit($sessionId));
 		
 		//从管理列表中剔除一个SessionID
 		return $this->manager->delete($sessionId);

@@ -10,9 +10,11 @@ use HuiLib\Error\Exception;
  * 
  * Session管理要点：
  * 1、ZSet:在线列表，最近在单位时间内活跃的用户，比如半小时（不能太长，以前2小时没意义，除了数量上，没其他意义）
- *      超过时间执行GC，更新用户资料，删除Session数据
+ *      超过时间执行GC，删除Session数据
  * 2、ZSet:保持状态登录用户列表及维护（有AutoLogin cookie标记），根据deadline(最后存活时间)，超过1个月没活动后删除。
  *      删除后用户自动退出登录。（是否登录以是否存在session为依据）
+ *      
+ * 注释：GC或者销毁，Session数据不回写到数据库，有同步Model
  *      
  * 假设：session储存是永久的，因为像Memcache，重启、关机可能导致登录会话丢失
  * 
@@ -21,7 +23,10 @@ use HuiLib\Error\Exception;
  */
 class SessionManager
 {
+	//ZSet:在线列表，最近在单位时间内活跃的用户
 	const MANAGER_DATALIST='global:session:gc:manager:datalist';
+	
+	//ZSet:保持状态登录用户列表及维护
 	const MANAGER_DEADLINE='global:session:gc:manager:deadline';
 	
 	/**
@@ -131,6 +136,7 @@ class SessionManager
 	 */
 	public function gc($maxlifetime)
 	{
+		echo 'gc';die();
 		$gcTime=time();
 		
 		/**
@@ -144,32 +150,16 @@ class SessionManager
 		//print_r($kickOnline);die();
 		
 		if (!empty($kickOnline)) {
-			$redisMulti=$this->redis->multi();
+			//这里不能使用redis multi，因为读session可能使用redis
 			foreach ($kickOnline as $sessionId=>$lastVisit ){
 				//删除在线列表中数据
-				$redisMulti->zDelete(self::MANAGER_DATALIST, $sessionId);
+				$this->redis->zDelete(self::MANAGER_DATALIST, $sessionId);
 				
-				//删除实体session数据 保持登录标记
-				$session=$this->connect->read($sessionId);
-				if (empty($session)) {
-					//为空，直接删除
+				//删除实体session数据 保持登录的除外
+				if (!intval($this->getDeadline($sessionId))) {
 					$this->connect->delete($sessionId);
-					continue;
-				}
-				
-				$session=@unserialize($session);
-				//登录用户，更新到数据
-				if (!empty($session['uid'])) {
-					//触发一次更新资料到数据库表
-					$this->pushSessionToDb($session, $lastVisit);
-						
-					//删除实体数据(保持登录用户标记除外)
-					if (empty($session['autoLogin'])) {
-						$this->connect->delete($sessionId);
-					}
 				}
 			}
-			$redisMulti->exec();
 		}
 		
 		/**
@@ -191,22 +181,6 @@ class SessionManager
 			}
 			$redisMulti->exec();
 		}
-	}
-	
-	/**
-	 * 将session资料更新到用户数据库表
-	 * 
-	 * @param array $session 用户session数据
-	 * @param int $lastVisit 上次访问
-	 */
-	public function pushSessionToDb($session, $lastVisit){
-		$config=$this->connect->getConfig();
-		if (!isset($config['model']) || !class_exists($config['model'])) {
-			throw new Exception('App.ini setting of session.model has not been set or not valid.');
-		}
-		
-		$modelClass=$config['model'];
-		return $modelInstance=$modelClass::create()->pushToDb($session, $lastVisit);
 	}
 
 	/**
