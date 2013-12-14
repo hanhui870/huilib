@@ -114,12 +114,14 @@ class SessionBase implements \SessionHandlerInterface
 	 */
 	public function write ( $sessionId , $sessionData )
 	{
-	
+		$_SESSION['last']=time();
 	}
 	
 	public function close ()
 	{
-		print_r($_SESSION);die();
+		//Session关闭事件
+		$this->manager->getModel()->onSessionClose();
+		
 		return true;
 	}
 	
@@ -132,6 +134,8 @@ class SessionBase implements \SessionHandlerInterface
 	{
 		//清除浏览器session passport cookie; sessionId不用清理 因为长期
 		$cookie=\HuiLib\Helper\Cookie::create()->delCookie(self::$authCookieName);
+		
+		$this->manager->getModel()->onSessionDestroy();
 		
 		//从管理列表中剔除一个SessionID
 		return $this->manager->delete($sessionId);
@@ -244,6 +248,9 @@ class SessionBase implements \SessionHandlerInterface
 		//注册Session处理函数
 		session_set_save_handler($driver, TRUE);
 		session_start();
+	
+		//Session开启后事件调用
+		$driver->manager->getModel()->onSessionStart();
 		
 		return $driver;
 	}

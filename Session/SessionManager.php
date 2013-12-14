@@ -37,10 +37,16 @@ class SessionManager
 	protected $redis=NULL;
 	
 	/**
-	 * Session Connect
+	 * SessionBase
 	 * @var \HuiLib\Session\SessionBase
 	 */
-	protected $connect=NULL;
+	protected $sessionBase=NULL;
+	
+	/**
+	 * SessionBase
+	 * @var \HuiLib\Session\ModelInterface
+	 */
+	protected $sessionModel=NULL;
 	
 	/**
 	 * 每次GC最大执行数
@@ -53,13 +59,13 @@ class SessionManager
 	}
 	
 	/**
-	 * 设置Session Connect Adapter
+	 * 设置SessionBase Adapter
 	 *
 	 * @param string $sessionId session缓存键
 	 */
 	public function setAdapter(\HuiLib\Session\SessionBase $session)
 	{
-		$this->connect=$session;
+		$this->sessionBase=$session;
 	}
 	
 	/**
@@ -97,7 +103,7 @@ class SessionManager
 	public function updateDeadline($sessionId)
 	{
 		//Session后端生存时间 默认一个月
-		$life=$this->connect->getLife();
+		$life=$this->sessionBase->getLife();
 		return $this->redis->zAdd(self::MANAGER_DEADLINE, time()+$life, $sessionId);
 	}
 	
@@ -136,7 +142,6 @@ class SessionManager
 	 */
 	public function gc($maxlifetime)
 	{
-		echo 'gc';die();
 		$gcTime=time();
 		
 		/**
@@ -145,7 +150,7 @@ class SessionManager
 		 * 取出来数据格式 array($sessionID=>score):
 		 * Array([yunk5y093qzlcoij5nhbz49ospyay4rp8yilbxli] => 1379425023)
 		 */
-		$endStamp=$gcTime-$this->connect->getLife();
+		$endStamp=$gcTime-$this->sessionBase->getLife();
 		$kickOnline=$this->redis->zRangeByScore(self::MANAGER_DATALIST, 0, $endStamp, array('withscores'=>TRUE, 'limit' => array(0, self::MAX_GC_PER_ACTION)));
 		//print_r($kickOnline);die();
 		
@@ -157,7 +162,7 @@ class SessionManager
 				
 				//删除实体session数据 保持登录的除外
 				if (!intval($this->getDeadline($sessionId))) {
-					$this->connect->delete($sessionId);
+					$this->sessionBase->delete($sessionId);
 				}
 			}
 		}
@@ -177,10 +182,30 @@ class SessionManager
 				$redisMulti->zDelete(self::MANAGER_DEADLINE, $sessionId);
 				
 				//删除实体session数据，直接删除，从在线列表剔除时更新资料过
-				$this->connect->delete($sessionId);
+				$this->sessionBase->delete($sessionId);
 			}
 			$redisMulti->exec();
 		}
+	}
+	
+	/**
+	 * 返回应用端(App)交互接口Model
+	 * 
+	 * @return \HuiLib\Session\ModelInterface
+	 */
+	public function getModel()
+	{
+		if ($this->sessionModel===NULL) {
+			$config=$this->sessionBase->getConfig();
+			if (!isset($config['model']) || !class_exists($config['model'])) {
+				throw new Exception('App.ini setting of session.model has not been set or not valid.');
+			}
+			
+			$modelClass=$config['model'];
+			$this->sessionModel=$modelClass::getInstance();
+		}
+		
+		return $this->sessionModel;
 	}
 
 	/**
