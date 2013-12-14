@@ -202,7 +202,7 @@ class SessionManager
 	public function pushSessionToDb($session, $lastVisit){
 		$config=$this->connect->getConfig();
 		if (!isset($config['model']) || !class_exists($config['model'])) {
-			throw new Exception('App.ini setting of valid session.model has not been set.');
+			throw new Exception('App.ini setting of session.model has not been set or not valid.');
 		}
 		
 		$modelClass=$config['model'];
