@@ -180,4 +180,14 @@ class TableAbstract extends \HuiLib\App\Model
 		$rowSetInstance->setTable($this);
 		return $rowSetInstance;
 	}
+	
+	/**
+	 * 获取表行默认初始化数据
+	 * @return array
+	 */
+	public static function getRowInitData()
+	{
+		$rowClass=static::ROW_CLASS;
+		return $rowClass::getInitData();
+	}
 }

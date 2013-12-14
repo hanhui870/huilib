@@ -273,6 +273,15 @@ class RowAbstract extends \HuiLib\App\Model
 	}
 	
 	/**
+	 * 获取表行默认初始化数据
+	 * @return array
+	 */
+	public static function getInitData()
+	{
+		return static::$initData;
+	}
+	
+	/**
 	 * 删除后事件绑定
 	 */
 	protected function onAfterDelete()
