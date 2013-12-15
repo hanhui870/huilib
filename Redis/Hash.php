@@ -237,11 +237,36 @@ class Hash extends RedisBase
 		}
 	}
 	
+	/**
+	 * 修改数据
+	 * @param string $key
+	 * @param number $value
+	 * @return boolean
+	 */
+	public function __set($key, $value)
+	{
+		if (isset($this->data[$key])) {
+			$this->originalData[$key]=$this->data[$key];
+			$this->data[$key]=$value;
+			$this->editData[$key]=$this->data[$key]-$this->originalData[$key];
+			return TRUE;
+		}
+		return FALSE;
+	}
+	
+	protected function getFinalCacheData()
+	{
+		if (!empty($this->editData)) {
+			$this->data[self::EDIT_FIELD_KEY]=$this->editData;
+		}
+		return $this->data;
+	}
+	
 	public function __destruct()
 	{
-		//对象销毁自动触发保存
-		if ($this->FromDb && isset($this->data[$this->primaryIdKey])) {
-			$this->getAdapter()->hMset($this->getRedisKey($this->data[$this->primaryIdKey]), $this->data);
+		//对象销毁自动触发保存到redis
+		if ($this->FromDb || !empty($this->editData)) {
+			$this->getAdapter()->hMset($this->getRedisKey($this->data[$this->primaryIdKey]), $this->getFinalCacheData());
 		}
 	}
 }
