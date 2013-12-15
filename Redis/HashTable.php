@@ -1,6 +1,8 @@
 <?php
 namespace HuiLib\Redis;
 
+use HuiLib\Error\Exception;
+
 /**
  * Redis HashTable基础管理类
  *
@@ -9,6 +11,10 @@ namespace HuiLib\Redis;
  */
 class HashTable extends RedisBase
 {
+	/**
+	 * 表类常量定义
+	 * @var string
+	 */
 	const TABLE_CLASS=NULL;
 	
 	/**
@@ -33,21 +39,40 @@ class HashTable extends RedisBase
 	 * 主键字段
 	 * @var string
 	*/
-	protected $primaryId=NULL;
+	protected $primaryIdKey=NULL;
+	
+	/**
+	 * 是否从迟久库新获取
+	 * @var boolean
+	 */
+	protected $FromDb=FALSE;
 	
 	protected function __construct()
 	{
-		self::initRowInitData();
+		//经测试，第一个需要加载类情况，比较慢,5ms内。第二行不用加载了就比较快1/100ms左右。
+		static::$initData=self::getRowInitData();
+		$this->primaryIdKey=self::getRowPrimaryIdKey();
+		
+		if (static::$initData===NULL || $this->primaryIdKey===NULL) {
+			throw new Exception('Row class static::$initData or primaryIdKey parsed NULL.');
+		}
 	}
 
 	/**
 	 * 通过主ID获取
 	 */
-	public function initByPrimaryId($primaryId)
+	public function initByprimaryIdKey($primaryIdValue)
 	{
-		$tableClass=static::TABLE_CLASS;
-		//通过主键获取数据
-		$data=$tableClass::create()->getRowByField($this->primaryId, $primaryId);
+		//首先尝试Redis获取
+		$data=$this->getAdapter()->hGetAll($this->getRedisKey($primaryIdValue));
+		
+		if (empty($data)) {
+			//通过主键尝试数据表获取数据
+			$tableClass=static::TABLE_CLASS;
+			$data=$tableClass::create()->getRowByField(static::PRIMAY_IDKEY, $primaryIdValue);
+			$this->FromDb=TRUE;
+		}
+		
 		if (empty($data)) {
 			return FALSE;
 		}
@@ -61,26 +86,50 @@ class HashTable extends RedisBase
 	}
 	
 	/**
+	 * 获取redis储存键
+	 * 
+	 * @param mix $primaryIdValue
+	 */
+	protected function getRedisKey($primaryIdValue)
+	{
+		if (static::TABLE_CLASS===NULL) {
+			throw new Exception('Model table class has not been set.');
+		}
+		return self::KEY_PREFIX.static::TABLE_CLASS.':'.$primaryIdValue;
+	}
+	
+	/**
 	 * 初始化表行默认初始化数据
 	 * @return array
 	 */
-	public static function initRowInitData()
+	public static function getRowInitData()
 	{
 		$tableClass=static::TABLE_CLASS;
-		static::$initData=$tableClass::getRowInitData();
+		return $tableClass::getRowInitData();
+	}
+	
+	/**
+	 * 初始化表行主键名
+	 * @return array
+	 */
+	public function getRowPrimaryIdKey()
+	{
+		$tableClass=static::TABLE_CLASS;
+		$rowClass=$tableClass::ROW_CLASS;
+		return $rowClass::PRIMAY_IDKEY;
 	}
 	
 	/**
 	 * 快速创建Redis数据模型
 	 * 
-	 * @param string $primaryId
+	 * @param string $primaryIdValue
 	 * @return \HuiLib\Redis\HashTable
 	 */
-	public static function create($primaryId=NULL)
+	public static function create($primaryIdValue=NULL)
 	{
 		$instance=new static();
-		if ($primaryId!==NULL) {
-			$instance->initByPrimaryId($primaryId);
+		if ($primaryIdValue!==NULL) {
+			$instance->initByprimaryIdKey($primaryIdValue);
 		}
 		
 		return $instance;
@@ -97,10 +146,20 @@ class HashTable extends RedisBase
 	
 	/**
 	 * 执行储存到Redis
+	 * 
+	 * 默认情况下不需要编辑，因为编辑一般直接获取数据库表的Model对象。此处一般做相对增减。
+	 * 
+	 * 有效期问题：需要定期和数据库同步，何时新拉取，何时同步过去
 	 */
 	public function save()
 	{
-		
+		if ($this->FromDb && isset($this->data[$this->primaryIdKey])) {
+			$this->getAdapter()->hMset($this->getRedisKey($this->data[$this->primaryIdKey]), $this->data);
+		}
+		//更新编辑后的数据 仅允许数字增减
+		if ($this->editData) {
+			//TODO update
+		}
 	}
 	
 	public function __destruct()
