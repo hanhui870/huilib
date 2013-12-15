@@ -14,6 +14,12 @@ use HuiLib\Db\Query\Where;
 class RowAbstract extends \HuiLib\App\Model
 {
 	/**
+	 * 主键字段键名
+	 * @var string
+	 */
+	const PRIMAY_IDKEY=NULL;
+	
+	/**
 	 * 行数据储存
 	 * @var array
 	 */
@@ -36,12 +42,6 @@ class RowAbstract extends \HuiLib\App\Model
 	 * @var array
 	 */
 	protected $originalData=array();
-	
-	/**
-	 * 主键字段
-	 * @var string
-	 */
-	protected $primaryId=NULL;
 	
 	/**
 	 * 主键原值字段 如果修改过主键
@@ -72,8 +72,8 @@ class RowAbstract extends \HuiLib\App\Model
 		parent::__construct();
 		
 		$this->data=$data;
-		if ($this->primaryId===NULL) {
-			throw new Exception('RowAbstract primaryId has not been set.');
+		if (static::PRIMAY_IDKEY===NULL) {
+			throw new Exception('RowAbstract const PRIMAY_IDKEY has not been set.');
 		}
 	}
 	
@@ -97,7 +97,7 @@ class RowAbstract extends \HuiLib\App\Model
 		
 		$this->onBeforeSave();
 		if ($this->newRow) {
-			$result=$this->data[$this->primaryId]=$query->query();
+			$result=$this->data[static::PRIMAY_IDKEY]=$query->query();
 		}else{
 			$result=$query->query();
 		}
@@ -147,7 +147,7 @@ class RowAbstract extends \HuiLib\App\Model
 		
 		$table=$tableInstance::TABLE;
 		if ($this->newRow) {//新行
-			// primaryId 可以设置为默认值0，自动增长的也会自动更新；不然有些非自动增长的会有问题
+			// PRIMAY_IDKEY 可以设置为默认值0，自动增长的也会自动更新；不然有些非自动增长的会有问题
 			$insert=Query::insert($table);
 			if ($this->dbAdapter!==NULL) {
 				$insert->setAdapter($this->dbAdapter);
@@ -157,7 +157,7 @@ class RowAbstract extends \HuiLib\App\Model
 				$insert->enableDuplicate();
 				//dup的时候要注意去除主键为0的情况
 				$duplicate=$this->data;
-				unset($duplicate[$this->primaryId]);
+				unset($duplicate[static::PRIMAY_IDKEY]);
 				$insert->dupFields(array_keys($duplicate));
 			}
 			
@@ -167,12 +167,12 @@ class RowAbstract extends \HuiLib\App\Model
 			if (!$this->editData){
 				throw new Exception('Table row editData has not been set.');
 			}
-			$primaryValue=$this->oldPrimaryIdValue===NULL ? $this->data[$this->primaryId] : $this->oldPrimaryIdValue;
+			$primaryValue=$this->oldPrimaryIdValue===NULL ? $this->data[static::PRIMAY_IDKEY] : $this->oldPrimaryIdValue;
 			$update=Query::update($table);
 			if ($this->dbAdapter!==NULL) {
 				$update->setAdapter($this->dbAdapter);
 			}
-			return $update->sets($this->editData)->where(Where::createPair($this->primaryId, $primaryValue));
+			return $update->sets($this->editData)->where(Where::createPair(static::PRIMAY_IDKEY, $primaryValue));
 		}
 	}
 	
@@ -231,7 +231,7 @@ class RowAbstract extends \HuiLib\App\Model
 			$delete->setAdapter($this->dbAdapter);
 		}
 	
-		$delete->where(Where::createPair($this->primaryId, $this->data[$this->primaryId]));
+		$delete->where(Where::createPair(static::PRIMAY_IDKEY, $this->data[static::PRIMAY_IDKEY]));
 
 		$this->onBeforeDelete();
 		$result=$delete->query();
@@ -305,7 +305,7 @@ class RowAbstract extends \HuiLib\App\Model
 			$this->editData[$key]=$value;
 			
 			//修改主键值，支持但不建议修改
-			if ($key == $this->primaryId) {
+			if ($key == static::PRIMAY_IDKEY) {
 				$this->oldPrimaryIdValue=$this->originalData[$key];
 			}
 			return TRUE;
