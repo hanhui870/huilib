@@ -9,7 +9,7 @@ use HuiLib\Error\Exception;
  * @author 祝景法
  * @since 2013/12/14
  */
-class HashTable extends RedisBase
+class Hash extends RedisBase
 {
 	/**
 	 * 表类常量定义
