@@ -5,6 +5,8 @@ use HuiLib\Error\Exception;
 
 /**
  * Redis HashTable基础管理类
+ * 
+ * 通过在变量中嵌入RedisUpdate字段值触发更新机制
  *
  * @author 祝景法
  * @since 2013/12/14
@@ -16,6 +18,12 @@ class Hash extends RedisBase
 	 * @var string
 	 */
 	const TABLE_CLASS=NULL;
+	
+	/**
+	 * Hash保存修改过的键
+	 * @var string
+	 */
+	const EDIT_FIELD_KEY='RedisEdited';
 	
 	/**
 	 * 行数据储存
@@ -36,7 +44,7 @@ class Hash extends RedisBase
 	protected $editData=array();
 	
 	/**
-	 * 主键字段
+	 * 主键字段，通过行类获取
 	 * @var string
 	*/
 	protected $primaryIdKey=NULL;
@@ -61,18 +69,51 @@ class Hash extends RedisBase
 	/**
 	 * 通过主ID获取
 	 */
-	public function initByprimaryIdKey($primaryIdValue)
+	public function initByPrimaryIdKey($primaryIdValue)
 	{
 		//首先尝试Redis获取
 		$data=$this->getAdapter()->hGetAll($this->getRedisKey($primaryIdValue));
-		
-		if (empty($data)) {
-			//通过主键尝试数据表获取数据
-			$tableClass=static::TABLE_CLASS;
-			$data=$tableClass::create()->getRowByField(static::PRIMAY_IDKEY, $primaryIdValue);
-			$this->FromDb=TRUE;
+		//超过缓存有效期，同步数据
+		if (empty($data->RedisUpdate) || time()-$data->RedisUpdate>self::CACHE_SYNC_INTERVAL) {
+			$this->flushEditedToDb($data);
+			unset($data);
 		}
 		
+		if (empty($data)) {
+			$data=$this->fetchFromDb($primaryIdValue);
+		}
+
+		return $this->applyData($data);
+	}
+	
+	/**
+	 * 从数据库获取值
+	 * 
+	 * @param int $primaryIdValue
+	 * @return array
+	 */
+	protected function fetchFromDb($primaryIdValue)
+	{
+		//通过主键尝试数据表获取数据
+		$tableClass=static::TABLE_CLASS;
+		$data=$tableClass::create()->getRowByField($this->primaryIdKey, $primaryIdValue);
+		if (empty($data)) {
+			return array();
+		}
+		
+		//redis更新时间戳
+		$data->RedisUpdate=time();
+		$this->FromDb=TRUE;
+		
+		return $data->toArray();
+	}
+	
+	/**
+	 * 将键值数据应用到对象上
+	 * @param array $data
+	 */
+	protected function applyData($data)
+	{
 		if (empty($data)) {
 			return FALSE;
 		}
@@ -82,7 +123,34 @@ class Hash extends RedisBase
 				$this->data[$key]=$value;
 			}
 		}
+		
 		return TRUE;
+	}
+	
+	/**
+	 * 将编辑的数据推送到迟久库
+	 * 
+	 * 更新编辑数据到数据库 仅数字增减等非完全覆盖修改
+	 * 默认情况下不需要编辑，因为编辑一般直接获取数据库表的Model对象。此处一般做相对增减。
+	 *
+	 * @param array $data 缓存数据
+	 */
+	protected function flushEditedToDb($data)
+	{
+		//通过主键尝试数据表获取行数据
+		$tableClass=static::TABLE_CLASS;
+		$rowObj=$tableClass::create()->getRowByField($this->primaryIdKey, $data[$this->primaryIdKey]);
+		
+		if (empty($data[self::EDIT_FIELD_KEY]) || empty($rowObj)) {
+			return FALSE;
+		}
+
+		//更新影响值
+		foreach ($data[self::EDIT_FIELD_KEY] as $key=>$value){
+			$rowObj->$key+=$value;
+		}
+		
+		return $rowObj->save();
 	}
 	
 	/**
@@ -102,7 +170,7 @@ class Hash extends RedisBase
 	 * 初始化表行默认初始化数据
 	 * @return array
 	 */
-	public static function getRowInitData()
+	protected static function getRowInitData()
 	{
 		$tableClass=static::TABLE_CLASS;
 		return $tableClass::getRowInitData();
@@ -112,7 +180,7 @@ class Hash extends RedisBase
 	 * 初始化表行主键名
 	 * @return array
 	 */
-	public function getRowPrimaryIdKey()
+	protected function getRowPrimaryIdKey()
 	{
 		$tableClass=static::TABLE_CLASS;
 		$rowClass=$tableClass::ROW_CLASS;
@@ -129,10 +197,35 @@ class Hash extends RedisBase
 	{
 		$instance=new static();
 		if ($primaryIdValue!==NULL) {
-			$instance->initByprimaryIdKey($primaryIdValue);
+			$instance->initByPrimaryIdKey($primaryIdValue);
 		}
 		
 		return $instance;
+	}
+	
+	/**
+	 * 强制刷新Redis数据缓存，同时更新编辑过的数据
+	 *
+	 * @param string $primaryIdValue
+	 * @return \HuiLib\Redis\HashTable
+	 */
+	public static function refresh($primaryIdValue)
+	{
+		$instance=new static();
+
+		//首先尝试Redis获取
+		$data=$instance->getAdapter()->hGetAll($instance->getRedisKey($primaryIdValue));
+		if (empty($data)) {//不存在不用处理
+			return TRUE;
+		}
+		
+		//写入数据库
+		$instance->flushEditedToDb($data);
+		
+		//删除缓存，下次自动获取
+		$instance->getAdapter()->del($instance->getRedisKey($primaryIdValue));
+		
+		return TRUE;
 	}
 	
 	public function __get($key)
@@ -144,27 +237,11 @@ class Hash extends RedisBase
 		}
 	}
 	
-	/**
-	 * 执行储存到Redis
-	 * 
-	 * 默认情况下不需要编辑，因为编辑一般直接获取数据库表的Model对象。此处一般做相对增减。
-	 * 
-	 * 有效期问题：需要定期和数据库同步，何时新拉取，何时同步过去
-	 */
-	public function save()
-	{
-		if ($this->FromDb && isset($this->data[$this->primaryIdKey])) {
-			$this->getAdapter()->hMset($this->getRedisKey($this->data[$this->primaryIdKey]), $this->data);
-		}
-		//更新编辑后的数据 仅允许数字增减
-		if ($this->editData) {
-			//TODO update
-		}
-	}
-	
 	public function __destruct()
 	{
 		//对象销毁自动触发保存
-		 $this->save();
+		if ($this->FromDb && isset($this->data[$this->primaryIdKey])) {
+			$this->getAdapter()->hMset($this->getRedisKey($this->data[$this->primaryIdKey]), $this->data);
+		}
 	}
 }

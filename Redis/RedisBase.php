@@ -12,6 +12,12 @@ use HuiLib\Cache\CacheBase;
 abstract class RedisBase
 {
 	const KEY_PREFIX='model:';
+	
+	/**
+	 * 缓存更新触发机制
+	 * @var int
+	 */
+	const CACHE_SYNC_INTERVAL=600;
 
 	/**
 	 * Redis适配器
