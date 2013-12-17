@@ -21,16 +21,16 @@ class TableAbstract extends \HuiLib\App\Model
 	const TABLE=NULL;
 	
 	/**
+	 * 表行类名
+	 * @var string
+	 */
+	const ROW_CLASS='\HuiLib\Db\RowAbstract';
+	
+	/**
 	 * 存在相同主键行是否覆盖
 	 */
 	const CREATE_DUPLICATE=TRUE;//覆盖
 	const CREATE_NO_DUPLICATE=FALSE;//不覆盖
-	
-	/**
-	 * 表行类名
-	 * @var string
-	 */
-	protected $rowClass='\HuiLib\Db\RowAbstract';
 
 	/**
 	 * 通过单个Field获取单条记录
@@ -137,7 +137,7 @@ class TableAbstract extends \HuiLib\App\Model
 	 */
 	public function createRow($duplicate=self::CREATE_NO_DUPLICATE)
 	{
-		$rowClass=$this->rowClass;
+		$rowClass=static::ROW_CLASS;
 		$rowInstance=$rowClass::createNewRow();
 		$rowInstance->setTable($this);
 		if ($duplicate) {
@@ -158,7 +158,7 @@ class TableAbstract extends \HuiLib\App\Model
 			return NULL;
 		}
 		
-		$rowClass=$this->rowClass;
+		$rowClass=static::ROW_CLASS;
 		$rowInstance=$rowClass::create($data);
 		$rowInstance->setTable($this);
 		return $rowInstance;
@@ -176,8 +176,18 @@ class TableAbstract extends \HuiLib\App\Model
 		}
 
 		$rowSetInstance=\HuiLib\Db\RowSet::create($dataList);
-		$rowSetInstance->setRowClass($this->rowClass);
+		$rowSetInstance->setRowClass(static::ROW_CLASS);
 		$rowSetInstance->setTable($this);
 		return $rowSetInstance;
+	}
+	
+	/**
+	 * 获取表行默认初始化数据
+	 * @return array
+	 */
+	public static function getRowInitData()
+	{
+		$rowClass=static::ROW_CLASS;
+		return $rowClass::getInitData();
 	}
 }

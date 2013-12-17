@@ -9,7 +9,7 @@ namespace HuiLib\Session;
  * 2、Session管理使用Redis KV数据库管理元数据，如在线列表、保持登录等功能
  * 3、针对Robots的session_id特殊处理
  * 
- * 清空本访问关联session使用: $_SESSION=array();//使用''无效
+ * 清空本访问关联session使用: $_SESSION=array();//使用$_SESSION=''无效
  * 
  * @author 祝景法
  * @since 2013/09/27
@@ -33,7 +33,7 @@ class SessionBase implements \SessionHandlerInterface
 	 * Session权限信息生存时间
 	 * 
 	 * 默认一个月，前台后台一致。需要到期前自动延长
-	 * App.ini: app.session.authLife
+	 * App.ini: session.authLife
 	 * @var int
 	 */
 	protected $lifeTime=0;
@@ -114,11 +114,14 @@ class SessionBase implements \SessionHandlerInterface
 	 */
 	public function write ( $sessionId , $sessionData )
 	{
-	
+		$_SESSION['last']=time();
 	}
 	
 	public function close ()
 	{
+		//Session关闭事件
+		$this->manager->getModel()->onSessionClose();
+		
 		return true;
 	}
 	
@@ -132,12 +135,7 @@ class SessionBase implements \SessionHandlerInterface
 		//清除浏览器session passport cookie; sessionId不用清理 因为长期
 		$cookie=\HuiLib\Helper\Cookie::create()->delCookie(self::$authCookieName);
 		
-		/**
-		 * 将个人资料推送到数据库中的操作 
-		 * 
-		 * 用户触发，不管保持登录，直接清除(在子类触发)
-		 */
-		$this->manager->pushSessionToDb($this->read($sessionId), $this->manager->getLastVisit($sessionId));
+		$this->manager->getModel()->onSessionDestroy();
 		
 		//从管理列表中剔除一个SessionID
 		return $this->manager->delete($sessionId);
@@ -227,7 +225,7 @@ class SessionBase implements \SessionHandlerInterface
 			self::$prefix=$config ['prefix'];
 		}
 		//权限验证名称
-		$authCookie=$configInstance->getByKey('app.session.auth');
+		$authCookie=$configInstance->getByKey('session.auth');
 		if (!empty($authCookie )) {
 			self::$authCookieName=$authCookie;
 		}
@@ -240,13 +238,19 @@ class SessionBase implements \SessionHandlerInterface
 				$driver = new \HuiLib\Session\Storage\Redis ( $driverConfig );
 				break;
 		}
+
+		//保存session配置信息
+		$driver->config=$config;
 		
 		//设置后端生命期
-		$driver->setLife($configInstance->getByKey('app.session.authLife'));
+		$driver->setLife($configInstance->getByKey('session.authLife'));
 		
 		//注册Session处理函数
 		session_set_save_handler($driver, TRUE);
 		session_start();
+	
+		//Session开启后事件调用
+		$driver->manager->getModel()->onSessionStart();
 		
 		return $driver;
 	}

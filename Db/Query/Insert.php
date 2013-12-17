@@ -3,6 +3,8 @@ namespace HuiLib\Db\Query;
 
 /**
  * Sql语句查询类Insert操作
+ * 
+ * 支持通过values操作插入多行
  *
  * @author 祝景法
  * @since 2013/09/03
@@ -246,12 +248,12 @@ class Insert extends \HuiLib\Db\Query
 		}
 		
 		$normalSets=$dupSets=array();
-		foreach ($valueArray as $keyIter=>$value){
-			if (!isset($this->fields[$keyIter])) throw new \HuiLib\Error\Exception ( 'Insert::kvDupReMap，字段和字段值数组不匹配' );
+		foreach ($valueArray as $key=>$value){
+			if (!isset($this->fields[$key])) throw new \HuiLib\Error\Exception ( 'Insert::kvDupReMap，字段和字段值数组不匹配' );
 			
-			$setTemp=$this->fields[$keyIter].'='.$this->escape($value);
+			$setTemp=$this->fields[$key].'='.$this->escape($value);
 			$normalSets[]=$setTemp;
-			if (in_array($this->fields[$keyIter], $this->dupFields) && empty($this->dupValues[$iter])) {
+			if (in_array($this->fields[$key], $this->dupFields) && empty($this->dupValues[$iter])) {
 				//没有独立设置了重复更新数组
 				$dupSets[]=$setTemp;
 			}
