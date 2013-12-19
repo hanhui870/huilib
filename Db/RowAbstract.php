@@ -172,7 +172,7 @@ class RowAbstract extends \HuiLib\App\Model
 			if ($this->dbAdapter!==NULL) {
 				$update->setAdapter($this->dbAdapter);
 			}
-			return $update->sets($this->editData)->where(Where::createPair(static::PRIMAY_IDKEY, $primaryValue));
+			return $update->sets($this->editData)->where(Where::createPair(static::PRIMAY_IDKEY, $primaryValue))->limit(1);
 		}
 	}
 	
