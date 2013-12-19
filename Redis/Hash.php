@@ -20,10 +20,28 @@ class Hash extends RedisBase
 	const TABLE_CLASS=NULL;
 	
 	/**
+	 * Redis键前缀，需要和父类的组合
+	 * @var string
+	 */
+	const KEY_PREFIX='hash:table:';
+	
+	/**
 	 * Hash保存修改过的键
 	 * @var string
 	 */
 	const EDIT_FIELD_KEY='RedisEdited';
+	
+	/**
+	 * Hash保存增减过的键
+	 * @var string
+	 */
+	const INCR_FIELD_KEY='RedisIncred';
+	
+	/**
+	 * Redis更新触发时间戳
+	 * @var timestamp
+	 */
+	const REDIS_UPDATE_KEY='RedisUpdate';
 	
 	/**
 	 * 行数据储存
@@ -39,9 +57,24 @@ class Hash extends RedisBase
 	
 	/**
 	 * 修改数据储存
+	 * 
+	 * RedisHash也支持直接编辑数据，但是全覆盖提交
+	 * 优先处理incrData，两者字段互斥
+	 * 
+	 * 另外，不同于数据库行模型
+	 * 
 	 * @var array
 	 */
 	protected $editData=array();
+	
+	/**
+	 * 通过Incr操作修改的数据
+	 * 
+	 * 不是直接覆盖，而是通过Update附加影响数据；支持正负。
+	 * 
+	 * @var array
+	 */
+	protected $incrData=array();
 	
 	/**
 	 * 主键字段，通过行类获取
@@ -53,7 +86,7 @@ class Hash extends RedisBase
 	 * 是否从迟久库新获取
 	 * @var boolean
 	 */
-	protected $FromDb=FALSE;
+	protected $fromDb=FALSE;
 	
 	protected function __construct()
 	{
@@ -73,9 +106,11 @@ class Hash extends RedisBase
 	{
 		//首先尝试Redis获取
 		$data=$this->getAdapter()->hGetAll($this->getRedisKey($primaryIdValue));
+		$this->applyData($data);
+
 		//超过缓存有效期，同步数据
-		if (empty($data->RedisUpdate) || time()-$data->RedisUpdate>self::CACHE_SYNC_INTERVAL) {
-			$this->flushEditedToDb($data);
+		if (!empty($data)&&(empty($data[self::REDIS_UPDATE_KEY]) || time()-$data[self::REDIS_UPDATE_KEY]>self::CACHE_SYNC_INTERVAL)) {
+			$this->flushEditedToDb();
 			unset($data);
 		}
 		
@@ -101,9 +136,9 @@ class Hash extends RedisBase
 			return array();
 		}
 		
-		//redis更新时间戳
-		$data->RedisUpdate=time();
-		$this->FromDb=TRUE;
+		//redis更新时间戳 $data->RedisUpdate更新失败，非库中键
+		$this->data[self::REDIS_UPDATE_KEY]=time();
+		$this->fromDb=TRUE;
 		
 		return $data->toArray();
 	}
@@ -118,8 +153,17 @@ class Hash extends RedisBase
 			return FALSE;
 		}
 		
+		if (!empty($data[self::EDIT_FIELD_KEY])) {
+			$this->editData=json_decode($data[self::EDIT_FIELD_KEY], TRUE);
+		}
+		if (!empty($data[self::INCR_FIELD_KEY])) {
+			$this->incrData=json_decode($data[self::INCR_FIELD_KEY], TRUE);
+		}
+		
 		foreach ($data as $key=>$value){
 			if(isset(static::$initData[$key])){
+				$this->data[$key]=$value;
+			}elseif (in_array($key, array(self::REDIS_UPDATE_KEY))){
 				$this->data[$key]=$value;
 			}
 		}
@@ -135,22 +179,38 @@ class Hash extends RedisBase
 	 *
 	 * @param array $data 缓存数据
 	 */
-	protected function flushEditedToDb($data)
+	protected function flushEditedToDb()
 	{
 		//通过主键尝试数据表获取行数据
 		$tableClass=static::TABLE_CLASS;
-		$rowObj=$tableClass::create()->getRowByField($this->primaryIdKey, $data[$this->primaryIdKey]);
-		
-		if (empty($data[self::EDIT_FIELD_KEY]) || empty($rowObj)) {
+		$rowObj=$tableClass::create()->getRowByField($this->primaryIdKey, $this->data[$this->primaryIdKey]);
+
+		if (empty($this->editData) && empty($this->incrData) || empty($rowObj)) {
 			return FALSE;
 		}
 
-		//更新影响值
-		foreach ($data[self::EDIT_FIELD_KEY] as $key=>$value){
+		//更新增减影响值
+		foreach ($this->incrData as $key=>$value){
 			$rowObj->$key+=$value;
 		}
 		
-		return $rowObj->save();
+		//更新影响值
+		foreach ($this->editData as $key=>$value){
+			//有增减影响，直接忽略编辑的
+			if (isset($this->incrData[$key])) continue;
+			$rowObj->$key=$value;
+		}
+		
+		//echo $rowObj->getSaveSql();
+		if($rowObj->save()){
+			//删除缓存， 重置信息
+			$this->getAdapter()->del($this->getRedisKey($this->data[$this->primaryIdKey]));
+			$this->editData=array();
+			$this->incrData=array();
+			$this->data=array();
+		}
+		
+		return TRUE;
 	}
 	
 	/**
@@ -162,8 +222,9 @@ class Hash extends RedisBase
 	{
 		if (static::TABLE_CLASS===NULL) {
 			throw new Exception('Model table class has not been set.');
-		}
-		return self::KEY_PREFIX.static::TABLE_CLASS.':'.$primaryIdValue;
+		} 
+		$spaceInfo=explode(NAME_SEP, static::TABLE_CLASS);
+		return parent::KEY_PREFIX.self::KEY_PREFIX.array_pop($spaceInfo).':'.$primaryIdValue;
 	}
 	
 	/**
@@ -218,12 +279,10 @@ class Hash extends RedisBase
 		if (empty($data)) {//不存在不用处理
 			return TRUE;
 		}
+		$this->applyData($data);
 		
 		//写入数据库
-		$instance->flushEditedToDb($data);
-		
-		//删除缓存，下次自动获取
-		$instance->getAdapter()->del($instance->getRedisKey($primaryIdValue));
+		$instance->flushEditedToDb();
 		
 		return TRUE;
 	}
@@ -245,28 +304,66 @@ class Hash extends RedisBase
 	 */
 	public function __set($key, $value)
 	{
+		//不支持修改主键值
+		if ($key == $this->primaryIdKey) {
+			throw new Exception('Redis Hash row model can not edit primary key value.');
+		}
+		
 		if (isset($this->data[$key])) {
-			$this->originalData[$key]=$this->data[$key];
 			$this->data[$key]=$value;
-			$this->editData[$key]=$this->data[$key]-$this->originalData[$key];
+			$this->editData[$key]=$value;
 			return TRUE;
 		}
 		return FALSE;
 	}
 	
-	protected function getFinalCacheData()
+	/**
+	 * 动态增减某些键值
+	 * @param string $key
+	 * @param number $value
+	 */
+	public function incrValue($key, $value)
+	{
+		if ( !is_numeric($value) ) {
+			throw new Exception('Number of $value is required by incrKey() method.');
+		}
+		
+		if (isset($this->data[$key])){
+			$this->data[$key]+=$value;
+			if (!isset($this->incrData[$key])) {
+				$this->incrData[$key]=0;
+			}
+			$this->incrData[$key]+=$value;
+			return TRUE;
+		}
+		return FALSE;
+	}
+	
+	protected function getFinalData()
 	{
 		if (!empty($this->editData)) {
-			$this->data[self::EDIT_FIELD_KEY]=$this->editData;
+			$this->data[self::EDIT_FIELD_KEY]=json_encode($this->editData);
 		}
+		if (!empty($this->incrData)) {
+			$this->data[self::INCR_FIELD_KEY]=json_encode($this->incrData);
+		}
+		return $this->data;
+	}
+	
+	/**
+	 * 返回对象的数组表示
+	 * @return array
+	 */
+	public function toArray()
+	{
 		return $this->data;
 	}
 	
 	public function __destruct()
 	{
 		//对象销毁自动触发保存到redis
-		if ($this->FromDb || !empty($this->editData)) {
-			$this->getAdapter()->hMset($this->getRedisKey($this->data[$this->primaryIdKey]), $this->getFinalCacheData());
+		if ($this->fromDb || !empty($this->editData) || !empty($this->incrData)) {
+			$this->getAdapter()->hMset($this->getRedisKey($this->data[$this->primaryIdKey]), $this->getFinalData());
 		}
 	}
 }

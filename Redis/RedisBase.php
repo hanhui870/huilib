@@ -11,6 +11,10 @@ use HuiLib\Cache\CacheBase;
  */
 abstract class RedisBase
 {
+	/**
+	 * Redis键前缀
+	 * @var string
+	 */
 	const KEY_PREFIX='model:';
 	
 	/**
