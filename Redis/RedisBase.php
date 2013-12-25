@@ -28,6 +28,12 @@ abstract class RedisBase
 	 * @var \HuiLib\Cache\Storage\Redis
 	 */
 	protected $adapter=NULL;
+	
+	/**
+	 * 基础APP实例
+	 * @var \HuiLib\App\AppBase
+	 */
+	protected $appInstance;
 
 	protected function __construct()
 	{
@@ -44,6 +50,28 @@ abstract class RedisBase
 		}
 	
 		return $this->adapter;
+	}
+	
+	/**
+	 * 获取应用实例
+	 */
+	protected function getAppInstace()
+	{
+		if ($this->appInstance===NULL) {
+			$this->appInstance=\HuiLib\Bootstrap::getInstance()->appInstance();
+		}
+	
+		return $this->appInstance;
+	}
+	
+	/**
+	 * 设置应用实例
+	 */
+	public function setAppInstance(\HuiLib\App\AppBase $appInstance=NULL)
+	{
+		$this->appInstance=$appInstance;
+	
+		return $this;
 	}
 	
 

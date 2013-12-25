@@ -232,6 +232,19 @@ abstract class RequestBase
 	}
 
 	/**
+	 * 获取路由路径信息
+	 * 
+	 * @return string
+	 */
+	public function getRouteInfo()
+	{
+		if ($this->routeInfo===NULL) {
+			return '';
+		}
+		return implode("/", $this->routeInfo);
+	}
+	
+	/**
 	 * 请求对象初始化
 	 */
 	abstract public function init();
