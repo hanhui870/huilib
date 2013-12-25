@@ -56,6 +56,13 @@ class RowAbstract extends \HuiLib\App\Model
 	protected $tableInstance=NULL;
 	
 	/**
+	 * 需要计算的字段，通过公开方法获取
+	 * 
+	 * @var array
+	 */
+	protected $calculated=NULL;
+	
+	/**
 	 * 是否是新行
 	 * @var boolean
 	 */
