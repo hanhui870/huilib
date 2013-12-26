@@ -10,6 +10,7 @@ namespace HuiLib\View;
  * app. 程序相关信息
  * site.命名空间 网站配置相关
  * session.登录会话相关
+ * my. 当前登录用户
  * 
  * @author 祝景法
  * @since 2013/09/20
