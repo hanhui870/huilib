@@ -7,10 +7,9 @@ namespace HuiLib\View;
  * 视图类内部使用变量全部加下划线，赋值到前台的变量直接写
  * 
  * 命名规则：
- * app.version 程序版本标志，关联前台静态资源版本
+ * app. 程序相关信息
  * site.命名空间 网站配置相关
  * session.登录会话相关
- * app.homepage 首页网址
  * 
  * @author 祝景法
  * @since 2013/09/20
