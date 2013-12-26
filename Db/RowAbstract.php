@@ -7,6 +7,9 @@ use HuiLib\Db\Query\Where;
 
 /**
  * 数据行类
+ * 
+ * 行对象通过调用不存在的属性调用方法，属性必须在$calculated注册，并且存在getProperty()方法。
+ * 样例可以参照用户类。
  *
  * @author 祝景法
  * @since 2013/10/20
@@ -299,9 +302,17 @@ class RowAbstract extends \HuiLib\App\Model
 	{
 		if (isset($this->data[$key])) {
 			return $this->data[$key];
-		}else{
-			return NULL;
+		
+		//NULL是默认值，使用isset将判断失败
+		}elseif (array_key_exists($key, $this->calculated)){
+			$method='get'.$key;
+			
+			if (method_exists($this, $method)) {
+				return $this->$method();
+			}
 		}
+		
+		return NULL;
 	}
 	
 	public function __set($key, $value)
