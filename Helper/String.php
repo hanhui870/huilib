@@ -9,17 +9,28 @@ namespace HuiLib\Helper;
  */
 class String
 {
-	const DEFAULT_CHARSET = "utf-8";
+	/**
+	 * 截取输出是否添加逗点
+	 */
 	const DOT_ENDING = true;
 	const DOT_ENDING_NO = false;
+	
+	/**
+	 * 截取输出是否HTML编码
+	 */
 	const HTML_ENCODE = true;
 	const HTML_ENCODE_NO = false;
+	
+	/**
+	 * 默认编码设置
+	 */
+	private static $defalutCharset = "utf-8";
 
 	public static function substr($string, $start, $length, $addDot = self::DOT_ENDING_NO, $htmlEncode = self::HTML_ENCODE_NO)
 	{
 		if ($htmlEncode)
 			$str = self::htmlEncode ( $string );
-		$string = mb_substr ( $string, $start, $addDot ? $length - 3 : $length, self::DEFAULT_CHARSET ) . ($addDot && mb_strlen ( $string, self::DEFAULT_CHARSET ) > $length ? '...' : '');
+		$string = mb_substr ( $string, $start, $addDot ? $length - 3 : $length, self::$defalutCharset ) . ($addDot && mb_strlen ( $string, self::$defalutCharset ) > $length ? '...' : '');
 		if ($htmlEncode)
 			$string = self::htmlDecode ( $string );
 		return $string;
@@ -44,7 +55,7 @@ class String
 	 */
 	public static function strlen($string)
 	{
-		return mb_strlen ( $string, self::DEFAULT_CHARSET );
+		return mb_strlen ( $string, self::$defalutCharset );
 	}
 
 	/**
@@ -141,8 +152,11 @@ class String
 	 * @param string $string 输入的编码
 	 * @param string $string 输出的编码
 	 */
-	public static function iconv($string, $inCharset, $outCharset=self::DEFAULT_CHARSET)
+	public static function iconv($string, $inCharset, $outCharset=NULL)
 	{
+		if ($outCharset===NULL) {
+			$outCharset=self::$defalutCharset;
+		}
 		if ( is_array ( $string )) {
 			foreach ( $string as $key => $iterString ) {
 				if (is_array ( $iterString )) {
@@ -161,5 +175,19 @@ class String
 		}
 
 		return $string;
+	}
+	
+	/**
+	 * 设置默认编码
+	 * @param unknown $charset
+	 */
+	public static function setDefaultCharset($charset)
+	{
+		self::$defalutCharset=$charset;
+	}
+	
+	public static function getDefaultCharset()
+	{
+		return self::$defalutCharset;
 	}
 }
