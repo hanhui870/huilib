@@ -4,14 +4,14 @@ namespace HuiLib\Redis;
 use HuiLib\Error\Exception;
 
 /**
- * Redis HashTable基础管理类
+ * Redis HashRow基础管理类
  * 
  * 通过在变量中嵌入RedisUpdate字段值触发更新机制
  *
  * @author 祝景法
  * @since 2013/12/14
  */
-class Hash extends RedisBase
+class HashRow extends RedisBase
 {
 	/**
 	 * 表类常量定义
@@ -23,7 +23,7 @@ class Hash extends RedisBase
 	 * Redis键前缀，需要和父类的组合
 	 * @var string
 	 */
-	const KEY_PREFIX='hash:table:';
+	const KEY_PREFIX='hash:row:';
 	
 	/**
 	 * Hash保存修改过的键
