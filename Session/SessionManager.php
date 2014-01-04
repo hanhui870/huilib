@@ -24,10 +24,10 @@ use HuiLib\Error\Exception;
 class SessionManager
 {
 	//ZSet:在线列表，最近在单位时间内活跃的用户
-	const MANAGER_DATALIST='global:session:gc:manager:datalist';
+	const MANAGER_DATALIST='global:session:gc:manager:datalist:zset';
 	
 	//ZSet:保持状态登录用户列表及维护
-	const MANAGER_DEADLINE='global:session:gc:manager:deadline';
+	const MANAGER_DEADLINE='global:session:gc:manager:deadline:zset';
 	
 	/**
 	 * 管理器缓存内部连接
