@@ -203,7 +203,11 @@ class Where
 	 * 
 	 * 只支持单个占位符或者或者数组占位
 	 * 
-	 * 占位式(createQuote) $select->where(Where::createQuote('id=?', 2));  //=>"id='2'"
+	 * 占位式(createQuote) 
+	 * $select->where(Where::createQuote('id=?', 2));  //=>"id='2'"
+	 * 
+	 * Where in组织，括号不能少
+	 * Where::createQuote ( 'id in (?) ', $ids )
 	 * 
 	 * @param string $placeHolder 带占位符的语句
 	 * @param mix $value 需要嵌入的值

@@ -75,6 +75,24 @@ class TableAbstract extends \HuiLib\App\Model
 		}
 		return $this->rowSetObject($select->where ( Where::createPair ( $field, $value ) )->limit ( $limit )->offset ( $offset )->query ()->fetchAll ());
 	}
+	
+	/**
+	 * 通过单个Field的多个IDS获取多条记录
+	 * 
+	 * 通过where in实现
+	 *
+	 * @param string $field
+	 * @param string $value
+	 */
+	public function getListByIds($field, $ids)
+	{
+		$select=Query::select ( static::TABLE );
+		if ($this->dbAdapter!==NULL) {
+			$select->setAdapter($this->dbAdapter);
+		}
+
+		return $this->rowSetObject($select->where ( Where::createQuote ( $field . ' in (?) ', $ids ) )->query ()->fetchAll ());
+	}
 
 	/**
 	 * 通过单个Field获取单条记录的某个字段值
