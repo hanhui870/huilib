@@ -252,7 +252,8 @@ class Controller
 			$json=$callback."($json)";
 		}
 		
-		die($json);
+		echo $json;
+		die();
 	}
 	
 	/**
@@ -265,6 +266,7 @@ class Controller
 		 $code=0;
 		 $status=self::STATUS_SUCCESS;
 		 $message='';
+		 $data=array();
 		 
 		 if (isset($result['code'])) {
 		 	$code=$result['code'];
@@ -278,8 +280,14 @@ class Controller
 		 	$message=$result['message'];
 		 	unset($result['message']);
 		 }
+		 if (isset($result['data'])) {
+		 	$data=$result['data'];
+		 	unset($result['data']);
+		 }else{
+		 	$data=$result;
+		 }
 		 
-		 $this->renderJson($status, $message, $code, $result);
+		 $this->renderJson($status, $message, $code, $data);
 	}
 
 	/**
