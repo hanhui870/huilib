@@ -38,12 +38,6 @@ class HashRow extends RedisBase
 	const INCR_FIELD_KEY='RedisIncred';
 	
 	/**
-	 * Redis更新触发时间戳
-	 * @var timestamp
-	 */
-	const REDIS_UPDATE_KEY='RedisUpdate';
-	
-	/**
 	 * 行数据储存
 	 * @var array
 	 */
