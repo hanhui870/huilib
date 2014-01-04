@@ -33,6 +33,16 @@ class TableAbstract extends \HuiLib\App\Model
 	const CREATE_NO_DUPLICATE=FALSE;//不覆盖
 
 	/**
+	 * 获取表的Select对象
+	 *
+	 * @return \HuiLib\Db\Query\Select
+	 */
+	public function select()
+	{
+		return Query::select ( static::TABLE );
+	}
+	
+	/**
 	 * 通过单个Field获取单条记录
 	 * 
 	 * @param string $field
