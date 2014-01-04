@@ -18,6 +18,12 @@ abstract class RedisBase
 	const KEY_PREFIX='model:';
 	
 	/**
+	 * Redis更新触发时间戳
+	 * @var int timestamp
+	 */
+	const REDIS_UPDATE_KEY='RedisUpdate';
+	
+	/**
 	 * 缓存更新触发机制
 	 * @var int
 	 */
@@ -41,7 +47,7 @@ abstract class RedisBase
 	
 	/**
 	 * 获取Redis适配器
-	 * @return \HuiLib\Cache\Storage\Redis
+	 * @return \Redis
 	 */
 	protected function getAdapter()
 	{
