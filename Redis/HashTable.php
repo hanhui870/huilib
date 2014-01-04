@@ -93,19 +93,6 @@ abstract class HashTable extends RedisBase
 	}
 	
 	/**
-	 * 手工添加一条
-	 */
-	public function addOne($key, $valueUnit)
-	{
-		$result=array();
-		$result[$key]=$valueUnit;
-		
-		//埋Redis更新时间戳
-		$result[self::REDIS_UPDATE_KEY]=time();
-		return $this->getAdapter()->hMset($this->getRedisKey(), $result);
-	}
-	
-	/**
 	 * 从Redis HashTable从删除数据
 	 * 
 	 * @param array $hashKeys 单条为值，多条array，内容是HashKey
@@ -125,6 +112,19 @@ abstract class HashTable extends RedisBase
 		}
 		
 		return $multi->exec();
+	}
+	
+	/**
+	 * 手工添加一条
+	 */
+	public function addOne($key, $valueUnit)
+	{
+		$result=array();
+		$result[$key]=$valueUnit;
+	
+		//埋Redis更新时间戳
+		$result[self::REDIS_UPDATE_KEY]=time();
+		return $this->getAdapter()->hMset($this->getRedisKey(), $result);
 	}
 	
 	/**
@@ -152,6 +152,8 @@ abstract class HashTable extends RedisBase
 	
 	/**
 	 * 从数据库获取数据，重建列表
+	 * 
+	 * TODO 短链等可能需要组合键生成Hashkey
 	 */
 	protected function importFromDb()
 	{
