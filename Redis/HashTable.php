@@ -9,6 +9,8 @@ use HuiLib\Db\Query\Where;
  * 
  * 更新时间戳，嵌套在HashKey中。
  * 从数据库更新时是通过主键获取的，主键需要是整型的。
+ * 
+ * HashTable只支持单个键组成的Hash，不允许符合键。因为符合键可以通过拆解实现，减少复杂度。
  *
  * @author 祝景法
  * @since 2014/01/04
@@ -152,8 +154,6 @@ abstract class HashTable extends RedisBase
 	
 	/**
 	 * 从数据库获取数据，重建列表
-	 * 
-	 * TODO 短链等可能需要组合键生成Hashkey
 	 */
 	protected function importFromDb()
 	{
