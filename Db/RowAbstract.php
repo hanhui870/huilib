@@ -298,6 +298,13 @@ class RowAbstract extends \HuiLib\App\Model
 	{
 	}
 	
+	/**
+	 * 直接通过对象属性获取
+	 * 
+	 * 注意:以下哪怕直接获取是有值的，但还是判断失败的
+	 * var_dump(isset($result->Email));
+	 * var_dump(!empty($result->Email));
+	 */
 	public function __get($key)
 	{
 		if (isset($this->data[$key])) {
