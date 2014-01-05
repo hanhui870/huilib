@@ -119,10 +119,10 @@ abstract class HashTable extends RedisBase
 	/**
 	 * 手工添加一条
 	 */
-	public function addOne($key, $valueUnit)
+	public function addOne($valueUnit)
 	{
 		$result=array();
-		$result[$key]=$this->getValueString($valueUnit);
+		$result[$valueUnit[$this->hashKeyField]]=$this->getValueString($valueUnit);
 	
 		//埋Redis更新时间戳
 		$result[self::REDIS_UPDATE_KEY]=time();
