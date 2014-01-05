@@ -243,6 +243,18 @@ class HashRow extends RedisBase
 	}
 	
 	/**
+	 * 获取数据库表行对象
+	 * @return \HuiLib\Db\RowAbstract
+	 */
+	public function getDbRowInstance()
+	{
+		$tableClass=static::TABLE_CLASS;
+		$rowClass=$tableClass::ROW_CLASS;
+		
+		return $rowClass::create($this->data);
+	}
+	
+	/**
 	 * 快速创建Redis数据模型
 	 * 
 	 * @param string $primaryIdValue
