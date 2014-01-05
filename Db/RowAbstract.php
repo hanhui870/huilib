@@ -175,7 +175,7 @@ class RowAbstract extends \HuiLib\App\Model
 				
 		}else{
 			if (!$this->editData){
-				throw new Exception('Table row editData has not been set.');
+				throw new Exception('Table row editData has not been set or the field hasn\'t changed.');
 			}
 			$primaryValue=$this->oldPrimaryIdValue===NULL ? $this->data[static::PRIMAY_IDKEY] : $this->oldPrimaryIdValue;
 			$update=Query::update($table);
@@ -325,7 +325,7 @@ class RowAbstract extends \HuiLib\App\Model
 	
 	public function __set($key, $value)
 	{
-		if (isset($this->data[$key])) {
+		if (isset($this->data[$key]) && $this->data[$key]!=$value) {
 			$this->originalData[$key]=$this->data[$key];
 			$this->data[$key]=$value;
 			$this->editData[$key]=$value;
