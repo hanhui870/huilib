@@ -302,6 +302,7 @@ class RowAbstract extends \HuiLib\App\Model
 	 * 直接通过对象属性获取
 	 * 
 	 * 注意:以下哪怕直接获取是有值的，但还是判断失败的
+	 * 对一个重载的属性使用empty时,重载魔术方法将不会被调用。 
 	 * var_dump(isset($result->Email));
 	 * var_dump(!empty($result->Email));
 	 */
