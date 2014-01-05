@@ -218,4 +218,13 @@ class TableAbstract extends \HuiLib\App\Model
 		$rowClass=static::ROW_CLASS;
 		return $rowClass::getInitData();
 	}
+	
+	/**
+	 * 获取表关联的行类
+	 * @return array
+	 */
+	public static function getRowClass()
+	{
+		return static::ROW_CLASS;
+	}
 }
