@@ -234,10 +234,10 @@ class Controller
 	 * 
 	 * @param boolean $status
 	 * @param string $message 返回代码
-	 * @param int $code 返回代码 0代表一切正常
+	 * @param int $code 返回代码见\HuiLib\Helper\Header
 	 * @param mix $data 返回数据
 	 */
-	protected function renderJson($status=self::STATUS_SUCCESS, $message='', $code=0, $data=array())
+	protected function renderJson($status=self::STATUS_SUCCESS, $message='', $code=\HuiLib\Helper\Header::OK, $data=array())
 	{
 		$result=array();
 		
@@ -263,7 +263,7 @@ class Controller
 	 */
 	protected function renderJsonResult($result)
 	{
-		 $code=0;
+		 $code=\HuiLib\Helper\Header::OK;
 		 $status=self::STATUS_SUCCESS;
 		 $message='';
 		 $data=array();
