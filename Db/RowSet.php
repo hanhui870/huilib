@@ -9,7 +9,7 @@ use HuiLib\Error\Exception;
  * @author 祝景法
  * @since 2013/11/30
  */
-class RowSet extends \HuiLib\App\Model implements \Iterator, \ArrayAccess
+class RowSet extends \HuiLib\Model\ModelBase implements \Iterator, \ArrayAccess
 {
 	/**
 	 * 行列表数据储存

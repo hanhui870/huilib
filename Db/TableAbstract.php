@@ -12,7 +12,7 @@ use HuiLib\Db\Query\Where;
  * @author 祝景法
  * @since 2013/10/20
  */
-class TableAbstract extends \HuiLib\App\Model
+class TableAbstract extends \HuiLib\Model\ModelBase
 {
 	/**
 	 * 表名

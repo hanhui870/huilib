@@ -14,7 +14,7 @@ use HuiLib\Db\Query\Where;
  * @author 祝景法
  * @since 2013/10/20
  */
-class RowAbstract extends \HuiLib\App\Model
+class RowAbstract extends \HuiLib\Model\ModelBase
 {
 	/**
 	 * 主键字段键名
