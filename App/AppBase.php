@@ -205,12 +205,8 @@ abstract class AppBase
 	 */
 	protected function initShutCall()
 	{
-		$this->shutCall = \HuiLib\Runtime\ShutCall::getInstance ();
-	}
-
-	public function shutCallInstance()
-	{
-		return $this->shutCall;
+		$this->shutCall = \HuiLib\Runtime\ShutCall::create ();
+		Front::getInstance()->setShutCall($this->shutCall );
 	}
 
 	/**

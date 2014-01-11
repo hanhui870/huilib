@@ -9,7 +9,6 @@ namespace HuiLib\Runtime;
  */
 class ShutCall
 {
-	private static $instance;
 	private $callbacks=array();
 	
 	private function __construct()
@@ -71,11 +70,8 @@ class ShutCall
 	 * 获取引导类实例
 	 * @return \HuiLib\Runtime\ShutCall
 	 */
-	public static function getInstance()
+	public static function create()
 	{
-		if (self::$instance == NULL) {
-			self::$instance = new self ();
-		}
-		return self::$instance;
+		return new self ();
 	}
 }

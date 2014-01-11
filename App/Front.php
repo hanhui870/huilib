@@ -80,6 +80,13 @@ class Front
 	 */
 	protected $view=NULL;
 	
+	/**
+	 * 应用运行末期注册方法呼叫
+	 *
+	 *  @var \HuiLib\Runtime\ShutCall
+	 */
+	protected $shutCall=NULL;
+	
 	public function setApp(\HuiLib\App\AppBase $app)
 	{
 		$this->app=$app;
@@ -190,6 +197,16 @@ class Front
 	public function getView()
 	{
 		return $this->view;
+	}
+	
+	public function setShutCall(\HuiLib\Runtime\ShutCall $shutCall)
+	{
+		$this->shutCall=$shutCall;
+	}
+	
+	public function getShutCall()
+	{
+		return $this->shutCall;
 	}
 	
 	public static function getInstance()
