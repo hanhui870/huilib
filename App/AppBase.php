@@ -90,7 +90,6 @@ abstract class AppBase
 		
 		//初始化测试库
 		$instance = $queryString::getInstance ();
-		$instance->setApp ( $this );
 		
 		//执行
 		$instance->run ();
@@ -105,7 +104,6 @@ abstract class AppBase
 	
 		//初始化测试库
 		$instance = $queryString::getInstance ();
-		$instance->setApp ( $this );
 	
 		//执行
 		$instance->run ();

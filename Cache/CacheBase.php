@@ -1,6 +1,8 @@
 <?php
 namespace HuiLib\Cache;
 
+use HuiLib\App\Front;
+
 /**
  * 缓存功能基础类
  * 
@@ -58,7 +60,7 @@ abstract class CacheBase
 	 */
 	public static function getDefault(\HuiLib\Config\ConfigBase $configInstance=NULL){
 		if ($configInstance===NULL) {
-			$configInstance=\HuiLib\Bootstrap::getInstance()->appInstance()->configInstance();
+			$configInstance=Front::getInstance()->getAppConfig();
 		}
 	
 		$adapterName=$configInstance->getByKey('cache.defalut');
@@ -103,7 +105,7 @@ abstract class CacheBase
 	
 	private static function staticCreate($adapterName, \HuiLib\Config\ConfigBase $configInstance=NULL){
 		if ($configInstance===NULL) {
-			$configInstance=\HuiLib\Bootstrap::getInstance()->appInstance()->configInstance();
+			$configInstance=Front::getInstance()->getAppConfig();
 		}
 	
 		$adapterConfig=$configInstance->getByKey($adapterName);

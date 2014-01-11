@@ -4,7 +4,7 @@ namespace HuiLib;
 use HuiLib\App\Front;
 
 /**
- * 系统初始化引导文件
+ * 系统初始化引导文件，非单例模式
  * 
  * SYS_PATH 系统根目录，在库和应用目录上一级
  * LIB_PATH 库根目录，约定库目录在系统目录下
@@ -19,7 +19,6 @@ use HuiLib\App\Front;
 class Bootstrap
 {
 	const DEFAULT_ENV = 'production';
-	private static $instance;
 	
 	/**
 	 * 运行环境
@@ -129,24 +128,15 @@ class Bootstrap
 	public function getAllowEnv(){
 		return $this->allowedEnv;
 	}
-
-	/**
-	 * 获取已创建的应用
-	 */
-	public function appInstance(){
-		return $this->application;
-	}
 	
 	/**
 	 * 获取引导类实例
 	 * @return \HuiLib\Bootstrap
 	 */
-	public static function getInstance()
+	public static function create()
 	{
-		if (self::$instance == NULL) {
-			self::$instance = new self ();
-			Front::getInstance()->setBootstrap(self::$instance);
-		}
-		return self::$instance;
+		$instance = new self ();
+		Front::getInstance()->setBootstrap($instance);
+		return $instance;
 	}
 }

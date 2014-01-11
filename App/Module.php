@@ -9,12 +9,6 @@ namespace HuiLib\App;
  */
 class Module
 {
-	/**
-	 * 网站全局配置对象
-	 * @var \HuiLib\Config\ConfigBase
-	 */
-	protected $siteConfig=NULL;
-
 	protected function __construct()
 	{
 	}
@@ -32,10 +26,7 @@ class Module
 	 */
 	protected function getSiteConfig()
 	{
-		if ($this->siteConfig===NULL) {
-			$this->siteConfig = $this->getAppInstace()->siteConfigInstance();
-		}
-		return $this->siteConfig;
+		return Front::getInstance()->getSiteConfig();
 	}
 	
 	/**

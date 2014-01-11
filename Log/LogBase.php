@@ -3,6 +3,7 @@ namespace HuiLib\Log;
 
 use HuiLib\Bootstrap;
 use HuiLib\Helper\Param;
+use HuiLib\App\Front;
 
 /**
  * File基础类
@@ -91,7 +92,7 @@ abstract class LogBase
 	protected function __construct($config, $configInstance)
 	{
 		//初始化公共信息部分
-		$constroller = Bootstrap::getInstance ()->appInstance ()->requestInstance ()->controllerInstance ();
+		$constroller = Front::getInstance()->getController();
 		if ($constroller instanceof \HuiLib\App\Controller) {
 			$this->package = $constroller->getPackage ();
 			$this->controller = $constroller->getController ();
@@ -109,7 +110,7 @@ abstract class LogBase
 	public static function getDefault(\HuiLib\Config\ConfigBase $configInstance = NULL)
 	{
 		if ($configInstance === NULL) {
-			$configInstance = \HuiLib\Bootstrap::getInstance ()->appInstance ()->configInstance ();
+			$configInstance = Front::getInstance()->getAppConfig();
 		}
 		
 		$adapterName = $configInstance->getByKey ( 'log.defalut' );
@@ -147,7 +148,7 @@ abstract class LogBase
 	private static function staticCreate($adapterName, \HuiLib\Config\ConfigBase $configInstance = NULL)
 	{
 		if ($configInstance === NULL) {
-			$configInstance = \HuiLib\Bootstrap::getInstance ()->appInstance ()->configInstance ();
+			$configInstance = Front::getInstance()->getAppConfig();
 		}
 		
 		$adapterConfig = $configInstance->getByKey ( $adapterName );

@@ -12,22 +12,11 @@ abstract class ToolBase
 	//已初始化对象缓存
 	private static $instanceCache;
 	
-	//app初始化对象
-	protected $appInstance;
-	
 	protected function __construct(){
 	
 	}
 	
 	abstract public function run();
-	
-	/**
-	 * 设置app初始化运行环境
-	 * @param \HuiLib\App\AppBase $app
-	 */
-	public function setApp(\HuiLib\App\AppBase $appInstance){
-		$this->appInstance=$appInstance;
-	}
 	
 	/**
 	 * 只能获取多个之类单例
