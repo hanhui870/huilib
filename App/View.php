@@ -1,6 +1,8 @@
 <?php
 namespace HuiLib\App;
 
+use HuiLib\App\Front;
+
 /**
  * View类
  * 
@@ -9,9 +11,8 @@ namespace HuiLib\App;
  */
 class View extends \HuiLib\View\ViewBase
 {
-	public function __construct(\HuiLib\App\AppBase $appInstance)
+	public function __construct()
 	{
-		$this->_appInstance=$appInstance;
 	}
 	
 	/**
@@ -31,7 +32,7 @@ class View extends \HuiLib\View\ViewBase
 		if (!file_exists($cacheFile)) {//缓存文件不存在
 			$this->_engineInstance->parse()->writeCompiled();
 			
-		}elseif ($this->_appInstance->configInstance()->getByKey('webRun.view.refresh')){//开启模板自动扫描刷新
+		}elseif (Front::getInstance()->getAppConfig()->getByKey('webRun.view.refresh')){//开启模板自动扫描刷新
 			$cacheStamp=filemtime($cacheFile);
 			$tplStamp=filemtime($this->_engineInstance->getTplFilePath());
 			$tplStampList=array($tplStamp);
@@ -46,9 +47,9 @@ class View extends \HuiLib\View\ViewBase
 				unlink ( $cacheFile );
 				$this->_engineInstance->parse()->writeCompiled();
 			}
-			
-		}elseif ($this->_appInstance->configInstance()->getByKey('webRun.view.life')){//配置了自动过期时间
-			$lifeTime=$this->_appInstance->configInstance()->getByKey('webRun.view.life');
+		
+		}elseif (Front::getInstance()->getAppConfig()->getByKey('webRun.view.life')){//配置了自动过期时间
+			$lifeTime=Front::getInstance()->getAppConfig()->getByKey('webRun.view.life');
 			if ( time() - filemtime ( $cacheFile ) >= $lifeTime) {
 				unlink ( $cacheFile );
 				$this->_engineInstance->parse()->writeCompiled();

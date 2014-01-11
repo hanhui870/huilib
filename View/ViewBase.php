@@ -1,6 +1,8 @@
 <?php
 namespace HuiLib\View;
 
+use HuiLib\App\Front;
+
 /**
  * 视图基础类
  * 
@@ -22,12 +24,6 @@ abstract class ViewBase
 	 * @var \HuiLib\View\TemplateEngine 
 	 */
 	protected $_engineInstance;
-	
-	/**
-	 * 基础APP实例
-	 * @var \HuiLib\App\AppBase
-	 */
-	protected $_appInstance;
 
 	/**
 	 * 初始化渲染引擎
@@ -36,7 +32,7 @@ abstract class ViewBase
 	{
 		$this->_engineInstance = new \HuiLib\View\TemplateEngine($view, $ajaxDelimiter);
 		
-		$viewConfig=$this->_appInstance->configInstance()->getByKey('webRun.view');
+		$viewConfig=Front::getInstance()->getAppConfig()->getByKey('webRun.view');
 		
 		if (empty($viewConfig['viewPath']) || empty($viewConfig['cachePath'])) {
 			throw new \HuiLib\Error\Exception ( "请在网站配置中同时添加webRun.view.viewPath和webRun.view.cachePath路径" );

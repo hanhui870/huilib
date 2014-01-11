@@ -1,6 +1,8 @@
 <?php
 namespace HuiLib\App;
 
+use HuiLib\App\Front;
+
 /**
  * 控制器基础类
  * 
@@ -40,36 +42,6 @@ class Controller
 	protected $subAction;
 	
 	/**
-	 * 基础APP实例
-	 * @var \HuiLib\App\AppBase
-	 */
-	protected $appInstance;
-	
-	/**
-	 * 网站配置实例
-	 * 
-	 * @var \HuiLib\Config\ConfigBase
-	 */
-	protected $appConfig;
-	
-	/**
-	 * 网站全局配置对象
-	 * @var \HuiLib\Config\ConfigBase
-	 */
-	protected $siteConfig=NULL;
-	
-	/**
-	 * 请求对象
-	 * @var \HuiLib\Request\RequestBase
-	 */
-	protected $request;
-	
-	/**
-	 * 响应内容
-	 */
-	protected $responce;
-	
-	/**
 	 * 请求对象
 	 * @var \HuiLib\View\ViewBase
 	 */
@@ -94,22 +66,12 @@ class Controller
 	 */
 	protected $ajax = FALSE;
 	
-	/**
-	 * 应用主域名
-	 * @var \HuiLib\Lang\LangBase
-	 */
-	protected $langInstace = NULL;
-	
 	//Ajax状态返回
 	const STATUS_SUCCESS=TRUE;
 	const STATUS_FAIL=FALSE;
 
-	public function __construct(\HuiLib\App\AppBase $appInstance)
+	public function __construct()
 	{
-		$this->appInstance = $appInstance;
-		$this->appConfig = $appInstance->configInstance ();
-		$this->request = $appInstance->requestInstance ();
-		
 		//是否Ajax请求
 		$this->ajax=\HuiLib\Helper\Param::isXmlHttpRequest();
 		
@@ -136,7 +98,7 @@ class Controller
 		}
 		
 		//路由方法 附加操作后缀
-		$this->action=$this->request->getActionRouteSeg();
+		$this->action=Front::getInstance()->getRequest()->getActionRouteSeg();
 		$action=$this->action.'Action';
 		$this->$action();
 		
@@ -215,9 +177,7 @@ class Controller
 	{
 		//有View类型的才像前台赋值配置数据
 		$this->getSiteConfig();
-		if (!empty($this->siteConfig)) {
-			$this->view->assign($this->siteConfig->getByKey());
-		}
+		$this->view->assign(Front::getInstance()->getSiteConfig()->getByKey());
 	}
 	
 	/**
@@ -315,7 +275,8 @@ class Controller
 	protected function initView()
 	{
 		if ($this->view===NULL) {
-			$this->view = new \HuiLib\App\View ( $this->appInstance );
+			$this->view = new \HuiLib\App\View ();
+			Front::getInstance()->setView($this->view);
 		}
 	}
 	
@@ -324,10 +285,7 @@ class Controller
 	 */
 	protected function getSiteConfig()
 	{
-		if ($this->siteConfig===NULL) {
-			$this->siteConfig = $this->appInstance->siteConfigInstance();
-		}
-		return $this->siteConfig;
+		return Front::getInstance()->getSiteConfig();
 	}
 
 	/**
@@ -404,11 +362,7 @@ class Controller
 	 */
 	protected function getLang()
 	{
-		if ($this->langInstace===NULL) {
-			$this->langInstace=\HuiLib\Lang\LangBase::getDefault();
-		}
-	
-		return $this->langInstace;
+		return Front::getInstance()->getLang();
 	}
 	
 	public function __call($name, $arguments)

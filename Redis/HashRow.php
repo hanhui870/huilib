@@ -251,6 +251,7 @@ class HashRow extends RedisBase
 		$tableClass=static::TABLE_CLASS;
 		$rowClass=$tableClass::ROW_CLASS;
 		
+		unset($this->data[self::REDIS_UPDATE_KEY]);
 		return $rowClass::create($this->data);
 	}
 	

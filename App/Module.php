@@ -10,18 +10,6 @@ namespace HuiLib\App;
 class Module
 {
 	/**
-	 * 基础APP实例
-	 * @var \HuiLib\App\AppBase
-	 */
-	protected $appInstance;
-	
-	/**
-	 * 应用主域名
-	 * @var \HuiLib\Lang\LangBase
-	 */
-	protected $langInstace = NULL;
-	
-	/**
 	 * 网站全局配置对象
 	 * @var \HuiLib\Config\ConfigBase
 	 */
@@ -32,37 +20,11 @@ class Module
 	}
 	
 	/**
-	 * 获取应用实例
-	 */
-	protected function getAppInstace()
-	{
-		if ($this->appInstance===NULL) {
-			$this->appInstance=\HuiLib\Bootstrap::getInstance()->appInstance();
-		}
-	
-		return $this->appInstance;
-	}
-	
-	/**
-	 * 设置应用实例
-	 */
-	public function setAppInstance(\HuiLib\App\AppBase $appInstance=NULL)
-	{
-		$this->appInstance=$appInstance;
-		
-		return $this;
-	}
-	
-	/**
 	 * 获取翻译实例
 	 */
 	protected function getLang()
 	{
-		if ($this->langInstace===NULL) {
-			$this->langInstace=\HuiLib\Lang\LangBase::getDefault();
-		}
-	
-		return $this->langInstace;
+		return Front::getInstance()->getLang();
 	}
 	
 	/**

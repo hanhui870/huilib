@@ -1,6 +1,8 @@
 <?php
 namespace HuiLib\App;
 
+use HuiLib\App\Front;
+
 /**
  * 应用创建文件
  *
@@ -9,12 +11,6 @@ namespace HuiLib\App;
  */
 abstract class AppBase
 {
-	/**
-	 * 引导程序
-	 * @var \HuiLib\Bootstrap
-	 */
-	protected $bootStrap;
-	
 	/**
 	 * 请求对象
 	 * @var \HuiLib\Request\RequestBase
@@ -34,29 +30,10 @@ abstract class AppBase
 	protected $configPath;
 	
 	/**
-	 * 网站全局配置 定位原来数据的setting表
-	 * @var \HuiLib\Config\ConfigBase
-	 */
-	protected $siteConfigInstance=NULL;
-	
-	/**
-	 * 数据库连接
-	 *  @var \HuiLib\Db\DbBase
-	 */
-	protected $dbInstance=NULL;
-	
-	/**
 	 * session实例
 	 *  @var \HuiLib\Session\SessionBase
 	 */
 	protected $sessionInstance=NULL;
-	
-	/**
-	 * 翻译国际化功能
-	 * 
-	 *  @var \HuiLib\Lang\LangBase 
-	 */
-	protected $langInstance=NULL;
 
 	/**
 	 * 构造函数
@@ -71,8 +48,6 @@ abstract class AppBase
 		}
 		$this->configPath = $config;
 		
-		$this->bootStrap = \HuiLib\Bootstrap::getInstance ();
-		
 		//初始化应用配置
 		$this->initConfig ();
 		
@@ -84,6 +59,7 @@ abstract class AppBase
 		
 		//初始化请求对象 具体可能在子类初始化
 		$this->initRequest ();
+		Front::getInstance()->setRequest($this->requestInstance);
 	}
 
 	/**
@@ -96,13 +72,13 @@ abstract class AppBase
 		
 		$this->requestInstance->init();
 		
-		if (method_exists($this->requestInstance->controllerInstance(), 'dispatch')) {
-			$this->requestInstance->controllerInstance()->dispatch();
+		if (method_exists(Front::getInstance()->getController(), 'dispatch')) {
+			Front::getInstance()->getController()->dispatch();
 		}else{
 			throw new \HuiLib\Error\Exception ( "AppBase::run controller dispatch failed!" );
 		}
 		
-		$this->requestInstance->controllerInstance()->output();
+		Front::getInstance()->getController()->output();
 	}
 
 	/**
@@ -141,6 +117,7 @@ abstract class AppBase
 	protected function initConfig()
 	{
 		$this->appConfig = new \HuiLib\Config\ConfigBase ( $this->configPath );
+		Front::getInstance()->setAppConfig($this->appConfig);
 	}
 
 	/**
@@ -151,30 +128,6 @@ abstract class AppBase
 	{
 		return $this->appConfig;
 	}
-	
-	/**
-	 * 返回网站配置实例
-	 * 
-	 * @return \HuiLib\Config\ConfigBase
-	 */
-	public function siteConfigInstance()
-	{
-		if ($this->siteConfigInstance===NULL) {
-			$siteIni=$this->appConfig->getByKey('app.global');
-			$this->siteConfigInstance = new \HuiLib\Config\ConfigBase ( $siteIni );
-		}
-		
-		return $this->siteConfigInstance;
-	}
-	
-	/**
-	 * 返回启动器实例
-	 * @return \HuiLib\Bootstrap
-	 */
-	public function bootstrapInstance()
-	{
-		return $this->bootStrap;
-	}
 
 	/**
 	 * 初始化请求
@@ -182,15 +135,6 @@ abstract class AppBase
 	 * 先在之类初始化请求，然后父类初始化配置
 	 */
 	protected abstract function initRequest();
-	
-	/**
-	 * 返回请求对象实例
-	 * @return \HuiLib\Request\RequestBase
-	 */
-	public function requestInstance()
-	{
-		return $this->requestInstance;
-	}
 
 	/**
 	 * 获取应用所在的命名空间
@@ -212,15 +156,7 @@ abstract class AppBase
 	protected function initSession()
 	{
 		$this->sessionInstance=\HuiLib\Session\SessionBase::create($this->configInstance ());
-	}
-	
-	/**
-	 * 返回session对象实例
-	 * @return \HuiLib\Session\SessionBase
-	 */
-	public function sessionInstance()
-	{
-		return $this->sessionInstance;
+		Front::getInstance()->setSession($this->sessionInstance);
 	}
 
 	/**
@@ -258,7 +194,7 @@ abstract class AppBase
 	{
 		$loads = $this->appConfig->getByKey ( 'autoLoad' );
 		
-		$loader = $this->bootStrap->autoLoaderInstance ();
+		$loader = Front::getInstance()->getLoader ();
 		foreach ( $loads as $name => $path ) {
 			$loader->addSpace ( $name, $path );
 		}

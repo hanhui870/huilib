@@ -175,6 +175,10 @@ class Front
 	
 	public function getLang()
 	{
+		if ($this->lang===NULL) {
+			$this->lang=\HuiLib\Lang\LangBase::getDefault();
+		}
+	
 		return $this->lang;
 	}
 	

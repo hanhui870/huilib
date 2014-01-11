@@ -1,6 +1,8 @@
 <?php
 namespace HuiLib;
 
+use HuiLib\App\Front;
+
 /**
  * 系统初始化引导文件
  * 
@@ -44,7 +46,11 @@ class Bootstrap
 	
 	private $allowedEnv = array ('production', 'testing', 'develop' );
 	
-	private static $loadInstance;
+	/**
+	 * 加载器实例
+	 * @var \HuiLib\Loader\AutoLoad
+	 */
+	private $loadInstance;
 	
 	private function __construct()
 	{
@@ -84,8 +90,9 @@ class Bootstrap
 	private function initLoader()
 	{
 		include_once LIB_PATH . 'Loader/AutoLoad.php';
-		self::$loadInstance = \HuiLib\Loader\AutoLoad::getInstance ();
-		spl_autoload_register ( array (self::$loadInstance, 'loadClass' ) );
+		$this->loadInstance = \HuiLib\Loader\AutoLoad::getInstance ();
+		spl_autoload_register ( array ($this->loadInstance, 'loadClass' ) );
+		Front::getInstance()->setLoader($this->loadInstance);
 	}
 	
 	public function autoLoaderInstance(){
@@ -99,6 +106,7 @@ class Bootstrap
 	public function createApp($config)
 	{
 		$this->application=\HuiLib\App\AppBase::factory($this->runMethod, $config);
+		Front::getInstance()->setApp($this->application);
 		
 		return $this->application;
 	}
@@ -137,6 +145,7 @@ class Bootstrap
 	{
 		if (self::$instance == NULL) {
 			self::$instance = new self ();
+			Front::getInstance()->setBootstrap(self::$instance);
 		}
 		return self::$instance;
 	}
