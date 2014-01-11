@@ -88,12 +88,38 @@ class RowAbstract extends \HuiLib\App\Model
 	}
 	
 	/**
-	 * 返回对象的数组表示
+	 * 返回对象的内部数组表示
+	 * 
 	 * @return array
 	 */
 	public function toArray()
 	{
 		return $this->data;
+	}
+	
+	/**
+	 * 返回对象完整数组表示
+	 * 
+	 * 包含$this->calculated需要计算生成的字段，参考user、topic表
+	 * 也可覆盖定制实现
+	 *
+	 * @return array
+	 */
+	public function toFullArray()
+	{
+		$unit=$this->data;
+		
+		if ($this->calculated) {
+			//默认实现会输出全部需要计算字段，其中可能包含对象，覆盖这个方法可以个性输出
+			foreach ($this->calculated as $key=>$value){
+				if ($value===NULL) {
+					$this->calculated[$key]=$this->$key;
+				}
+				$unit[$key]=$this->calculated[$key];
+			}
+		}
+		
+		return $unit;
 	}
 	
 	/**
