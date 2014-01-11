@@ -2,6 +2,7 @@
 namespace HuiLib\Session;
 
 use HuiLib\App\Front;
+
 /**
  * Session基础类及工厂函数
  * 

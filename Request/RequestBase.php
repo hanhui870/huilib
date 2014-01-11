@@ -2,6 +2,7 @@
 namespace HuiLib\Request;
 
 use HuiLib\App\Front;
+
 /**
  * Request基础类
  *

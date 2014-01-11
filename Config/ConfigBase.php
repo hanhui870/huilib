@@ -1,5 +1,6 @@
 <?php
 namespace HuiLib\Config;
+
 use \HuiLib\Helper\String;
 use HuiLib\App\Front;
 

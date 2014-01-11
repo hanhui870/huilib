@@ -107,6 +107,9 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	 */
 	public function toFullArray()
 	{
+		if (empty($this->data)) {
+			return $this->data;
+		}
 		$unit=$this->data;
 		
 		if ($this->calculated) {

@@ -1,6 +1,8 @@
 <?php
 namespace HuiLib\Model;
 
+use HuiLib\App\Front;
+
 /**
  * 数据表模型Model基础类
  * 

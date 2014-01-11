@@ -1,6 +1,8 @@
 <?php
 namespace HuiLib\Module;
 
+use HuiLib\App\Front;
+
 /**
  * Module基础类
  * 

@@ -2,6 +2,7 @@
 namespace HuiLib\Lang;
 
 use HuiLib\App\Front;
+
 /**
  * 语言翻译类
  * 
