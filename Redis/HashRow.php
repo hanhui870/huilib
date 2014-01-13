@@ -104,15 +104,16 @@ class HashRow extends RedisBase
 
 		//超过缓存有效期，同步数据
 		if (!empty($data)&&(empty($data[self::REDIS_UPDATE_KEY]) || time()-$data[self::REDIS_UPDATE_KEY]>self::CACHE_SYNC_INTERVAL)) {
-			$this->flushEditedToDb();
+			$this->flushEditedAndDelete();
 			unset($data);
 		}
 		
 		if (empty($data)) {
 			$data=$this->fetchFromDb($primaryIdValue);
+			$this->applyData($data);
 		}
 
-		return $this->applyData($data);
+		return TRUE;
 	}
 	
 	/**
@@ -166,44 +167,43 @@ class HashRow extends RedisBase
 	}
 	
 	/**
-	 * 将编辑的数据推送到迟久库
+	 * 将编辑的数据推送到迟久库，并删除缓存
 	 * 
 	 * 更新编辑数据到数据库 仅数字增减等非完全覆盖修改
 	 * 默认情况下不需要编辑，因为编辑一般直接获取数据库表的Model对象。此处一般做相对增减。
 	 *
 	 * @param array $data 缓存数据
 	 */
-	protected function flushEditedToDb()
+	protected function flushEditedAndDelete()
 	{
+		//先删除缓存，避免可能在行对象保存后事件中激发refresh引发递归，只尝试保存一次
+		$this->getAdapter()->del($this->getRedisKey($this->data[$this->primaryIdKey]));
+		
 		//通过主键尝试数据表获取行数据
 		$tableClass=static::TABLE_CLASS;
 		$rowObj=$tableClass::create()->getRowByField($this->primaryIdKey, $this->data[$this->primaryIdKey]);
 
-		if (empty($this->editData) && empty($this->incrData) || empty($rowObj)) {
-			return FALSE;
+		if ((!empty($this->editData) || !empty($this->incrData)) && !empty($rowObj)) {
+			//更新增减影响值
+			foreach ($this->incrData as $key=>$value){
+				$rowObj->$key+=$value;
+			}
+			
+			//更新影响值
+			foreach ($this->editData as $key=>$value){
+				//有增减影响，直接忽略编辑的
+				if (isset($this->incrData[$key])) continue;
+				$rowObj->$key=$value;
+			}
+			
+			//echo $rowObj->getSaveSql();
+			if($rowObj->save()){
+				$this->editData=array();
+				$this->incrData=array();
+				$this->data=array();
+			}
 		}
 
-		//更新增减影响值
-		foreach ($this->incrData as $key=>$value){
-			$rowObj->$key+=$value;
-		}
-		
-		//更新影响值
-		foreach ($this->editData as $key=>$value){
-			//有增减影响，直接忽略编辑的
-			if (isset($this->incrData[$key])) continue;
-			$rowObj->$key=$value;
-		}
-		
-		//echo $rowObj->getSaveSql();
-		if($rowObj->save()){
-			//删除缓存， 重置信息
-			$this->getAdapter()->del($this->getRedisKey($this->data[$this->primaryIdKey]));
-			$this->editData=array();
-			$this->incrData=array();
-			$this->data=array();
-		}
-		
 		return TRUE;
 	}
 	
@@ -286,10 +286,10 @@ class HashRow extends RedisBase
 		if (empty($data)) {//不存在不用处理
 			return TRUE;
 		}
-		$this->applyData($data);
+		$instance->applyData($data);
 		
 		//写入数据库
-		$instance->flushEditedToDb();
+		$instance->flushEditedAndDelete();
 		
 		return TRUE;
 	}
