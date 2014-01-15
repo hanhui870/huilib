@@ -77,6 +77,15 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	 */
 	protected $duplicateCreate=FALSE;
 	
+	/**
+	 * 是否开启自动保存
+	 * 
+	 * 主要指对象解构时的自动保存
+	 * 
+	 * @var boolean
+	 */
+	protected $autoSave=FALSE;
+	
 	protected function __construct(array $data)
 	{
 		parent::__construct();
@@ -141,6 +150,9 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 			$result=$query->query();
 		}
 		$this->onAfterSave();
+		
+		//保存后自动保存关闭
+		$this->autoSave=FALSE;
 		
 		return $result;
 	}
@@ -233,6 +245,17 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	public function enableDupliateCreate()
 	{
 		$this->duplicateCreate=TRUE;
+		return $this;
+	}
+	
+	/**
+	 * 开启解构时自动保存
+	 *
+	 * @return array
+	 */
+	public function enableAutoSave()
+	{
+		$this->autoSave=TRUE;
 		return $this;
 	}
 	
@@ -366,5 +389,13 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 			return TRUE;
 		}
 		return FALSE;
+	}
+	
+	public function __destruct()
+	{
+		//执行自动保存对象
+		if($this->autoSave){
+			$this->save();
+		}
 	}
 }
