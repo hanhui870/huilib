@@ -31,6 +31,13 @@ class TableAbstract extends \HuiLib\Model\ModelBase
 	 */
 	const CREATE_DUPLICATE=TRUE;//覆盖
 	const CREATE_NO_DUPLICATE=FALSE;//不覆盖
+	
+	/**
+	 * 事务更新锁定模式
+	 *
+	 * @var boolean
+	 */
+	protected $forUpdate = false;
 
 	/**
 	 * 获取表的Select对象
@@ -54,6 +61,9 @@ class TableAbstract extends \HuiLib\Model\ModelBase
 		$select=Query::select ( static::TABLE );
 		if ($this->dbAdapter!==NULL) {
 			$select->setAdapter($this->dbAdapter);
+		}
+		if ($this->forUpdate) {
+			$select->enableForUpdate();
 		}
 
 		return $this->rowObject($select->where ( Where::createPair ( $field, $value ) )->limit ( 1 )->query ()->fetch ());
@@ -226,5 +236,15 @@ class TableAbstract extends \HuiLib\Model\ModelBase
 	public static function getRowClass()
 	{
 		return static::ROW_CLASS;
+	}
+	
+	/**
+	 * 开启更新锁定事务模式
+	 */
+	public function enableForUpdate()
+	{
+		$this->forUpdate=true;
+	
+		return $this;
 	}
 }
