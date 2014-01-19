@@ -35,6 +35,14 @@ class ModelBase
 	}
 	
 	/**
+	 * 获取翻译实例
+	 */
+	protected function getLang()
+	{
+		return Front::getInstance()->getLang();
+	}
+	
+	/**
 	 * 快速创建一个Module实例
 	 *
 	 * 原理：创建对象的灵活获取参数是从第0个开始的。一般函数是从第一个开始的。
