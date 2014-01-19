@@ -351,6 +351,16 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	}
 	
 	/**
+	 * 是否新创建的行
+	 *
+	 * @return boolean
+	 */
+	public function isNew()
+	{
+		return $this->newRow;
+	}
+	
+	/**
 	 * 直接通过对象属性获取
 	 * 
 	 * 注意:以下哪怕直接获取是有值的，但还是判断失败的
