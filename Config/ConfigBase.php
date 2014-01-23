@@ -1,6 +1,8 @@
 <?php
 namespace HuiLib\Config;
+
 use \HuiLib\Helper\String;
+use HuiLib\App\Front;
 
 /**
  * ini文件配置信息解析类
@@ -95,7 +97,7 @@ class ConfigBase
 		}
 		
 		//检测是否存在服务器环境标签
-		$allowEnvTag = \HuiLib\Bootstrap::getInstance ()->getAllowEnv ();
+		$allowEnvTag =Front::getInstance()->getBootstrap()->getAllowEnv ();
 		$existSection = FALSE;
 		foreach ( $allowEnvTag as $envTag ) {
 			if (isset ( $this->configSource [$envTag] )) {

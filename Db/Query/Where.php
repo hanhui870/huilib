@@ -183,6 +183,9 @@ class Where
 	/**
 	 * 创建结果集对象Plain方法
 	 * 
+	 * $select->where(Where::createPlain('t.id=:id'));
+	 * $re=$select->prepare()->execute(array('id'=>14));
+	 * 
 	 * @param string $plainWhere 源条件语句，如"name is null"
 	 * 
 	 * @return \HuiLib\Db\Query\Where
@@ -199,6 +202,12 @@ class Where
 	 * 创建结果集对象Quote方法
 	 * 
 	 * 只支持单个占位符或者或者数组占位
+	 * 
+	 * 占位式(createQuote) 
+	 * $select->where(Where::createQuote('id=?', 2));  //=>"id='2'"
+	 * 
+	 * Where in组织，括号不能少
+	 * Where::createQuote ( 'id in (?) ', $ids )
 	 * 
 	 * @param string $placeHolder 带占位符的语句
 	 * @param mix $value 需要嵌入的值

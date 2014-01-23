@@ -7,11 +7,14 @@ use HuiLib\Db\Query\Where;
 
 /**
  * 数据行类
+ * 
+ * 行对象通过调用不存在的属性调用方法，属性必须在$calculated注册，并且存在getProperty()方法。
+ * 样例可以参照用户类。
  *
  * @author 祝景法
  * @since 2013/10/20
  */
-class RowAbstract extends \HuiLib\App\Model
+class RowAbstract extends \HuiLib\Model\ModelBase
 {
 	/**
 	 * 主键字段键名
@@ -56,6 +59,13 @@ class RowAbstract extends \HuiLib\App\Model
 	protected $tableInstance=NULL;
 	
 	/**
+	 * 需要计算的字段，通过公开方法获取
+	 * 
+	 * @var array
+	 */
+	protected $calculated=NULL;
+	
+	/**
 	 * 是否是新行
 	 * @var boolean
 	 */
@@ -66,6 +76,15 @@ class RowAbstract extends \HuiLib\App\Model
 	 * @var boolean
 	 */
 	protected $duplicateCreate=FALSE;
+	
+	/**
+	 * 是否开启自动保存
+	 * 
+	 * 主要指对象解构时的自动保存
+	 * 
+	 * @var boolean
+	 */
+	protected $autoSave=FALSE;
 	
 	protected function __construct(array $data)
 	{
@@ -78,12 +97,41 @@ class RowAbstract extends \HuiLib\App\Model
 	}
 	
 	/**
-	 * 返回对象的数组表示
+	 * 返回对象的内部数组表示
+	 * 
 	 * @return array
 	 */
 	public function toArray()
 	{
 		return $this->data;
+	}
+	
+	/**
+	 * 返回对象完整数组表示
+	 * 
+	 * 包含$this->calculated需要计算生成的字段，参考user、topic表
+	 * 也可覆盖定制实现
+	 *
+	 * @return array
+	 */
+	public function toFullArray()
+	{
+		if (empty($this->data)) {
+			return $this->data;
+		}
+		$unit=$this->data;
+		
+		if ($this->calculated) {
+			//默认实现会输出全部需要计算字段，其中可能包含对象，覆盖这个方法可以个性输出
+			foreach ($this->calculated as $key=>$value){
+				if ($value===NULL) {
+					$this->calculated[$key]=$this->$key;
+				}
+				$unit[$key]=$this->calculated[$key];
+			}
+		}
+		
+		return $unit;
 	}
 	
 	/**
@@ -102,6 +150,9 @@ class RowAbstract extends \HuiLib\App\Model
 			$result=$query->query();
 		}
 		$this->onAfterSave();
+		
+		//保存后自动保存关闭
+		$this->autoSave=FALSE;
 		
 		return $result;
 	}
@@ -165,14 +216,14 @@ class RowAbstract extends \HuiLib\App\Model
 				
 		}else{
 			if (!$this->editData){
-				throw new Exception('Table row editData has not been set.');
+				throw new Exception('Table row editData has not been set or the field hasn\'t changed.');
 			}
 			$primaryValue=$this->oldPrimaryIdValue===NULL ? $this->data[static::PRIMAY_IDKEY] : $this->oldPrimaryIdValue;
 			$update=Query::update($table);
 			if ($this->dbAdapter!==NULL) {
 				$update->setAdapter($this->dbAdapter);
 			}
-			return $update->sets($this->editData)->where(Where::createPair(static::PRIMAY_IDKEY, $primaryValue));
+			return $update->sets($this->editData)->where(Where::createPair(static::PRIMAY_IDKEY, $primaryValue))->limit(1);
 		}
 	}
 	
@@ -194,6 +245,17 @@ class RowAbstract extends \HuiLib\App\Model
 	public function enableDupliateCreate()
 	{
 		$this->duplicateCreate=TRUE;
+		return $this;
+	}
+	
+	/**
+	 * 开启解构时自动保存
+	 *
+	 * @return array
+	 */
+	public function enableAutoSave()
+	{
+		$this->autoSave=TRUE;
 		return $this;
 	}
 	
@@ -288,18 +350,44 @@ class RowAbstract extends \HuiLib\App\Model
 	{
 	}
 	
+	/**
+	 * 是否新创建的行
+	 *
+	 * @return boolean
+	 */
+	public function isNew()
+	{
+		return $this->newRow;
+	}
+	
+	/**
+	 * 直接通过对象属性获取
+	 * 
+	 * 注意:以下哪怕直接获取是有值的，但还是判断失败的
+	 * 对一个重载的属性使用empty时,重载魔术方法将不会被调用。 
+	 * var_dump(isset($result->Email));
+	 * var_dump(!empty($result->Email));
+	 */
 	public function __get($key)
 	{
 		if (isset($this->data[$key])) {
 			return $this->data[$key];
-		}else{
-			return NULL;
+		
+		//NULL是默认值，使用isset将判断失败
+		}elseif (array_key_exists($key, $this->calculated)){
+			$method='get'.$key;
+			
+			if (method_exists($this, $method)) {
+				return $this->$method();
+			}
 		}
+		
+		return NULL;
 	}
 	
 	public function __set($key, $value)
 	{
-		if (isset($this->data[$key])) {
+		if (isset($this->data[$key]) && $this->data[$key]!=$value) {
 			$this->originalData[$key]=$this->data[$key];
 			$this->data[$key]=$value;
 			$this->editData[$key]=$value;
@@ -311,5 +399,13 @@ class RowAbstract extends \HuiLib\App\Model
 			return TRUE;
 		}
 		return FALSE;
+	}
+	
+	public function __destruct()
+	{
+		//执行自动保存对象
+		if($this->autoSave){
+			$this->save();
+		}
 	}
 }

@@ -1,5 +1,7 @@
 <?php
-namespace HuiLib\App;
+namespace HuiLib\Model;
+
+use HuiLib\App\Front;
 
 /**
  * 数据表模型Model基础类
@@ -7,14 +9,8 @@ namespace HuiLib\App;
  * @author 祝景法
  * @since 2013/10/20
  */
-class Model
+class ModelBase
 {
-	/**
-	 * 基础APP实例
-	 * @var \HuiLib\App\AppBase
-	 */
-	protected $appInstance;
-	
 	/**
 	 * 数据库连接适配器
 	 * @var \HuiLib\Db\DbBase
@@ -23,28 +19,6 @@ class Model
 	
 	protected function __construct()
 	{
-	}
-	
-	/**
-	 * 获取应用实例
-	 */
-	protected function getAppInstace()
-	{
-		if ($this->appInstance===NULL) {
-			$this->appInstance=\HuiLib\Bootstrap::getInstance()->appInstance();
-		}
-	
-		return $this->appInstance;
-	}
-	
-	/**
-	 * 设置应用实例
-	 */
-	public function setAppInstance(\HuiLib\App\AppBase $appInstance=NULL)
-	{
-		$this->appInstance=$appInstance;
-	
-		return $this;
 	}
 	
 
@@ -58,6 +32,14 @@ class Model
 		$this->dbAdapter = $dbAdapter;
 	
 		return $this;
+	}
+	
+	/**
+	 * 获取翻译实例
+	 */
+	protected function getLang()
+	{
+		return Front::getInstance()->getLang();
 	}
 	
 	/**

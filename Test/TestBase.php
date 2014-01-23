@@ -12,9 +12,6 @@ abstract class TestBase
 	//已初始化对象缓存
 	private static $instanceCache;
 	
-	//app初始化对象
-	protected $appInstance;
-	
 	protected function __construct(){
 		
 	}
@@ -41,14 +38,6 @@ abstract class TestBase
 		}else{
 			echo '<br>Expected:<span style="color:green">'.var_export($expected, 1).'</span>， RunResult:<span style="color:red">'.var_export($runResult, 1).'</span></br>';
 		}
-	}
-	
-	/**
-	 * 设置app初始化运行环境
-	 * @param \HuiLib\App\AppBase $app
-	 */
-	public function setApp(\HuiLib\App\AppBase $appInstance){
-		$this->appInstance=$appInstance;
 	}
 	
 	/**

@@ -1,8 +1,10 @@
 <?php
 namespace HuiLib;
 
+use HuiLib\App\Front;
+
 /**
- * 系统初始化引导文件
+ * 系统初始化引导文件，非单例模式
  * 
  * SYS_PATH 系统根目录，在库和应用目录上一级
  * LIB_PATH 库根目录，约定库目录在系统目录下
@@ -17,7 +19,6 @@ namespace HuiLib;
 class Bootstrap
 {
 	const DEFAULT_ENV = 'production';
-	private static $instance;
 	
 	/**
 	 * 运行环境
@@ -44,7 +45,11 @@ class Bootstrap
 	
 	private $allowedEnv = array ('production', 'testing', 'develop' );
 	
-	private static $loadInstance;
+	/**
+	 * 加载器实例
+	 * @var \HuiLib\Loader\AutoLoad
+	 */
+	private $loadInstance;
 	
 	private function __construct()
 	{
@@ -84,8 +89,9 @@ class Bootstrap
 	private function initLoader()
 	{
 		include_once LIB_PATH . 'Loader/AutoLoad.php';
-		self::$loadInstance = \HuiLib\Loader\AutoLoad::getInstance ();
-		spl_autoload_register ( array (self::$loadInstance, 'loadClass' ) );
+		$this->loadInstance = \HuiLib\Loader\AutoLoad::getInstance ();
+		spl_autoload_register ( array ($this->loadInstance, 'loadClass' ) );
+		Front::getInstance()->setLoader($this->loadInstance);
 	}
 	
 	public function autoLoaderInstance(){
@@ -99,6 +105,7 @@ class Bootstrap
 	public function createApp($config)
 	{
 		$this->application=\HuiLib\App\AppBase::factory($this->runMethod, $config);
+		Front::getInstance()->setApp($this->application);
 		
 		return $this->application;
 	}
@@ -121,23 +128,15 @@ class Bootstrap
 	public function getAllowEnv(){
 		return $this->allowedEnv;
 	}
-
-	/**
-	 * 获取已创建的应用
-	 */
-	public function appInstance(){
-		return $this->application;
-	}
 	
 	/**
 	 * 获取引导类实例
 	 * @return \HuiLib\Bootstrap
 	 */
-	public static function getInstance()
+	public static function create()
 	{
-		if (self::$instance == NULL) {
-			self::$instance = new self ();
-		}
-		return self::$instance;
+		$instance = new self ();
+		Front::getInstance()->setBootstrap($instance);
+		return $instance;
 	}
 }

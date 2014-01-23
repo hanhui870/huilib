@@ -11,7 +11,17 @@ use HuiLib\Cache\CacheBase;
  */
 abstract class RedisBase
 {
+	/**
+	 * Redis键前缀
+	 * @var string
+	 */
 	const KEY_PREFIX='model:';
+	
+	/**
+	 * Redis更新触发时间戳
+	 * @var int timestamp
+	 */
+	const REDIS_UPDATE_KEY='RedisUpdate';
 	
 	/**
 	 * 缓存更新触发机制
@@ -31,7 +41,7 @@ abstract class RedisBase
 	
 	/**
 	 * 获取Redis适配器
-	 * @return \HuiLib\Cache\Storage\Redis
+	 * @return \Redis
 	 */
 	protected function getAdapter()
 	{
@@ -41,7 +51,6 @@ abstract class RedisBase
 	
 		return $this->adapter;
 	}
-	
 
 	/**
 	 * 快速创建Redis数据模型

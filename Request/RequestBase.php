@@ -1,6 +1,8 @@
 <?php
 namespace HuiLib\Request;
 
+use HuiLib\App\Front;
+
 /**
  * Request基础类
  *
@@ -37,32 +39,10 @@ abstract class RequestBase
 	 */
 	protected $controllerInstance=NULL;
 	
-	protected $appInstance=NULL;
-	
 	protected $appConfig=NULL;
 	
-	function __construct(\HuiLib\App\AppBase $app)
+	function __construct()
 	{
-		$this->appInstance=$app;
-		$this->setConfig($app->configInstance());
-	}
-	
-	/**
-	 * 设置配置文件实例
-	 * @param \HuiLib\Config\ConfigBase $config
-	 */
-	public function setConfig(\HuiLib\Config\ConfigBase $config)
-	{
-		$this->appConfig=$config;	
-	}
-	
-	/**
-	 * 返回控制器实例
-	 * 
-	 * @return \HuiLib\App\Controller
-	 */
-	public function controllerInstance(){
-		return $this->controllerInstance;
 	}
 	
 	/**
@@ -82,11 +62,13 @@ abstract class RequestBase
 		
 		$controllerClass=NAME_SEP.'Controller'.NAME_SEP.ucfirst($this->package).NAME_SEP.ucfirst($this->controller);
 		try {
-			$this->controllerInstance=new $controllerClass($this->appInstance);
+			$this->controllerInstance=new $controllerClass();
 			
 			$this->controllerInstance->setPackage($this->package);
 			$this->controllerInstance->setController($this->controller);
 			$this->controllerInstance->setHost($this->host);
+			
+			Front::getInstance()->setController($this->controllerInstance);
 
 		}catch (\Exception $exception){
 			//检测包路由 不存在包路径触发
@@ -231,6 +213,19 @@ abstract class RequestBase
 		$this->routeInfo[4]=$subAction;
 	}
 
+	/**
+	 * 获取路由路径信息
+	 * 
+	 * @return string
+	 */
+	public function getRouteInfo()
+	{
+		if ($this->routeInfo===NULL) {
+			return '';
+		}
+		return implode("/", $this->routeInfo);
+	}
+	
 	/**
 	 * 请求对象初始化
 	 */

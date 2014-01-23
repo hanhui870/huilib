@@ -12,7 +12,7 @@ use HuiLib\Db\Query\Where;
  * @author 祝景法
  * @since 2013/10/20
  */
-class TableAbstract extends \HuiLib\App\Model
+class TableAbstract extends \HuiLib\Model\ModelBase
 {
 	/**
 	 * 表名
@@ -31,7 +31,24 @@ class TableAbstract extends \HuiLib\App\Model
 	 */
 	const CREATE_DUPLICATE=TRUE;//覆盖
 	const CREATE_NO_DUPLICATE=FALSE;//不覆盖
+	
+	/**
+	 * 事务更新锁定模式
+	 *
+	 * @var boolean
+	 */
+	protected $forUpdate = false;
 
+	/**
+	 * 获取表的Select对象
+	 *
+	 * @return \HuiLib\Db\Query\Select
+	 */
+	public function select()
+	{
+		return Query::select ( static::TABLE );
+	}
+	
 	/**
 	 * 通过单个Field获取单条记录
 	 * 
@@ -44,6 +61,9 @@ class TableAbstract extends \HuiLib\App\Model
 		$select=Query::select ( static::TABLE );
 		if ($this->dbAdapter!==NULL) {
 			$select->setAdapter($this->dbAdapter);
+		}
+		if ($this->forUpdate) {
+			$select->enableForUpdate();
 		}
 
 		return $this->rowObject($select->where ( Where::createPair ( $field, $value ) )->limit ( 1 )->query ()->fetch ());
@@ -64,6 +84,24 @@ class TableAbstract extends \HuiLib\App\Model
 			$select->setAdapter($this->dbAdapter);
 		}
 		return $this->rowSetObject($select->where ( Where::createPair ( $field, $value ) )->limit ( $limit )->offset ( $offset )->query ()->fetchAll ());
+	}
+	
+	/**
+	 * 通过单个Field的多个IDS获取多条记录
+	 * 
+	 * 通过where in实现
+	 *
+	 * @param string $field
+	 * @param string $value
+	 */
+	public function getListByIds($field, $ids)
+	{
+		$select=Query::select ( static::TABLE );
+		if ($this->dbAdapter!==NULL) {
+			$select->setAdapter($this->dbAdapter);
+		}
+
+		return $this->rowSetObject($select->where ( Where::createQuote ( $field . ' in (?) ', $ids ) )->query ()->fetchAll ());
 	}
 
 	/**
@@ -189,5 +227,24 @@ class TableAbstract extends \HuiLib\App\Model
 	{
 		$rowClass=static::ROW_CLASS;
 		return $rowClass::getInitData();
+	}
+	
+	/**
+	 * 获取表关联的行类
+	 * @return array
+	 */
+	public static function getRowClass()
+	{
+		return static::ROW_CLASS;
+	}
+	
+	/**
+	 * 开启更新锁定事务模式
+	 */
+	public function enableForUpdate()
+	{
+		$this->forUpdate=true;
+	
+		return $this;
 	}
 }

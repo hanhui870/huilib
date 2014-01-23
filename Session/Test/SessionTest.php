@@ -15,7 +15,7 @@ class SessionTest extends \HuiLib\Test\TestBase
 	
 	private function test()
 	{
-		\HuiLib\Session\SessionBase::create($this->appInstance->configInstance ());
+		\HuiLib\Session\SessionBase::create();
 
 		print_r($_SESSION);
 	}

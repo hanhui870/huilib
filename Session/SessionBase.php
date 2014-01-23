@@ -1,6 +1,8 @@
 <?php 
 namespace HuiLib\Session;
 
+use HuiLib\App\Front;
+
 /**
  * Session基础类及工厂函数
  * 
@@ -208,8 +210,9 @@ class SessionBase implements \SessionHandlerInterface
 	 * 
 	 * 支持redis、memcache、dbtable等三种适配器
 	 */
-	public static function create(\HuiLib\Config\ConfigBase $configInstance)
+	public static function create()
 	{
+		$configInstance=Front::getInstance()->getAppConfig();
 		$config=$configInstance->getByKey('session');
 		if (empty ( $config ['adapter'] ) || empty ( $config ['driver'] )) {
 			throw new \HuiLib\Error\Exception ( 'Session adapter & driver can not be empty' );

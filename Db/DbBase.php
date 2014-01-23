@@ -1,6 +1,8 @@
 <?php
 namespace HuiLib\Db;
 
+use HuiLib\App\Front;
+
 /**
  * 数据库基础类
  * 
@@ -119,7 +121,7 @@ abstract class DbBase
 	 */
 	protected static function initConfig(){
 		if (self::$config===NULL) {
-			$configInstance=\HuiLib\Bootstrap::getInstance()->appInstance()->configInstance();
+			$configInstance=Front::getInstance()->getAppConfig();
 			self::$config=$configInstance->getByKey('db');
 		}
 	}

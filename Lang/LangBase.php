@@ -1,6 +1,8 @@
 <?php
 namespace HuiLib\Lang;
 
+use HuiLib\App\Front;
+
 /**
  * 语言翻译类
  * 
@@ -141,7 +143,7 @@ abstract class LangBase
 		}
 		
 		if ($configInstance === NULL) {
-			$configInstance = \HuiLib\Bootstrap::getInstance ()->appInstance ()->configInstance ();
+			$configInstance = Front::getInstance()->getAppConfig();
 		}
 		
 		$config = $configInstance->getByKey ( 'lang' );
