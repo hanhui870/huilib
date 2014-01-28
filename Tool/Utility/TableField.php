@@ -11,15 +11,19 @@ use HuiLib\Helper\String;
  * @author 祝景法
  * @since 2013/11/30
  */
-class TableField extends \HuiLib\Tool\ToolBase
+abstract class TableField extends \HuiLib\Tool\ToolBase
 {
+	protected $table=NULL;
+	
 	public function run(){
-		if (!defined('static::TABLE')) {
+		$this->getTable();
+		
+		if (!$this->table) {
 			throw new Exception('Tool class table name has not been set.');
 		}
 		
 		$db=DbBase::createMaster();
-		$fieldList=$db->getConnection()->query('describe '.static::TABLE)->fetchAll(\Pdo::FETCH_ASSOC);
+		$fieldList=$db->getConnection()->query('describe '.$this->table)->fetchAll(\Pdo::FETCH_ASSOC);
 		
 		$result=array();
 		foreach ($fieldList as $field)
@@ -38,8 +42,10 @@ class TableField extends \HuiLib\Tool\ToolBase
 		}
 		
 		//print_r($fieldList);
-		var_export($result);
+		echo "<pre>".var_export($result, TRUE)."</pre>";
 	}
+	
+	protected abstract function getTable();
 	
 	protected static function className(){
 		return __CLASS__;
