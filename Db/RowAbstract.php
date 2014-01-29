@@ -141,9 +141,9 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	 */
 	public function save()
 	{
-		$query=$this->getSaveQuery();
-
 		$this->onBeforeSave();
+		
+		$query=$this->getSaveQuery();
 		if ($this->newRow) {
 			$result=$this->data[static::PRIMAY_IDKEY]=$query->query();
 		}else{
