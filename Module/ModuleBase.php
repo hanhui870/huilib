@@ -11,8 +11,32 @@ use HuiLib\App\Front;
  */
 class ModuleBase
 {
+	//Api状态返回
+	const API_SUCCESS=TRUE;
+	const API_FAIL=FALSE;
+	
 	protected function __construct()
 	{
+	}
+	
+	/**
+	 * 输出JSON数据
+	 *
+	 * @param boolean $status
+	 * @param string $message 返回代码
+	 * @param int $code 返回代码见\HuiLib\Helper\Header
+	 * @param mix $data 返回数据
+	 */
+	protected function format($status=self::API_SUCCESS, $message='', $code=\HuiLib\Helper\Header::OK, $data=array())
+	{
+		$result=array();
+	
+		$result['success']=$status;
+		$result['message']=$message;
+		$result['code']=$code;
+		$result['data']=$data;
+	
+		return $result;
 	}
 	
 	/**
