@@ -298,6 +298,8 @@ class Select extends \HuiLib\Db\Query
 	{
 		$field=array();
 		foreach ($this->columns as $alias=>$column){
+			$column="`$column`";
+			$alias="`$alias`";
 			if (is_string($alias)) {
 				$field[]=sprintf("%s as %s", $column, $alias);
 			}else{
