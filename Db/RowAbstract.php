@@ -142,7 +142,7 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	public function save()
 	{
 		$query=$this->getSaveQuery();
-		
+
 		$this->onBeforeSave();
 		if ($this->newRow) {
 			$result=$this->data[static::PRIMAY_IDKEY]=$query->query();
@@ -261,6 +261,8 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	
 	/**
 	 * 使用默认数据创建全新的一行
+	 * 
+	 * 如果直接通过行对象生成新行的需要绑定表对象；建议通过表对象生成新行。
 	 * 
 	 * @return RowAbstract
 	 */
