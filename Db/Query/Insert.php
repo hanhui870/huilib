@@ -361,4 +361,33 @@ class Insert extends \HuiLib\Db\Query
 	
 		return $this;
 	}
+	
+	/**
+	 * 批量保存行对象
+	 * 
+	 * @param array $rows 由行对象组成的数组
+	 * @bool
+	 */
+	public function batchSaveRows($rows){
+		if (!is_array($rows)) {
+			$rows=array($rows);
+		}
+		
+		$inited=FALSE;
+		foreach ($rows as $rowInstance){
+			//非新建的过滤
+			if (!$rowInstance instanceof \HuiLib\Db\RowAbstract || !$rowInstance->isNew()) continue;
+			
+			$kvArray=$rowInstance->toArray();
+			if (!$inited) {
+				$tableInstance=$rowInstance->getTableInstance();
+				$this->table($tableInstance::TABLE)->fields(array_keys($kvArray));
+				$inited=TRUE;
+			}
+			
+			$this->values($kvArray);
+		}
+	
+		return $this;
+	}
 }
