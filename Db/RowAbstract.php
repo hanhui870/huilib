@@ -363,6 +363,17 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	}
 	
 	/**
+	 * 获取主键的值
+	 *
+	 * @return boolean
+	 */
+	public function getPrimaryIdValue()
+	{
+		$primaryKey=static::PRIMAY_IDKEY;
+		return $this->$primaryKey;
+	}
+	
+	/**
 	 * 直接通过对象属性获取
 	 * 
 	 * 注意:以下哪怕直接获取是有值的，但还是判断失败的
