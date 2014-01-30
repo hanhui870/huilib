@@ -181,6 +181,15 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	{
 	}
 	
+	/**
+	 * 获取表格对象
+	 *
+	 * @return \HuiLib\Db\TableAbstract
+	 */
+	public function getTableInstance()
+	{
+		return $this->tableInstance;
+	}
 	
 	/**
 	 * 获取Query更新对象
