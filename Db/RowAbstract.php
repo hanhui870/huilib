@@ -144,6 +144,11 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 		$this->onBeforeSave();
 		
 		$query=$this->getSaveQuery();
+		if (!$query) {
+		    //直接返回
+		    return TRUE;
+		}
+		
 		if ($this->newRow) {
 			$result=$this->data[static::PRIMAY_IDKEY]=$query->query();
 		}else{
@@ -164,7 +169,12 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	 */
 	public function getSaveSql()
 	{
-		return $this->getSaveQuery()->toString();
+	    $query=$this->getSaveQuery();
+	    
+	    if (!$query) {
+	        return '';
+	    }
+		return $query->toString();
 	}
 	
 	/**
@@ -225,7 +235,8 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 				
 		}else{
 			if (!$this->editData){
-				throw new Exception('Table row editData has not been set or the field hasn\'t changed.');
+			    //无修改，直接返回成功
+			    return FALSE;
 			}
 			$primaryValue=$this->oldPrimaryIdValue===NULL ? $this->data[static::PRIMAY_IDKEY] : $this->oldPrimaryIdValue;
 			$update=Query::update($table);
