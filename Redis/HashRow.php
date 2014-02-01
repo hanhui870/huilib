@@ -108,7 +108,7 @@ class HashRow extends RedisBase
 		$this->applyData($data);
 
 		//超过缓存有效期，同步数据
-		if (!empty($data)&&(empty($data[self::REDIS_UPDATE_KEY]) || time()-$data[self::REDIS_UPDATE_KEY]>self::CACHE_SYNC_INTERVAL)) {
+		if (!empty($data)&&(empty($data[self::REDIS_UPDATE_KEY]) || time()-$data[self::REDIS_UPDATE_KEY]>static::CACHE_SYNC_INTERVAL)) {
 			$this->flushEditedAndDelete();
 			unset($data);
 		}
