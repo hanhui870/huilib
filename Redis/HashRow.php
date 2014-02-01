@@ -371,6 +371,31 @@ class HashRow extends RedisBase
 		return $this->data;
 	}
 	
+	/**
+	 * 返回Redis中缓存数据
+	 * 
+	 * 如果无数据需要从数据库恢复，而不是直接获取
+	 * 
+	 * @param array $primaryIds 主键ID数组
+	 * @return array
+	 */
+	public static function getListByIds($primaryIds)
+	{
+	    if (!is_array($primaryIds)) {
+	        $primaryIds=array($primaryIds);
+	    }
+	    if (empty($primaryIds)) {
+	        return array();
+	    }
+
+	    $result=array();
+	    foreach ($primaryIds as $id){
+	        $tempInstance=static::create($id);
+	        $result[$id]=$tempInstance->toArray();
+	    }
+        return $result;
+	}
+	
 	public function __destruct()
 	{
 		//对象销毁自动触发保存到redis
