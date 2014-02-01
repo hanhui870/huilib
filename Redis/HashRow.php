@@ -45,6 +45,9 @@ class HashRow extends RedisBase
 	
 	/**
 	 * 行默认初始化数据
+	 * 
+	 * 子类可以具体定义字段，来指定具体保存的字段
+	 * 
 	 * @var array
 	*/
 	protected static $initData=NULL;
@@ -85,7 +88,9 @@ class HashRow extends RedisBase
 	protected function __construct()
 	{
 		//经测试，第一个需要加载类情况，比较慢,5ms内。第二行不用加载了就比较快1/100ms左右。
-		static::$initData=self::getRowInitData();
+		if (static::$initData===NULL) {
+		    static::$initData=self::getRowInitData();
+		}
 		$this->primaryIdKey=self::getRowPrimaryIdKey();
 		
 		if (static::$initData===NULL || $this->primaryIdKey===NULL) {
@@ -179,9 +184,9 @@ class HashRow extends RedisBase
 		//先删除缓存，避免可能在行对象保存后事件中激发refresh引发递归，只尝试保存一次
 		$this->getAdapter()->del($this->getRedisKey($this->data[$this->primaryIdKey]));
 		
-		//通过主键尝试数据表获取行数据
+		//通过主键尝试数据表获取行数据，锁定
 		$tableClass=static::TABLE_CLASS;
-		$rowObj=$tableClass::create()->getRowByField($this->primaryIdKey, $this->data[$this->primaryIdKey]);
+		$rowObj=$tableClass::create()->enableForUpdate()->getRowByField($this->primaryIdKey, $this->data[$this->primaryIdKey]);
 
 		if ((!empty($this->editData) || !empty($this->incrData)) && !empty($rowObj)) {
 			//更新增减影响值
