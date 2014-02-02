@@ -247,4 +247,13 @@ class TableAbstract extends \HuiLib\Model\ModelBase
 	
 		return $this;
 	}
+	
+	/**
+	 * TODO
+	 * 获取表名，子类可覆盖获取分表表名
+	 */
+	public function getTable()
+	{
+	    return static::TABLE;
+	}
 }
