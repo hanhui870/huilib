@@ -68,7 +68,8 @@ class Http extends RequestBase
 		
 		//有更改过scriptUrl，重新定位
 		if ($this->scriptUrl != Param::getScriptUrl()){
-			Header::redirect($this->scriptUrl.'?'.Param::getQueryString());
+		    $queryString=Param::getQueryString();
+			Header::redirect($this->scriptUrl. ($queryString ? '?'.$queryString : ''));
 		}
 		
 		return true;
