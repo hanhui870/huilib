@@ -383,13 +383,23 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	}
 	
 	/**
-	 * 是否编辑过的行
+	 * 是否行的某键已编辑过的
 	 *
 	 * @return boolean
 	 */
 	public function isEdited($key)
 	{
 	    return isset($this->editData[$key]) ? TRUE : FALSE;
+	}
+	
+	/**
+	 * 是否已经计算过
+	 *
+	 * @return boolean
+	 */
+	public function isCalculated($key)
+	{
+	    return isset($this->calculated[$key]) && $this->calculated[$key]!==NULL ? TRUE : FALSE;
 	}
 	
 	/**
