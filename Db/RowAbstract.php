@@ -383,6 +383,26 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	}
 	
 	/**
+	 * 是否编辑过的行
+	 *
+	 * @return boolean
+	 */
+	public function isEdited($key)
+	{
+	    return isset($this->editData[$key]) ? TRUE : FALSE;
+	}
+	
+	/**
+	 * 获取键修改前的值
+	 *
+	 * @return boolean
+	 */
+	public function getOriginalValue($key)
+	{
+	    return isset($this->originalData[$key]) ? $this->originalData[$key] : NULL;
+	}
+	
+	/**
 	 * 获取主键的值
 	 *
 	 * @return boolean
