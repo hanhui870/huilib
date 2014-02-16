@@ -281,6 +281,14 @@ class Controller
 	}
 	
 	/**
+	 * 初始化应用配置实例
+	 */
+	protected function getAppConfig()
+	{
+	    return Front::getInstance()->getAppConfig();
+	}
+	
+	/**
 	 * 初始化网站配置实例
 	 */
 	protected function getSiteConfig()
