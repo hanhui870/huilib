@@ -430,6 +430,8 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	 * 对一个重载的属性使用empty时,重载魔术方法将不会被调用。 
 	 * var_dump(isset($result->Email));
 	 * var_dump(!empty($result->Email));
+	 * 
+	 * 通过属性值快速获取对象是初始化方法优先。
 	 */
 	public function __get($key)
 	{
@@ -438,11 +440,13 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 		
 		//NULL是默认值，使用isset将判断失败
 		}elseif (array_key_exists($key, $this->calculated)){
-			$method='get'.$key;
-			
-			if (method_exists($this, $method)) {
-				return $this->$method();
-			}
+		    $method='get'.$key;
+		    	
+		    if (method_exists($this, $method)) {
+		        return $this->$method();
+		    }else{
+		        return $this->calculated[$key];
+		    }
 		}
 		
 		return NULL;
@@ -460,6 +464,8 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 				$this->oldPrimaryIdValue=$this->originalData[$key];
 			}
 			return TRUE;
+		}elseif (array_key_exists($key, $this->calculated)){
+			return $this->calculated[$key]=$value;
 		}
 		return FALSE;
 	}
