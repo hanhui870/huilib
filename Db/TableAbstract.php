@@ -92,7 +92,7 @@ class TableAbstract extends \HuiLib\Model\ModelBase
 	 * 通过where in实现
 	 *
 	 * @param string $field
-	 * @param string $value
+	 * @param string $ids
 	 */
 	public function getListByIds($field, $ids)
 	{
@@ -246,5 +246,14 @@ class TableAbstract extends \HuiLib\Model\ModelBase
 		$this->forUpdate=true;
 	
 		return $this;
+	}
+	
+	/**
+	 * TODO
+	 * 获取表名，子类可覆盖获取分表表名
+	 */
+	public function getTable()
+	{
+	    return static::TABLE;
 	}
 }

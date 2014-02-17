@@ -111,7 +111,7 @@ class Where
 	 * 渲染Pair语句
 	 */
 	private function renderPair(){
-		return $this->key.'='.self::$query->escape($this->value);
+		return '`'.$this->key.'`='.self::$query->escape($this->value);
 	}
 	
 	/**

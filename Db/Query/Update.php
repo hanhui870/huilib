@@ -97,7 +97,7 @@ class Update extends \HuiLib\Db\Query
 			if (is_array($value) && isset($value['plain'])) {//key=>value 形式 不能使用is_string会把数字等略掉
 				$sets[]=$value['plain'];//num=num+1等，特殊形式
 			}else{
-				$sets[]=$keyString.'='.$this->escape($value);
+				$sets[]='`'.$keyString.'`='.$this->escape($value);
 			}
 		}
 	

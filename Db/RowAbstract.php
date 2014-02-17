@@ -141,9 +141,14 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	 */
 	public function save()
 	{
-		$query=$this->getSaveQuery();
-		
 		$this->onBeforeSave();
+		
+		$query=$this->getSaveQuery();
+		if (!$query) {
+		    //直接返回
+		    return TRUE;
+		}
+		
 		if ($this->newRow) {
 			$result=$this->data[static::PRIMAY_IDKEY]=$query->query();
 		}else{
@@ -164,7 +169,12 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	 */
 	public function getSaveSql()
 	{
-		return $this->getSaveQuery()->toString();
+	    $query=$this->getSaveQuery();
+	    
+	    if (!$query) {
+	        return '';
+	    }
+		return $query->toString();
 	}
 	
 	/**
@@ -181,6 +191,15 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	{
 	}
 	
+	/**
+	 * 获取表格对象
+	 *
+	 * @return \HuiLib\Db\TableAbstract
+	 */
+	public function getTableInstance()
+	{
+		return $this->tableInstance;
+	}
 	
 	/**
 	 * 获取Query更新对象
@@ -216,7 +235,8 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 				
 		}else{
 			if (!$this->editData){
-				throw new Exception('Table row editData has not been set or the field hasn\'t changed.');
+			    //无修改，直接返回成功
+			    return FALSE;
 			}
 			$primaryValue=$this->oldPrimaryIdValue===NULL ? $this->data[static::PRIMAY_IDKEY] : $this->oldPrimaryIdValue;
 			$update=Query::update($table);
@@ -261,6 +281,8 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	
 	/**
 	 * 使用默认数据创建全新的一行
+	 * 
+	 * 如果直接通过行对象生成新行的需要绑定表对象；建议通过表对象生成新行。
 	 * 
 	 * @return RowAbstract
 	 */
@@ -361,12 +383,55 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	}
 	
 	/**
+	 * 是否行的某键已编辑过的
+	 *
+	 * @return boolean
+	 */
+	public function isEdited($key)
+	{
+	    return isset($this->editData[$key]) ? TRUE : FALSE;
+	}
+	
+	/**
+	 * 是否已经计算过
+	 *
+	 * @return boolean
+	 */
+	public function isCalculated($key)
+	{
+	    return isset($this->calculated[$key]) && $this->calculated[$key]!==NULL ? TRUE : FALSE;
+	}
+	
+	/**
+	 * 获取键修改前的值
+	 *
+	 * @return boolean
+	 */
+	public function getOriginalValue($key)
+	{
+	    return isset($this->originalData[$key]) ? $this->originalData[$key] : NULL;
+	}
+	
+	/**
+	 * 获取主键的值
+	 *
+	 * @return boolean
+	 */
+	public function getPrimaryIdValue()
+	{
+		$primaryKey=static::PRIMAY_IDKEY;
+		return $this->$primaryKey;
+	}
+	
+	/**
 	 * 直接通过对象属性获取
 	 * 
 	 * 注意:以下哪怕直接获取是有值的，但还是判断失败的
 	 * 对一个重载的属性使用empty时,重载魔术方法将不会被调用。 
 	 * var_dump(isset($result->Email));
 	 * var_dump(!empty($result->Email));
+	 * 
+	 * 通过属性值快速获取对象是初始化方法优先。
 	 */
 	public function __get($key)
 	{
@@ -375,11 +440,13 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 		
 		//NULL是默认值，使用isset将判断失败
 		}elseif (array_key_exists($key, $this->calculated)){
-			$method='get'.$key;
-			
-			if (method_exists($this, $method)) {
-				return $this->$method();
-			}
+		    $method='get'.$key;
+		    	
+		    if (method_exists($this, $method)) {
+		        return $this->$method();
+		    }else{
+		        return $this->calculated[$key];
+		    }
 		}
 		
 		return NULL;
@@ -397,6 +464,8 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 				$this->oldPrimaryIdValue=$this->originalData[$key];
 			}
 			return TRUE;
+		}elseif (array_key_exists($key, $this->calculated)){
+			return $this->calculated[$key]=$value;
 		}
 		return FALSE;
 	}

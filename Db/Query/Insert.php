@@ -211,7 +211,7 @@ class Insert extends \HuiLib\Db\Query
 		if ($this->fields===array()) {
 			return '';
 		}
-		return '('.implode(', ', $this->fields).')';
+		return '(`'.implode('`, `', $this->fields).'`)';
 	}
 	
 	/**
@@ -251,7 +251,7 @@ class Insert extends \HuiLib\Db\Query
 		foreach ($valueArray as $key=>$value){
 			if (!isset($this->fields[$key])) throw new \HuiLib\Error\Exception ( 'Insert::kvDupReMap，字段和字段值数组不匹配' );
 			
-			$setTemp=$this->fields[$key].'='.$this->escape($value);
+			$setTemp='`'.$this->fields[$key].'`='.$this->escape($value);
 			$normalSets[]=$setTemp;
 			if (in_array($this->fields[$key], $this->dupFields) && empty($this->dupValues[$iter])) {
 				//没有独立设置了重复更新数组
@@ -263,7 +263,7 @@ class Insert extends \HuiLib\Db\Query
 		if (isset($this->dupValues[$iter])) {
 			foreach ($this->dupValues[$iter] as $keyString=>$value){
 				if (is_string($value)) {//key=>value 形式
-					$dupSets[]=$keyString.'='.$this->escape($this->dupValues[$iter][$keyString]);
+					$dupSets[]='`'.$keyString.'`='.$this->escape($this->dupValues[$iter][$keyString]);
 				}elseif (is_array($value) && isset($value['plain'])){
 					$dupSets[]=$value['plain'];//num=num+1等，特殊形式
 				}
@@ -358,6 +358,35 @@ class Insert extends \HuiLib\Db\Query
 	
 	public function table($table){
 		parent::table($table);
+	
+		return $this;
+	}
+	
+	/**
+	 * 批量保存行对象
+	 * 
+	 * @param array $rows 由行对象组成的数组
+	 * @bool
+	 */
+	public function batchSaveRows($rows){
+		if (!is_array($rows)) {
+			$rows=array($rows);
+		}
+		
+		$inited=FALSE;
+		foreach ($rows as $rowInstance){
+			//非新建的过滤
+			if (!$rowInstance instanceof \HuiLib\Db\RowAbstract || !$rowInstance->isNew()) continue;
+			
+			$kvArray=$rowInstance->toArray();
+			if (!$inited) {
+				$tableInstance=$rowInstance->getTableInstance();
+				$this->table($tableInstance::TABLE)->fields(array_keys($kvArray));
+				$inited=TRUE;
+			}
+			
+			$this->values($kvArray);
+		}
 	
 		return $this;
 	}

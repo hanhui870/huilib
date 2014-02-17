@@ -118,6 +118,8 @@ abstract class HashTable extends RedisBase
 	
 	/**
 	 * 手工添加一条
+	 * 
+	 * @param array $valueUnit 单条信息数组
 	 */
 	public function addOne($valueUnit)
 	{
@@ -131,6 +133,8 @@ abstract class HashTable extends RedisBase
 	
 	/**
 	 * 通过主键批量添加
+	 * 
+	 * @param array $primaryIds 信息主键数组
 	 */
 	public function addByPrimaryIds($primaryIds)
 	{

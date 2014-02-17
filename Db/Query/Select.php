@@ -34,6 +34,12 @@ class Select extends \HuiLib\Db\Query
 	protected $columns = array ();
 	
 	/**
+	 * 不做安全过滤的字段
+	 * @var array
+	 */
+	protected $plainColumns = array ();
+	
+	/**
 	 * @var array
 	*/
 	protected $joins = array ();
@@ -71,7 +77,9 @@ class Select extends \HuiLib\Db\Query
 	protected $forUpdate = false;
 
 	/**
-	 * 设置SQL查询获取的类
+	 * 设置SQL查询获取的字段
+	 * 
+	 * 有安全过滤，一般用于默认字段
 	 * 
 	 * array(key => value, ...)
      * 字符key会用作alias，单个语句可以多次调用。
@@ -91,6 +99,24 @@ class Select extends \HuiLib\Db\Query
 				$this->columns[$key]=$value;
 			}else{
 				$this->columns[]=$value;//非字符键则添加在后面
+			}
+		}
+		return $this;
+	}
+	
+	/**
+	 * 同columns()，不做字段过滤设置
+	 * 
+	 * @param array $columns
+	 * @return \HuiLib\Db\Query\Select
+	 */
+	public function plainColumns(array $columns)
+	{
+		foreach ($columns as $key=>$value){
+			if (is_string($key)) {//字符键覆盖原先的
+				$this->plainColumns[$key]=$value;
+			}else{
+				$this->plainColumns[]=$value;//非字符键则添加在后面
 			}
 		}
 		return $this;
@@ -298,6 +324,17 @@ class Select extends \HuiLib\Db\Query
 	{
 		$field=array();
 		foreach ($this->columns as $alias=>$column){
+			$column="`$column`";//安全过滤
+			$alias="`$alias`";
+			if (is_string($alias)) {
+				$field[]=sprintf("%s as %s", $column, $alias);
+			}else{
+				$field[]=$column;
+			}
+		}
+		
+		//不做安全过滤的字段处理，类似count(*) as count等
+		foreach ($this->plainColumns as $alias=>$column){
 			if (is_string($alias)) {
 				$field[]=sprintf("%s as %s", $column, $alias);
 			}else{

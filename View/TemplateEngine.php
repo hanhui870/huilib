@@ -262,9 +262,11 @@ class TemplateEngine
 		/**
 		 * 变量、属性、常量、方法解析 
 		 * {MYROOT} echo MYROOT 放在最后
-		 * 支持对象的属性、方法
+		 * 支持对象的属性、方法、命名空间类常量
+		 * 
+		 * tip:匹配完全命名空间的\需要四个\，因为先字符串里处理，再是正则语法中
 		 */
-		$source = preg_replace ( '/\{([$]?[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff\[\]\'\-\>\(\)\$]*)\}/is', '<?php echo \1; ?>', $source );
+		$source = preg_replace ( '/\{([$]?[a-zA-Z_\x7f-\xff\\\\][a-zA-Z0-9_\x7f-\xff\[\]\'\-\>\(\)\$\:\\\\]*)\}/is', '<?php echo \1; ?>', $source );
 		
 		//保留必要注释<$!--note--$>
 		$source = preg_replace ( '/\<\$\!\-\-(.*?)\-\-\$\>/is', '<!--\1-->', $source );

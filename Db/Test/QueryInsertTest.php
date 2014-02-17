@@ -10,7 +10,7 @@ namespace HuiLib\Db\Test;
 class QueryInsertTest extends \HuiLib\Test\TestBase
 {
 	public function run(){
-		$this->testDupValues();
+		$this->testRowInstanceInsert();
 	}
 	
 	/**
@@ -58,6 +58,32 @@ class QueryInsertTest extends \HuiLib\Test\TestBase
 		->values(array('fvalue1', 'fvalue2'), array('field2'=>'newfvalue1', array('plain'=>'num=num+1')))->values(array('fvalue11', 'fvalue22'));
 		//$insert->query();
 		echo $insert->toString();
+	}
+	
+	/**
+	 * 测试多行行对象插入
+	 */
+	private function testRowInstanceInsert(){
+		//insert into user_salt (`Uid`, `Salt`) values ('31', 'fdadsf'), ('32', 'aaadsf'), ('35', 'ddddd') ;
+		$batch=array();
+		$row=\Model\Table\UserSalt::create()->createRow();
+		$row->Uid=31;
+		$row->Salt="fdadsf";
+		$batch[]=$row;
+		
+		$row=\Model\Table\UserSalt::create()->createRow();
+		$row->Uid=32;
+		$row->Salt="aaadsf";
+		$batch[]=$row;
+		
+		$row=\Model\Table\UserSalt::create()->createRow();
+		$row->Uid=35;
+		$row->Salt="ddddd";
+		$batch[]=$row;
+
+		$insert=\HuiLib\Db\Query::Insert()->batchSaveRows($batch);
+		echo $insert->toString();
+		//$insert->query();
 	}
 
 	protected static function className(){

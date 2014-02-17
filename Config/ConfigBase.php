@@ -6,6 +6,8 @@ use HuiLib\App\Front;
 
 /**
  * ini文件配置信息解析类
+ * 
+ * 暂时只支持临时单次运行修改，不支持回写到磁盘和Apc缓存。借此机制可设置应用标题等。
  *
  * @author 祝景法
  * @since 2013/08/11
@@ -46,7 +48,7 @@ class ConfigBase
 	{
 		$this->filePath = $configFile;
 		
-		//由于此时
+		//测试此时Apc中缓存是否存在
 		$this->cacheAdapter = \HuiLib\Cache\CacheBase::getApcDirectly ();
 		$cacheContent = $this->cacheAdapter->get ( $this->getCacheKey () );
 		//print_r($cacheContent);die();
