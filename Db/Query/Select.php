@@ -324,10 +324,10 @@ class Select extends \HuiLib\Db\Query
 	{
 		$field=array();
 		foreach ($this->columns as $alias=>$column){
-			$column="`$column`";//安全过滤
-			$alias="`$alias`";
+			$columnFiltered="`$column`";//安全过滤
+			$aliasFiltered="`$alias`";
 			if (is_string($alias)) {
-				$field[]=sprintf("%s as %s", $column, $alias);
+				$field[]=sprintf("%s as %s", $columnFiltered, $aliasFiltered);
 			}else{
 				$field[]=$column;
 			}
