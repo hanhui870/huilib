@@ -44,7 +44,7 @@ class AutoLoad
 
 	/**
 	 * 自动加载类
-	 * @tip 转发过来的请求形式module\common\core，没有最前面的斜线。
+	 * @tip 转发过来的请求形式module\common\core，没有最前面的斜线。应该跟use指令原理相同，从最顶级开始。
 	 */
 	public function loadClass($name)
 	{
