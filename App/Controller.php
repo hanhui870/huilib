@@ -190,20 +190,27 @@ class Controller
 	/**
 	 * 输出JSON数据
 	 * 
-	 * JSON数据结构:{"data":{},"success":true,"message":"","code":200}
+	 * JSON数据结构:{"data":{},"success":true,"message":"","extra":{code:200, forward:'', float:true}}
+	 *     success:请求状态
+	 *     message:前台客户端用户友好的提示信息
+	 *     extra:请求相关的额外状态数据，例如返回代码，ajax链接跳转指令（是否在浮动窗口中，例如登录）等
+	 *     data:要传输给客户端的业务数据
 	 * 
 	 * @param boolean $status
 	 * @param string $message 返回代码
-	 * @param int $code 返回代码见\HuiLib\Helper\Header
+	 * @param int $extra 请求相关的额外状态数据
 	 * @param mix $data 返回数据
 	 */
-	protected function renderJson($status=self::STATUS_SUCCESS, $message='', $code=\HuiLib\Helper\Header::OK, $data=array())
+	protected function renderJson($status=self::STATUS_SUCCESS, $message='', $extra=array(), $data=array())
 	{
 		$result=array();
 		
 		$result['success']=$status;
 		$result['message']=$message;
-		$result['code']=$code;
+		if (!isset($extra['code'])) {
+		    $extra['code']=\HuiLib\Helper\Header::OK;
+		}
+		$result['extra']=$extra;
 		$result['data']=$data;
 		$json=json_encode ( $result );
 		
@@ -223,14 +230,14 @@ class Controller
 	 */
 	protected function renderJsonResult($result)
 	{
-		 $code=\HuiLib\Helper\Header::OK;
+		 $extra=array();
 		 $status=self::STATUS_SUCCESS;
 		 $message='';
 		 $data=array();
 		 
-		 if (isset($result['code'])) {
-		 	$code=$result['code'];
-		 	unset($result['code']);
+		 if (isset($result['extra'])) {
+		 	$extra=$result['extra'];
+		 	unset($result['extra']);
 		 }
 		 if (isset($result['success'])) {
 		 	$status=$result['success'];
@@ -247,7 +254,7 @@ class Controller
 		 	$data=$result;
 		 }
 		 
-		 $this->renderJson($status, $message, $code, $data);
+		 $this->renderJson($status, $message, $extra, $data);
 	}
 
 	/**
