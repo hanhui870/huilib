@@ -80,7 +80,7 @@ class Controller
 	}
 	
 	/**
-	 * 控制器初始化接口，在dispatch前调用
+	 * init作为控制器初始化接口，在dispatch前调用
 	 */
 	protected function init()
 	{
@@ -91,6 +91,7 @@ class Controller
 	 */
 	public function dispatch()
 	{
+	    // Dispatch前执行
 		$this->onBeforeDispatch ();
 		
 		if ($this->useView) {
@@ -98,9 +99,20 @@ class Controller
 		}
 		
 		//路由方法 附加操作后缀
-		$this->action=Front::getInstance()->getRequest()->getActionRouteSeg();
-		$action=$this->action.'Action';
-		$this->$action();
+		$request=Front::getInstance()->getRequest();
+		$this->action=$request->getActionRouteSeg();
+		$action=$request->mapRouteSegToMethod($this->action).'Action';
+
+		if (method_exists($this, $action)) {
+		    //路由方法：通过获取对象方法，并判断调用方法是否存在来判断参数是否精确匹配
+		    if (strtolower($this->action) != $this->action 
+		          || !in_array($action, get_class_methods($this))) {
+		        exit("Bad url route action format.");
+		    }
+		    $this->$action();
+		}else{
+		    //App namespace route
+		}
 		
 		$this->onAfterDispatch ();
 		
