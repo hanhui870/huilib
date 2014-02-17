@@ -63,7 +63,7 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	 * 
 	 * @var array
 	 */
-	protected $calculated=NULL;
+	protected $calculated=array();
 	
 	/**
 	 * 是否是新行
