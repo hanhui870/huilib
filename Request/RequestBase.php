@@ -2,6 +2,7 @@
 namespace HuiLib\Request;
 
 use HuiLib\App\Front;
+use HuiLib\Helper\String;
 
 /**
  * Request基础类
@@ -11,8 +12,24 @@ use HuiLib\App\Front;
  */
 abstract class RequestBase
 {
+    /**
+     * 路由信息的分隔符
+     */
+    const ROUTE_URL_SEP='-';
+    
+    /**
+     * 重写前部分信息
+     * @var string
+     */
+    protected $scriptUrl=NULL;
+    
 	/**
 	 * 系统主要路由资源定位符
+	 * 
+	 * 为了规范链接，资源路由信息只能包含小写
+	 * Package, Controller, Action, SubAction相关名包含大写的，必须拆成-分隔的，如/discuss/api/add-discuss => api::addDiscuss()
+	 * 
+	 * TODO:短链格式规范
 	 * 
 	 * 类似http://iyunlin.com/thread/view/8878 => iyunlin.com/thread/view/8878
 	 * 
@@ -60,9 +77,16 @@ abstract class RequestBase
 		$this->package=$this->getPackageRouteSeg();
 		$this->controller=$this->getControllerRouteSeg();
 		
-		$controllerClass=NAME_SEP.'Controller'.NAME_SEP.ucfirst($this->package).NAME_SEP.ucfirst($this->controller);
+		$controllerClass='Controller'.NAME_SEP.self::mapRouteSegToClass($this->package).NAME_SEP.self::mapRouteSegToClass($this->controller);
 		try {
 			$this->controllerInstance=new $controllerClass();
+
+			//大小写规范问题
+			if (strtolower($this->package) != $this->package
+			     || strtolower($this->controller) != $this->controller 
+			     || get_class($this->controllerInstance) != $controllerClass) {//强力规范url
+			    exit("Bad url route package or controller format.");
+			}
 			
 			$this->controllerInstance->setPackage($this->package);
 			$this->controllerInstance->setController($this->controller);
@@ -73,7 +97,7 @@ abstract class RequestBase
 		}catch (\Exception $exception){
 			//检测包路由 不存在包路径触发
 			$packageDir=APP_PATH.'Controller'.SEP.ucfirst($this->package).SEP;
-			$this->appConfig->getByKey('webRun.route.SubDirectory');
+			Front::getInstance()->getAppConfig()->getByKey('webRun.route.SubDirectory');
 			if (!is_dir($packageDir) && $this->appConfig->getByKey('webRun.route.SubDirectory')) {
 				//不存在包 已设置二级目录路由
 				$route=new \HuiLib\Route\SubDirectory();
@@ -93,10 +117,53 @@ abstract class RequestBase
 		if ($this->routeUri==NULL) {
 			throw new \HuiLib\Error\Exception("关键路由信息ScriptUrl未初始化");
 		}
-		
+
 		$routeInfo=explode(URL_SEP, $this->routeUri);
 		
 		$this->routeInfo=$routeInfo;
+	}
+	
+	/**
+	 * 将路由组件转换到类名称
+	 * 
+	 * TODO:组件映射来规范链接问题也是有问题的
+	 *
+	 * eg. discuss-comment=>DiscussComment
+	 *
+	 * @param string $string路由组件
+	 */
+	public static function mapRouteSegToClass($string)
+	{
+	    if (!String::exist($string, self::ROUTE_URL_SEP)) {
+	        return ucfirst($string);
+	    }
+	   $segInfo=explode(self::ROUTE_URL_SEP, $string);
+	   $result=array();
+	   foreach ($segInfo as $part){
+	       $result[]=ucfirst($part);
+	   }
+	   return implode('', $result);
+	}
+	
+	/**
+	 * 将路由组件转换到控制器方法
+	 * 
+	 * eg. add-discuss=>addDiscuss
+	 * 
+	 * @param string $string路由组件
+	 */
+	public static function mapRouteSegToMethod($string)
+	{
+	    if (!String::exist($string, self::ROUTE_URL_SEP)) {
+	        return $string;
+	    }
+	    $segInfo=explode(self::ROUTE_URL_SEP, $string);
+	    
+	    $result=array(array_shift($segInfo));//第一个首字符大写
+	    foreach ($segInfo as $part){
+	        $result[]=ucfirst($part);
+	    }
+	    return implode('', $result);
 	}
 	
 	/**
