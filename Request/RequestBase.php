@@ -29,8 +29,6 @@ abstract class RequestBase
 	 * 为了规范链接，资源路由信息只能包含小写
 	 * Package, Controller, Action, SubAction相关名包含大写的，必须拆成-分隔的，如/discuss/api/add-discuss => api::addDiscuss()
 	 * 
-	 * TODO:短链格式规范
-	 * 
 	 * 类似http://iyunlin.com/thread/view/8878 => iyunlin.com/thread/view/8878
 	 * 
 	 * Http默认Host+ScriptUrl; Bin由参数组建
