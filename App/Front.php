@@ -2,10 +2,11 @@
 namespace HuiLib\App;
 
 use HuiLib\Error\Exception;
+
 /**
- * 常用对象中间储存，便于获取，各种对象注册交流中心
- *
- * 单例模式
+ * 库端常用对象中间储存
+ * 
+ * 便于获取，各种对象注册交流中心，单例模式，应用端在Controller\AppFront 
  * 
  * @author 祝景法
  * @since 2014/01/11
