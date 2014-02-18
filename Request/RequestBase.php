@@ -124,8 +124,6 @@ abstract class RequestBase
 	/**
 	 * 将路由组件转换到类名称
 	 * 
-	 * TODO:组件映射来规范链接问题也是有问题的
-	 *
 	 * eg. discuss-comment=>DiscussComment
 	 *
 	 * @param string $string路由组件
