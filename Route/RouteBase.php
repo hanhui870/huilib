@@ -12,6 +12,8 @@ namespace HuiLib\Route;
  */
 abstract class RouteBase
 {
-	
+    /**
+     * 路由接口
+     */
 	public abstract function route();
 }
