@@ -73,7 +73,7 @@ class AutoLoad
 		}
 	}
 	
-	private function getRegisteredPath($spaceName){
+	public function getRegisteredPath($spaceName){
 		if (!isset($this->allowedSpace[$spaceName]))
 		{
 			return false;
