@@ -41,7 +41,7 @@ class TopName extends RouteBase
 	   
 	   //print_r($info);echo $request->getRouteInfo();
 	   $baseCalss::dispatch($info);
-	   echo $request->getRouteInfo();
+
 	   //重新出发路由
 	   $request->reRoute();
 	}

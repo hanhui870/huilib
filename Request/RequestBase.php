@@ -73,43 +73,6 @@ abstract class RequestBase
 	}
 	
 	/**
-	 * 加载控制器
-	 * 
-	 * 	路由原理：
-	 * 1、以Controller为基础，不再支持任意指定一级目录；默认是IndexController
-	 * 2、Controller不存在的，再执行一级目录路由
-	 * 3、另外支持二级域名、拓展独立域名
-	 * 4、Bin模式需要将参数组合成scriptUrl
-	 * 
-	 * @throws \Exception
-	 */
-	protected function loadController()
-	{
-	    try {
-	        //默认到controller级
-	        $controllerClass='Controller'.NAME_SEP.self::mapRouteSegToClass($this->package).NAME_SEP.self::mapRouteSegToClass($this->controller);
-	        $this->controllerInstance=new $controllerClass();
-
-	        //大小写规范问题
-	        if (strtolower($this->package) != $this->getPackageRouteSeg()
-	        || strtolower($this->controller) != $this->getControllerRouteSeg()
-	        || get_class($this->controllerInstance) != $controllerClass) {//强力规范url
-	            exit("Bad url route package or controller format.");
-	        }
-	    
-	        $this->controllerInstance->setPackage($this->package);
-	        $this->controllerInstance->setController($this->controller);
-	        $this->controllerInstance->setHost($this->host);
-	    
-	        Front::getInstance()->setController($this->controllerInstance);
-	    }catch (\Exception $exception){
-	        //error handle, page can't load.
-	        exit("The page you request can not be found.");
-	    }
-	     
-	}
-	
-	/**
 	 * 网站URL路由控制
 	 *
 	 */
@@ -151,6 +114,38 @@ abstract class RequestBase
 	        
 	    }catch (\Exception $exception){
 	        exit("Reroute failed..");
+	    }
+	}
+	
+	/**
+	 * 加载控制器
+	 *
+	 * 	路由原理：
+	 * 1、以Controller为基础，不再支持任意指定一级目录；默认是IndexController
+	 * 2、Controller不存在的，再执行一级目录路由
+	 * 3、另外支持二级域名、拓展独立域名
+	 * 4、Bin模式需要将参数组合成scriptUrl
+	 *
+	 * @throws \Exception
+	 */
+	protected function loadController()
+	{
+	    try {
+	        //默认到controller级
+	        $controllerClass='Controller'.NAME_SEP.self::mapRouteSegToClass($this->package).NAME_SEP.self::mapRouteSegToClass($this->controller);
+	        $this->controllerInstance=new $controllerClass();
+	
+	        //大小写规范问题
+	        if (strtolower($this->package) != $this->getPackageRouteSeg()
+	        || strtolower($this->controller) != $this->getControllerRouteSeg()
+	        || get_class($this->controllerInstance) != $controllerClass) {//强力规范url
+	            exit("Bad url route package or controller format.");
+	        }
+	         
+	        Front::getInstance()->setController($this->controllerInstance);
+	    }catch (\Exception $exception){
+	        //error handle, page can't load.
+	        exit("The page you request can not be found.");
 	    }
 	}
 	
