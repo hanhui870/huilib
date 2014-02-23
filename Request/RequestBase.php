@@ -17,6 +17,13 @@ abstract class RequestBase
      */
     const ROUTE_URL_SEP='-';
     
+    //路由组件
+    const SEG_HOST=0;
+    const SEG_PACKAGE=1;
+    const SEG_CONTROLLER=2;
+    const SEG_ACTION=3;
+    const SEG_SUBACTION=4;
+    
     /**
      * 重写前部分信息
      * @var string
@@ -26,7 +33,7 @@ abstract class RequestBase
 	/**
 	 * 系统主要路由资源定位符
 	 * 
-	 * 为了规范链接，资源路由信息只能包含小写
+	 * 为了规范链接，资源路由信息只能包含 小写
 	 * Package, Controller, Action, SubAction相关名包含大写的，必须拆成-分隔的，如/discuss/api/add-discuss => api::addDiscuss()
 	 * 
 	 * 类似http://iyunlin.com/thread/view/8878 => iyunlin.com/thread/view/8878
@@ -38,9 +45,14 @@ abstract class RequestBase
 	/**
 	 * 路由结果数组
 	 * 
-	 * @var array 组成:Host, Package, Controller, Action, SubAction五层次封装，便于以后拓展
+	 * @var array 组成:Host, Package, Controller, Action, SubAction五层次封装，便于以后拓展，存在路由信息时可能不准
+	 * 关于索引：Package, Controller, Action, SubAction刚好1234，因为0被host占位了。修复路由$routeUri不变。
+	 * 
 	 */
 	protected $routeInfo=NULL;
+	
+	//路由信息中的主机
+	protected $host=NULL;
 
 	//路由信息中的包
 	protected $package=NULL;
@@ -61,54 +73,91 @@ abstract class RequestBase
 	}
 	
 	/**
-	 * 网站URL路由控制
-	 *
-	 * 路由原理：
+	 * 加载控制器
+	 * 
+	 * 	路由原理：
 	 * 1、以Controller为基础，不再支持任意指定一级目录；默认是IndexController
 	 * 2、Controller不存在的，再执行一级目录路由
 	 * 3、另外支持二级域名、拓展独立域名
 	 * 4、Bin模式需要将参数组合成scriptUrl
 	 * 
+	 * @throws \Exception
+	 */
+	protected function loadController()
+	{
+	    try {
+	        //默认到controller级
+	        $controllerClass='Controller'.NAME_SEP.self::mapRouteSegToClass($this->package).NAME_SEP.self::mapRouteSegToClass($this->controller);
+	        $this->controllerInstance=new $controllerClass();
+
+	        //大小写规范问题
+	        if (strtolower($this->package) != $this->getPackageRouteSeg()
+	        || strtolower($this->controller) != $this->getControllerRouteSeg()
+	        || get_class($this->controllerInstance) != $controllerClass) {//强力规范url
+	            exit("Bad url route package or controller format.");
+	        }
+	    
+	        $this->controllerInstance->setPackage($this->package);
+	        $this->controllerInstance->setController($this->controller);
+	        $this->controllerInstance->setHost($this->host);
+	    
+	        Front::getInstance()->setController($this->controllerInstance);
+	    }catch (\Exception $exception){
+	        //error handle, page can't load.
+	        exit("The page you request can not be found.");
+	    }
+	     
+	}
+	
+	/**
+	 * 网站URL路由控制
+	 *
 	 */
 	protected function urlRoute() {
-		$this->host=$this->getHostRouteSeg();
-		$this->package=$this->getPackageRouteSeg();
-		$this->controller=$this->getControllerRouteSeg();
-		
-		$controllerClass='Controller'.NAME_SEP.self::mapRouteSegToClass($this->package).NAME_SEP.self::mapRouteSegToClass($this->controller);
+	    $this->host=$this->getHostRouteSeg();
+	    $this->package=$this->getPackageRouteSeg();
+	    $this->controller=$this->getControllerRouteSeg();
+	     
+	    $loader=Front::getInstance()->getLoader();
+	    
 		try {
-			$this->controllerInstance=new $controllerClass();
-
-			//大小写规范问题
-			if (strtolower($this->package) != $this->package
-			     || strtolower($this->controller) != $this->controller 
-			     || get_class($this->controllerInstance) != $controllerClass) {//强力规范url
-			    exit("Bad url route package or controller format.");
-			}
-			
-			$this->controllerInstance->setPackage($this->package);
-			$this->controllerInstance->setController($this->controller);
-			$this->controllerInstance->setHost($this->host);
-			
-			Front::getInstance()->setController($this->controllerInstance);
-
+		    //检测Package是否有效
+		    $controllerPath=$loader->getRegisteredPath('Controller').self::mapRouteSegToClass($this->package);
+		    if (!is_dir($controllerPath)) {
+		        throw new \Exception('Bad package, go url route.');
+		    }
+		    
+		    $this->loadController();
+		    
 		}catch (\Exception $exception){
-			//检测包路由 不存在包路径触发
-			$packageDir=APP_PATH.'Controller'.SEP.ucfirst($this->package).SEP;
-			Front::getInstance()->getAppConfig()->getByKey('webRun.route.SubDirectory');
-			if (!is_dir($packageDir) && $this->appConfig->getByKey('webRun.route.SubDirectory')) {
-				//不存在包 已设置二级目录路由
-				$route=new \HuiLib\Route\SubDirectory();
-				$route->route();
-			}else{
-				//TODO Message display
-				throw new \HuiLib\Error\Exception("该页面不可访问:".$exception->getMessage());
-			}
+		    $topNameLoader=new \HuiLib\Route\TopName();
+		    
+		    //顶级路由处理
+		    $topNameLoader->route();
 		}
 	}
 	
 	/**
+	 * 二次路由
+	 */
+	public function reRoute()
+	{
+	    $this->host=$this->getHostRouteSeg();
+	    $this->package=$this->getPackageRouteSeg();
+	    $this->controller=$this->getControllerRouteSeg();
+	    
+	    try {
+	        $this->loadController();
+	        
+	    }catch (\Exception $exception){
+	        exit("Reroute failed..");
+	    }
+	}
+	
+	/**
 	 * 初始化系统关键路由信息
+	 * 
+	 * 按照Host, Package, Controller, Action, SubAction约定组件
 	 */
 	protected function initRouteInfo()
 	{
@@ -119,6 +168,25 @@ abstract class RequestBase
 		$routeInfo=explode(URL_SEP, $this->routeUri);
 		
 		$this->routeInfo=$routeInfo;
+	}
+	
+	/**
+	 * 修复路由索引信息
+	 * 
+	 * @param int $kickPart 路由索引
+	 * @param string $replaceMent 替换的内容，如果为空则删除
+	 */
+	public function fixRouteInfo($kickPart, $replaceMent=NULL)
+	{
+	    if (isset($this->routeInfo[$kickPart])) {
+	        if ($replaceMent) {
+	            $this->routeInfo[$kickPart]=strtolower($replaceMent);
+	        }else{
+	            unset($this->routeInfo[$kickPart]);
+	            //需要重新索引
+	            $this->routeInfo=array_values($this->routeInfo);
+	        }
+	    }
 	}
 	
 	/**
@@ -163,20 +231,12 @@ abstract class RequestBase
 	}
 	
 	/**
-	 * 二次路由
-	 */
-	public function reRoute($scriptUrl)
-	{
-		
-	}
-	
-	/**
 	 * 获取主机段路由信息
 	 */
 	public function getHostRouteSeg()
 	{
-		if (!empty($this->routeInfo[0])) {
-			return $this->routeInfo[0];
+		if (!empty($this->routeInfo[self::SEG_HOST])) {
+			return $this->routeInfo[self::SEG_HOST];
 		}else{
 			return '';
 		}
@@ -189,8 +249,8 @@ abstract class RequestBase
 	 */
 	public function getPackageRouteSeg()
 	{
-		if (!empty($this->routeInfo[1])) {
-			return $this->routeInfo[1];
+		if (!empty($this->routeInfo[self::SEG_PACKAGE])) {
+		    return $this->routeInfo[self::SEG_PACKAGE];
 		}else{
 			return 'index';
 		}
@@ -203,8 +263,8 @@ abstract class RequestBase
 	 */
 	public function getControllerRouteSeg()
 	{
-		if (!empty($this->routeInfo[2])) {
-			return $this->routeInfo[2];
+		if (!empty($this->routeInfo[self::SEG_CONTROLLER])) {
+			return $this->routeInfo[self::SEG_CONTROLLER];
 		}else{
 			return 'index';
 		}
@@ -217,8 +277,8 @@ abstract class RequestBase
 	 */
 	public function getActionRouteSeg()
 	{
-		if (!empty($this->routeInfo[3])) {
-			return $this->routeInfo[3];
+		if (!empty($this->routeInfo[self::SEG_ACTION])) {
+			return $this->routeInfo[self::SEG_ACTION];
 		}else{
 			return 'index';
 		}
@@ -229,11 +289,23 @@ abstract class RequestBase
 	 */
 	public function getSubActionRouteSeg()
 	{
-		if (!empty($this->routeInfo[4])) {
-			return $this->routeInfo[4];
+		if (!empty($this->routeInfo[self::SEG_SUBACTION])) {
+		    return $this->routeInfo[self::SEG_SUBACTION];
 		}else{
 			return '';
 		}
+	}
+	
+	/**
+	 * 通过指定位置获取路由组件
+	 */
+	public function getRouteSegNum($number)
+	{
+	    if (!empty($this->routeInfo[$number])) {
+	        return $this->routeInfo[$number];
+	    }else{
+	        return '';
+	    }
 	}
 	
 	/**
@@ -241,7 +313,7 @@ abstract class RequestBase
 	 */
 	public function setHostRouteSeg($host)
 	{
-		$this->routeInfo[0]=$host;
+		$this->routeInfo[self::SEG_HOST]=strtolower($host);
 	}
 	
 	/**
@@ -249,7 +321,7 @@ abstract class RequestBase
 	 */
 	public function setPackageRouteSeg($package)
 	{
-		$this->routeInfo[1]=$package;
+		$this->routeInfo[self::SEG_PACKAGE]=strtolower($package);
 	}
 	
 	/**
@@ -257,7 +329,7 @@ abstract class RequestBase
 	 */
 	public function setControllerRouteSeg($controller)
 	{
-		$this->routeInfo[2]=$controller;
+		$this->routeInfo[self::SEG_CONTROLLER]=strtolower($controller);
 	}
 	
 	/**
@@ -265,7 +337,7 @@ abstract class RequestBase
 	 */
 	public function setActionRouteSeg($action)
 	{
-		$this->routeInfo[3]=$action;
+		$this->routeInfo[self::SEG_ACTION]=strtolower($action);
 	}
 	
 	/**
@@ -273,7 +345,7 @@ abstract class RequestBase
 	 */
 	public function setSubActionRouteSeg($subAction)
 	{
-		$this->routeInfo[4]=$subAction;
+		$this->routeInfo[self::SEG_SUBACTION]=strtolower($subAction);
 	}
 
 	/**
