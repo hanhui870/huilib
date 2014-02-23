@@ -95,7 +95,7 @@ abstract class RequestBase
 		    $topNameLoader=new \HuiLib\Route\TopName();
 		    Front::getInstance()->setTopNameRoute($topNameLoader);
 		    
-		    //顶级路由处理
+		    //二级目录路由处理
 		    $topNameLoader->route();
 		}
 	}
@@ -144,8 +144,12 @@ abstract class RequestBase
 	         
 	        Front::getInstance()->setController($this->controllerInstance);
 	    }catch (\Exception $exception){
-	        //error handle, page can't load.
-	        exit("The page you request can not be found.");
+	        $appNameLoader=new \HuiLib\Route\AppName();
+	        $appNameLoader->setSegPart(self::SEG_CONTROLLER);
+	        Front::getInstance()->setAppNameRoute($appNameLoader, self::SEG_CONTROLLER);
+	        
+	        //三级目录路由处理 /topic/2
+	        $appNameLoader->route();
 	    }
 	}
 	

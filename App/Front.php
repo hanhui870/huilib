@@ -91,9 +91,9 @@ class Front
 	/**
 	 * 3级目录及以上的短名称
 	 *
-	 *  @var \HuiLib\Route\AppName
+	 *  @var array of  \HuiLib\Route\AppName
 	 */
-	protected $appNameRoute=NULL;
+	protected $appNameRoute=array();
 	
 	/**
 	 * 应用运行末期注册方法呼叫
@@ -224,14 +224,30 @@ class Front
 	    return $this->topNameRoute;
 	}
 	
-	public function setAppNameRoute(\HuiLib\Route\AppName $route)
+	/**
+	 * 三级目录以上设置
+	 * 
+	 * @param \HuiLib\Route\AppName $route
+	 * @param int $segPart
+	 */
+	public function setAppNameRoute(\HuiLib\Route\AppName $route, $segPart)
 	{
-	    $this->appNameRoute=$route;
+	    $this->appNameRoute[$segPart]=$route;
 	}
 	
-	public function getAppNameRoute()
+	/**
+	 * 获取appRoute对象
+	 * 
+	 * @param int $segPart
+	 * @return  \HuiLib\Route\AppName
+	 */
+	public function getAppNameRoute($segPart)
 	{
-	    return $this->appNameRoute;
+	    if (isset($this->appNameRoute[$segPart])) {
+	        return $this->appNameRoute[$segPart];
+	    }else{
+	        return NULL;
+	    }
 	}
 	
 	public function setShutCall(\HuiLib\Runtime\ShutCall $shutCall)
