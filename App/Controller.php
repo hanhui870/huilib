@@ -12,36 +12,6 @@ use HuiLib\App\Front;
 class Controller
 {
 	/**
-	 * 当前主机名
-	 * @var String
-	 */
-	protected $host;
-	
-	/**
-	 * 当前处理包名
-	 * @var String
-	 */
-	protected $package;
-	
-	/**
-	 * 当前处理控制器名
-	 * @var String
-	 */
-	protected $controller;
-	
-	/**
-	 * 当前处理动作名
-	 * @var String
-	 */
-	protected $action;
-	
-	/**
-	 * 当前处理子动作名
-	 * @var String
-	 */
-	protected $subAction;
-	
-	/**
 	 * 请求对象
 	 * @var \HuiLib\View\ViewBase
 	 */
@@ -111,7 +81,8 @@ class Controller
 		    }
 		    $this->$action();
 		}else{
-		    //App namespace route
+		    //TODO App namespace route
+		    $this->shortNameRoute($methodName, $arguments);
 		}
 		
 		$this->onAfterDispatch ();
@@ -171,7 +142,8 @@ class Controller
 		$this->preRenderView();
 		
 		if ($view === NULL) {
-			$view = ucfirst ( $this->package ) . SEP . ucfirst ( $this->controller ) . SEP . ucfirst ( $this->action );
+		    $request=Front::getInstance()->getRequest();
+			$view = ucfirst ( $request->getPackageRouteSeg() ) . SEP . ucfirst ( $request->getControllerRouteSeg() ) . SEP . ucfirst ( $request->getActionRouteSeg() );
 		}
 		
 		$this->view->render ( $view, $ajaxDelimiter );
@@ -338,52 +310,7 @@ class Controller
 	{
 		$this->autoRender = FALSE;
 	}
-	
-	public function setHost($host)
-	{
-		$this->host = $host;
-	}
 
-	public function setPackage($package)
-	{
-		$this->package = $package;
-	}
-
-	public function setController($controller)
-	{
-		$this->controller = $controller;
-	}
-
-	public function setAction($action)
-	{
-		$this->action = $action;
-	}
-	
-	public function setSubAction($subAction)
-	{
-		$this->subAction = $subAction;
-	}
-	
-	public function getPackage()
-	{
-		return $this->package;
-	}
-	
-	public function getController()
-	{
-		return $this->controller;
-	}
-	
-	public function getAction()
-	{
-		return $this->action;
-	}
-	
-	public function getSubAction()
-	{
-		return $this->subAction;
-	}
-	
 	/**
 	 * 获取翻译实例
 	 */
