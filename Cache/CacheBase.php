@@ -58,38 +58,36 @@ abstract class CacheBase
 	/**
 	 * 获取系统默认缓存实例
 	 */
-	public static function getDefault(\HuiLib\Config\ConfigBase $configInstance=NULL){
-		if ($configInstance===NULL) {
-			$configInstance=Front::getInstance()->getAppConfig();
-		}
+	public static function getDefault(){
+	    $configInstance=Front::getInstance()->getAppConfig();
 	
 		$adapterName=$configInstance->getByKey('cache.defalut');
 		if (empty ($adapterName)) {
 			throw new \HuiLib\Error\Exception ( 'Cache default adapter has not set.' );
 		}
 	
-		return self::staticCreate($adapterName, $configInstance);
+		return self::staticCreate($adapterName);
 	}
 	
 	/**
 	 * 获取Memcache默认缓存实例
 	 */
-	public static function getMemcache(\HuiLib\Config\ConfigBase $configInstance=NULL){
-		return self::staticCreate('cache.memcache', $configInstance);
+	public static function getMemcache(){
+		return self::staticCreate('cache.memcache');
 	}
 	
 	/**
 	 * 获取Redis默认缓存实例
 	 */
-	public static function getRedis(\HuiLib\Config\ConfigBase $configInstance=NULL){
-		return self::staticCreate('cache.redis', $configInstance);
+	public static function getRedis(){
+		return self::staticCreate('cache.redis');
 	}
 	
 	/**
 	 * 获取APC默认缓存实例
 	 */
-	public static function getApc(\HuiLib\Config\ConfigBase $configInstance=NULL){
-		return self::staticCreate('cache.apc', $configInstance);
+	public static function getApc(){
+		return self::staticCreate('cache.apc');
 	}
 	
 	/**
@@ -103,10 +101,8 @@ abstract class CacheBase
 		return self::create($config);
 	}
 	
-	private static function staticCreate($adapterName, \HuiLib\Config\ConfigBase $configInstance=NULL){
-		if ($configInstance===NULL) {
-			$configInstance=Front::getInstance()->getAppConfig();
-		}
+	private static function staticCreate($adapterName){
+	    $configInstance=Front::getInstance()->getAppConfig();
 	
 		$adapterConfig=$configInstance->getByKey($adapterName);
 		if (empty ( $adapterConfig )) {
