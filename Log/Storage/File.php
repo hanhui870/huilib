@@ -1,6 +1,7 @@
 <?php
 namespace HuiLib\Log\Storage;
 
+use HuiLib\App\Front;
 /**
  * 日志模块File适配器
  * 
@@ -72,8 +73,10 @@ class File extends \HuiLib\Log\LogBase
 		
 		$logInfo=array();
 		$logInfo['Time']=date("[H:i:s]:");
-		if ($this->package && $this->controller) {
-			$logInfo['Route']="[{$this->package}/{$this->controller}/{$this->action}]:";
+		
+		$request=Front::getInstance()->getRequest();
+		if ($request->getPackageRouteSeg() && $request->getControllerRouteSeg()) {
+			$logInfo['Route']="[{$request->getPackageRouteSeg()}/{$request->getControllerRouteSeg()}/{$request->getActionRouteSeg()}]:";
 		}
 		$logInfo['Info']="\"$info\"";
 		
