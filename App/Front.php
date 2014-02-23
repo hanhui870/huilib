@@ -82,6 +82,20 @@ class Front
 	protected $view=NULL;
 	
 	/**
+	 * 二级目录短链对象
+	 *
+	 *  @var \HuiLib\Route\TopName 
+	 */
+	protected $topNameRoute=NULL;
+	
+	/**
+	 * 3级目录及以上的短名称
+	 *
+	 *  @var \HuiLib\Route\AppName
+	 */
+	protected $appNameRoute=NULL;
+	
+	/**
 	 * 应用运行末期注册方法呼叫
 	 *
 	 *  @var \HuiLib\Runtime\ShutCall
@@ -198,6 +212,26 @@ class Front
 	public function getView()
 	{
 		return $this->view;
+	}
+	
+	public function setTopNameRoute(\HuiLib\Route\TopName $route)
+	{
+	    $this->topNameRoute=$route;
+	}
+	
+	public function getTopNameRoute()
+	{
+	    return $this->topNameRoute;
+	}
+	
+	public function setAppNameRoute(\HuiLib\Route\AppName $route)
+	{
+	    $this->appNameRoute=$route;
+	}
+	
+	public function getAppNameRoute()
+	{
+	    return $this->appNameRoute;
 	}
 	
 	public function setShutCall(\HuiLib\Runtime\ShutCall $shutCall)

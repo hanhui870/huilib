@@ -14,10 +14,13 @@ class TopName extends RouteBase
     //路由组件部分
     const SEG_PART=1;
     
+    private $topNameBack=NULL;
+    
 	public function route()
 	{
 	    $request=Front::getInstance()->getRequest();
 	    $topname=$request->getRouteSegNum(self::SEG_PART);
+	    $this->topNameBack=$topname;
 
 	    $appConfig=Front::getInstance()->getAppConfig();
 	    $routeClass=$appConfig->getByKey('webRun.route.TopName.Model');
@@ -36,7 +39,7 @@ class TopName extends RouteBase
 	   }
 	   
 	   //修正路由信息
-	   $request->fixRouteInfo(self::SEG_PART, $info['Item']);
+	   $request->setRouteSegNum(self::SEG_PART, $info['Item']);
 	   $baseCalss=$appConfig->getByKey('webRun.route.TopName.Base');
 	   
 	   //print_r($info);echo $request->getRouteInfo();
@@ -44,5 +47,10 @@ class TopName extends RouteBase
 
 	   //重新出发路由
 	   $request->reRoute();
+	}
+	
+	public function getTopName()
+	{
+	    return $this->topNameBack;
 	}
 }

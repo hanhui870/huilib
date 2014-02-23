@@ -45,8 +45,7 @@ abstract class RequestBase
 	/**
 	 * 路由结果数组
 	 * 
-	 * @var array 组成:Host, Package, Controller, Action, SubAction五层次封装，便于以后拓展，存在路由信息时可能不准
-	 * 关于索引：Package, Controller, Action, SubAction刚好1234，因为0被host占位了。修复路由$routeUri不变。
+	 * @var array 组成:Host, Package, Controller, Action, SubAction五层次封装，便于以后拓展，存在路由信息时可能不准，索引01234
 	 * 
 	 */
 	protected $routeInfo=NULL;
@@ -94,6 +93,7 @@ abstract class RequestBase
 		    
 		}catch (\Exception $exception){
 		    $topNameLoader=new \HuiLib\Route\TopName();
+		    Front::getInstance()->setTopNameRoute($topNameLoader);
 		    
 		    //顶级路由处理
 		    $topNameLoader->route();
@@ -164,26 +164,7 @@ abstract class RequestBase
 		
 		$this->routeInfo=$routeInfo;
 	}
-	
-	/**
-	 * 修复路由索引信息
-	 * 
-	 * @param int $kickPart 路由索引
-	 * @param string $replaceMent 替换的内容，如果为空则删除
-	 */
-	public function fixRouteInfo($kickPart, $replaceMent=NULL)
-	{
-	    if (isset($this->routeInfo[$kickPart])) {
-	        if ($replaceMent) {
-	            $this->routeInfo[$kickPart]=strtolower($replaceMent);
-	        }else{
-	            unset($this->routeInfo[$kickPart]);
-	            //需要重新索引
-	            $this->routeInfo=array_values($this->routeInfo);
-	        }
-	    }
-	}
-	
+
 	/**
 	 * 将路由组件转换到类名称
 	 * 
@@ -293,6 +274,8 @@ abstract class RequestBase
 	
 	/**
 	 * 通过指定位置获取路由组件
+	 * 
+	 * @param int $number 路由索引
 	 */
 	public function getRouteSegNum($number)
 	{
@@ -342,18 +325,45 @@ abstract class RequestBase
 	{
 		$this->routeInfo[self::SEG_SUBACTION]=strtolower($subAction);
 	}
+	
+
+	/**
+	 * 修复路由索引信息
+	 *
+	 * @param int $number 路由索引
+	 * @param string $replaceMent 替换的内容，如果为空则删除
+	 */
+	public function setRouteSegNum($number, $replaceMent=NULL)
+	{
+	    if (isset($this->routeInfo[$number])) {
+	        if ($replaceMent) {
+	            $this->routeInfo[$number]=strtolower($replaceMent);
+	        }else{
+	            unset($this->routeInfo[$number]);
+	            //需要重新索引
+	            $this->routeInfo=array_values($this->routeInfo);
+	        }
+	    }
+	}
 
 	/**
 	 * 获取路由路径信息
 	 * 
-	 * @return string
+	 * @return array
 	 */
 	public function getRouteInfo()
 	{
-		if ($this->routeInfo===NULL) {
-			return '';
-		}
-		return implode("/", $this->routeInfo);
+		return $this->routeInfo;
+	}
+	
+	/**
+	 * 获取原始路由路径信息
+	 *
+	 * @return string
+	 */
+	public function getOriginalRouteInfo()
+	{
+	    return explode(URL_SEP, $this->routeUri);
 	}
 	
 	/**
