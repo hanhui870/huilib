@@ -137,16 +137,15 @@ abstract class RequestBase
 	
 	        //大小写规范问题
 	        if (strtolower($this->package) != $this->getPackageRouteSeg()
-	        || strtolower($this->controller) != $this->getControllerRouteSeg()
-	        || get_class($this->controllerInstance) != $controllerClass) {//强力规范url
+    	        || strtolower($this->controller) != $this->getControllerRouteSeg()
+    	        || get_class($this->controllerInstance) != $controllerClass) {//强力规范url
 	            exit("Bad url route package or controller format.");
 	        }
 	         
 	        Front::getInstance()->setController($this->controllerInstance);
 	    }catch (\Exception $exception){
-	        $appNameLoader=new \HuiLib\Route\AppName();
-	        $appNameLoader->setSegPart(self::SEG_CONTROLLER);
-	        Front::getInstance()->setAppNameRoute($appNameLoader, self::SEG_CONTROLLER);
+	        $appNameLoader=new \HuiLib\Route\AppName(self::SEG_CONTROLLER);
+	        Front::getInstance()->setAppNameRoute($appNameLoader);
 	        
 	        //三级目录路由处理 /topic/2
 	        $appNameLoader->route();

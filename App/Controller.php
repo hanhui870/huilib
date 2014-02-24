@@ -2,6 +2,7 @@
 namespace HuiLib\App;
 
 use HuiLib\App\Front;
+use HuiLib\Request\RequestBase;
 
 /**
  * 控制器基础类
@@ -81,8 +82,12 @@ class Controller
 		    }
 		    $this->$action();
 		}else{
-		    //TODO App namespace route
-		    $this->shortNameRoute($methodName, $arguments);
+		    //App namespace route
+		    $appNameLoader=new \HuiLib\Route\AppName(RequestBase::SEG_ACTION);
+		    Front::getInstance()->setAppNameRoute($appNameLoader);
+		    
+		    //二级目录路由处理
+		    $appNameLoader->route();
 		}
 		
 		$this->onAfterDispatch ();
@@ -92,28 +97,7 @@ class Controller
 			$this->renderView ();
 		}
 	}
-	
-	/**
-	 * 控制器内二级以上路由方法
-	 * 
-	 * 由__call()转发而来
-	 * 比如:/thread/2，/thread/2/reply路由到相应方法，不存在相应方法的前提下
-	 * 两个层次：控制器层级(/thread/2)、类方法层级(thread/log/2 落到thread::log方法)
-	 * 
-	 * 可使用Redis Hash实现
-	 * 
-	 * @param string $key 路由标志 比如user, thread
-     * @param string $shortName 待路由的字符串 比如hanhui
-	 */
-	protected function shortNameRoute($methodName, $arguments)
-	{
-		$key=$this->host.URL_SEP.$this->package.URL_SEP.$this->controller.URL_SEP.$this->action;
-		
-		//不存在包 已设置二级目录路由
-		$route=new \HuiLib\Route\ShortName();
-		$route->route();
-		die();
-	}
+
 
 	/**
 	 * 请求派发前事件

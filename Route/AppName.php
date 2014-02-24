@@ -18,28 +18,29 @@ class AppName extends RouteBase
     protected $segPart=NULL;
     
     private $appNameBack=NULL;
-	
-	public function route()
+    
+	public function __construct($segPart)
 	{
-	    if ($this->segPart===NULL) {
+	    $segPart=intval($segPart);
+	    if ($segPart<0) {
 	        throw new Exception('AppName route need setSegPart().');
 	    }
+	    
+	    $this->setSegPart($segPart);
+	}
+    
+	public function route()
+	{
 	    $request=Front::getInstance()->getRequest();
 	    $appname=$request->getRouteSegNum($this->segPart);
 	    $this->appNameBack=$appname;
 	    
 	    $appConfig=Front::getInstance()->getAppConfig();
-	    $routeClass=$appConfig->getByKey('webRun.route.AppName.Model');
+	    $baseCalss = $appConfig->getByKey ( 'webRun.route.AppName.Base' );
+	    $baseCalss::dispatch ($this->segPart);
 	    
-	    if (is_numeric($appname)) {
-	        $info['Item']=$request->getPackageRouteSeg();
-	        $info['RelatedId']=$appname;
-	    }else{
-	        $model=$routeClass::create();
-	        $info=$model->parseUrl($appname);
-	    }
-	    print_r($info);
-	    die();
+	    //重新出发路由
+	    $request->reRoute ();
 	}
 	
 	public function setSegPart($segPart)

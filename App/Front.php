@@ -230,9 +230,9 @@ class Front
 	 * @param \HuiLib\Route\AppName $route
 	 * @param int $segPart
 	 */
-	public function setAppNameRoute(\HuiLib\Route\AppName $route, $segPart)
+	public function setAppNameRoute(\HuiLib\Route\AppName $route)
 	{
-	    $this->appNameRoute[$segPart]=$route;
+	    $this->appNameRoute[$route->getSegPart()]=$route;
 	}
 	
 	/**
