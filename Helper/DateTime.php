@@ -18,7 +18,7 @@ class DateTime
 	const WEEK=100;
 	//农历
 	const LUNAR_DAY=10;
-	//有好模式
+	//友好模式
 	const READABLE=1000;
 
 	public static function format($format = self::YMDHIS, $time = 0)
@@ -72,7 +72,7 @@ class DateTime
 				break;
 			case 1000 :
 				$timeNow = time ();
-				
+
 				// 59秒前
 				if ($timeNow - $time < 60) {
 					return ($timeNow - $time) . '秒前';
@@ -93,7 +93,7 @@ class DateTime
 					return floor ( ($timeNow - $time) / 86400 ) . '天前';
 				}
 				
-				return self::format ( $time, 5 );
+				return self::format ( 5, $time );
 				break;
 			default :
 				return date ( "Y-m-d H:i:s", $time );
