@@ -113,7 +113,7 @@ abstract class RequestBase
 	        $this->loadController();
 	        
 	    }catch (\Exception $exception){
-	        exit("Reroute failed..");
+	        exit("Reroute failed.");
 	    }
 	}
 	

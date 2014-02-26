@@ -88,6 +88,8 @@ class Controller
 		    
 		    //二级目录路由处理
 		    $appNameLoader->route();
+		    
+		    //TODO  reload action
 		}
 		
 		$this->onAfterDispatch ();
@@ -301,10 +303,5 @@ class Controller
 	protected function getLang()
 	{
 		return Front::getInstance()->getLang();
-	}
-	
-	public function __call($name, $arguments)
-	{
-		$this->shortNameRoute($name, $arguments);
 	}
 }
