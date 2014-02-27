@@ -44,10 +44,12 @@ abstract class RequestBase
 	/**
 	 * 路由结果数组
 	 * 
-	 * @var array 组成:Host, Package, Controller, Action五层次封装，便于以后拓展，存在路由信息时可能不准，索引01234
+	 * @var array 组成:Host, Package, Controller, Action五层次封装，便于以后拓展，存在路由信息时可能不准，索引0123
 	 * 
 	 */
 	protected $routeInfo=NULL;
+	
+	protected $originalRouteInfo=NULL;
 	
 	//路由信息中的主机
 	protected $host=NULL;
@@ -344,7 +346,24 @@ abstract class RequestBase
 	 */
 	public function getOriginalRouteInfo()
 	{
-	    return explode(URL_SEP, $this->routeUri);
+	    if ($this->originalRouteInfo===NULL) {
+	        $this->originalRouteInfo=explode(URL_SEP, $this->routeUri);
+	    }
+	    return $this->originalRouteInfo;
+	}
+
+	/**
+	 * 通过指定位置获取路由组件
+	 *
+	 * @param int $number 路由索引
+	 */
+	public function getOriginalRouteSegNum($number)
+	{
+	    if (!empty($this->originalRouteInfo[$number])) {
+	        return $this->originalRouteInfo[$number];
+	    }else{
+	        return '';
+	    }
 	}
 	
 	/**
