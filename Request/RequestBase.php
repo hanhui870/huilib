@@ -326,6 +326,8 @@ abstract class RequestBase
 	            //需要重新索引
 	            $this->routeInfo=array_values($this->routeInfo);
 	        }
+	    }elseif ($number>=0 && $number<=3 && $replaceMent){//package => action允许设置
+	        $this->routeInfo[$number]=strtolower($replaceMent);
 	    }
 	}
 
