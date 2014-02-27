@@ -12,11 +12,13 @@ namespace HuiLib\Route;
  *      /hanhui => user/view/index
  *      /zjgs => topic/view/index
  * 控制器层短链在Controller层处理，在RequestBase/loadController触发 如
+ *      注: 默认路由到view控制器
  *      /discuss/how-to-enjoy-zjgsdx => discuss/view/index?id
  *      /topic/2 => topic/view/index?id
  *      /zjgs/thread => topic/view/thread?id
  *      /hanhui/thread user/view/thread?page=1
  * 动作层短链在Action层处理，在Controller/dispatch触发，如
+ *      注: 默认路由到view控制器对应方法
  *      /discuss/2/log => discuss/view/log
  *      /hanhui/thread/2 => user/view/thread?page=2
  * 

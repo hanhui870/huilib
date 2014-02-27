@@ -3,6 +3,7 @@ namespace HuiLib\App;
 
 use HuiLib\App\Front;
 use HuiLib\Request\RequestBase;
+use HuiLib\Error\Exception;
 
 /**
  * 控制器基础类
@@ -69,28 +70,16 @@ class Controller
 			$this->initView ();
 		}
 		
-		//路由方法 附加操作后缀
-		$request=Front::getInstance()->getRequest();
-		$this->action=$request->getActionRouteSeg();
-		$action=$request->mapRouteSegToMethod($this->action).'Action';
-
-		if (method_exists($this, $action)) {
-		    //路由方法：通过获取对象方法，并判断调用方法是否存在来判断参数是否精确匹配
-		    if (strtolower($this->action) != $this->action 
-		          || !in_array($action, get_class_methods($this))) {
-		        exit("Bad url route action format.");
-		    }
-		    $this->$action();
-		}else{
+		try {
+		    $this->loadActionDispatch();
+		
+		}catch (\Exception $exception){
 		    //App namespace route
-		    $appNameLoader=new \HuiLib\Route\AppName(RequestBase::SEG_ACTION);
-		    Front::getInstance()->setAppNameRoute($appNameLoader);
+		    $actionRoute=new \HuiLib\Route\Action();
+		    Front::getInstance()->setActionRoute($actionRoute);
 		    
 		    //二级目录路由处理
-		    $appNameLoader->route();
-		    
-		    //var_dump($request->getRouteInfo());die();
-		    //TODO  reload action
+		    $actionRoute->route();
 		}
 		
 		$this->onAfterDispatch ();
@@ -101,7 +90,39 @@ class Controller
 		}
 	}
 
-
+	/**
+	 * 二次分发
+	 */
+	public function reDispatch()
+	{
+	    try {
+	        //var_dump( Front::getInstance()->getRequest()->getRouteInfo());die(); //路由后参数
+	        $this->loadActionDispatch();
+	         
+	    }catch (\Exception $exception){
+	        exit("Action ReDispatch failed.");
+	    }
+	}
+	
+    protected function loadActionDispatch()
+    {
+        //路由方法 附加操作后缀
+        $request=Front::getInstance()->getRequest();
+        $this->action=$request->getActionRouteSeg();
+        $action=$request->mapRouteSegToMethod($this->action).'Action';
+        
+        if (method_exists($this, $action)) {
+            //路由方法：通过获取对象方法，并判断调用方法是否存在来判断参数是否精确匹配
+            if (strtolower($this->action) != $this->action
+            || !in_array($action, get_class_methods($this))) {
+                exit("Bad url route action format.");
+            }
+            $this->$action();
+        }else{
+            throw new Exception('Load action failed.');
+        }
+    }
+	
 	/**
 	 * 请求派发前事件
 	 */

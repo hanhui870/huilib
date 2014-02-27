@@ -18,8 +18,8 @@ class Package extends RouteBase
     public function route()
     {
         $request = Front::getInstance ()->getRequest ();
-        $topname = $request->getRouteSegNum ( RequestBase::SEG_PACKAGE );
-        $this->nameBack = $topname;
+        $name = $request->getRouteSegNum ( RequestBase::SEG_PACKAGE );
+        $this->nameBack = $name;
         
         $appConfig = Front::getInstance ()->getAppConfig ();
         $baseCalss = $appConfig->getByKey ( 'webRun.route.Package.Base' );

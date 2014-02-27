@@ -142,7 +142,7 @@ abstract class RequestBase
     	        || get_class($this->controllerInstance) != $controllerClass) {//强力规范url
 	            exit("Bad url route package or controller format.");
 	        }
-	         
+	        
 	        Front::getInstance()->setController($this->controllerInstance);
 	    }catch (\Exception $exception){
 	        $controllerRoute=new \HuiLib\Route\Controller();
