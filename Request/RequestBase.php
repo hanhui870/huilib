@@ -143,11 +143,11 @@ abstract class RequestBase
 	         
 	        Front::getInstance()->setController($this->controllerInstance);
 	    }catch (\Exception $exception){
-	        $appNameLoader=new \HuiLib\Route\AppName(self::SEG_CONTROLLER);
-	        Front::getInstance()->setAppNameRoute($appNameLoader);
+	        $controllerRoute=new \HuiLib\Route\Controller();
+	        Front::getInstance()->setControllerRoute($controllerRoute);
 	        
-	        //三级目录路由处理 /topic/2
-	        $appNameLoader->route();
+	        //Controller路由处理 /topic/2
+	        $controllerRoute->route();
 	    }
 	}
 	
