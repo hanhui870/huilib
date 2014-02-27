@@ -91,11 +91,11 @@ abstract class RequestBase
 		    $this->loadController();
 		    
 		}catch (\Exception $exception){
-		    $topNameLoader=new \HuiLib\Route\TopName();
-		    Front::getInstance()->setTopNameRoute($topNameLoader);
+		    $packageRoute=new \HuiLib\Route\Package();
+		    Front::getInstance()->setPackageRoute($packageRoute);
 		    
 		    //二级目录路由处理
-		    $topNameLoader->route();
+		    $packageRoute->route();
 		}
 	}
 	

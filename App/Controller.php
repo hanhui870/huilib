@@ -89,6 +89,7 @@ class Controller
 		    //二级目录路由处理
 		    $appNameLoader->route();
 		    
+		    //var_dump($request->getRouteInfo());die();
 		    //TODO  reload action
 		}
 		

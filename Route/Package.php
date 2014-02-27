@@ -2,35 +2,35 @@
 namespace HuiLib\Route;
 
 use HuiLib\App\Front;
+use HuiLib\Request\RequestBase;
 
 /**
- * 定位于二级目录的短链模块
+ * Package层短链模块
  *
  * @author 祝景法
  * @since 2013/09/15
  */
-class TopName extends RouteBase
+class Package extends RouteBase
 {
     //路由组件部分
-    const SEG_PART = 1;
-    private $topNameBack = NULL;
+    private $nameBack = NULL;
 
     public function route()
     {
         $request = Front::getInstance ()->getRequest ();
-        $topname = $request->getRouteSegNum ( self::SEG_PART );
-        $this->topNameBack = $topname;
+        $topname = $request->getRouteSegNum ( RequestBase::SEG_PACKAGE );
+        $this->nameBack = $topname;
         
         $appConfig = Front::getInstance ()->getAppConfig ();
-        $baseCalss = $appConfig->getByKey ( 'webRun.route.TopName.Base' );
+        $baseCalss = $appConfig->getByKey ( 'webRun.route.Package.Base' );
         $baseCalss::dispatch ();
         
         //重新出发路由
         $request->reRoute ();
     }
 
-    public function getTopName()
+    public function getName()
     {
-        return $this->topNameBack;
+        return $this->nameBack;
     }
 }

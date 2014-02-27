@@ -82,19 +82,26 @@ class Front
 	protected $view=NULL;
 	
 	/**
-	 * 二级目录短链对象
+	 * Package短链对象
 	 *
-	 *  @var \HuiLib\Route\TopName 
+	 *  @var \HuiLib\Route\Package 
 	 */
-	protected $topNameRoute=NULL;
+	protected $packageRoute=NULL;
 	
 	/**
-	 * 3级目录及以上的短名称
+	 * Controller短链对象
 	 *
-	 *  @var array of  \HuiLib\Route\AppName
+	 *  @var \HuiLib\Route\Controller
 	 */
-	protected $appNameRoute=array();
+	protected $controllerRoute=NULL;
 	
+	/**
+	 * Action短链对象
+	 *
+	 *  @var \HuiLib\Route\Action
+	 */
+	protected $actionRoute=NULL;
+
 	/**
 	 * 应用运行末期注册方法呼叫
 	 *
@@ -214,40 +221,34 @@ class Front
 		return $this->view;
 	}
 	
-	public function setTopNameRoute(\HuiLib\Route\TopName $route)
+	public function setPackageRoute(\HuiLib\Route\Package $route)
 	{
-	    $this->topNameRoute=$route;
+	    $this->packageRoute=$route;
 	}
 	
-	public function getTopNameRoute()
+	public function getPackageRoute()
 	{
-	    return $this->topNameRoute;
+	    return $this->packageRoute;
 	}
 	
-	/**
-	 * 三级目录以上设置
-	 * 
-	 * @param \HuiLib\Route\AppName $route
-	 * @param int $segPart
-	 */
-	public function setAppNameRoute(\HuiLib\Route\AppName $route)
+	public function setControllerRoute(\HuiLib\Route\Controller $route)
 	{
-	    $this->appNameRoute[$route->getSegPart()]=$route;
+	    $this->controllerRoute=$route;
 	}
 	
-	/**
-	 * 获取appRoute对象
-	 * 
-	 * @param int $segPart
-	 * @return  \HuiLib\Route\AppName
-	 */
-	public function getAppNameRoute($segPart)
+	public function getControllerRoute()
 	{
-	    if (isset($this->appNameRoute[$segPart])) {
-	        return $this->appNameRoute[$segPart];
-	    }else{
-	        return NULL;
-	    }
+	    return $this->controllerRoute;
+	}
+	
+	public function setActionRoute(\HuiLib\Route\Action $route)
+	{
+	    $this->actionRoute=$route;
+	}
+	
+	public function getActionRoute()
+	{
+	    return $this->actionRoute;
 	}
 	
 	public function setShutCall(\HuiLib\Runtime\ShutCall $shutCall)
