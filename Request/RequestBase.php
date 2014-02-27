@@ -22,7 +22,6 @@ abstract class RequestBase
     const SEG_PACKAGE=1;
     const SEG_CONTROLLER=2;
     const SEG_ACTION=3;
-    const SEG_SUBACTION=4;
     
     /**
      * 重写前部分信息
@@ -34,7 +33,7 @@ abstract class RequestBase
 	 * 系统主要路由资源定位符
 	 * 
 	 * 为了规范链接，资源路由信息只能包含 小写
-	 * Package, Controller, Action, SubAction相关名包含大写的，必须拆成-分隔的，如/discuss/api/add-discuss => api::addDiscuss()
+	 * Package, Controller, Action相关名包含大写的，必须拆成-分隔的，如/discuss/api/add-discuss => api::addDiscuss()
 	 * 
 	 * 类似http://iyunlin.com/thread/view/8878 => iyunlin.com/thread/view/8878
 	 * 
@@ -45,7 +44,7 @@ abstract class RequestBase
 	/**
 	 * 路由结果数组
 	 * 
-	 * @var array 组成:Host, Package, Controller, Action, SubAction五层次封装，便于以后拓展，存在路由信息时可能不准，索引01234
+	 * @var array 组成:Host, Package, Controller, Action五层次封装，便于以后拓展，存在路由信息时可能不准，索引01234
 	 * 
 	 */
 	protected $routeInfo=NULL;
@@ -155,7 +154,7 @@ abstract class RequestBase
 	/**
 	 * 初始化系统关键路由信息
 	 * 
-	 * 按照Host, Package, Controller, Action, SubAction约定组件
+	 * 按照Host, Package, Controller, Action约定组件
 	 */
 	protected function initRouteInfo()
 	{
@@ -264,18 +263,6 @@ abstract class RequestBase
 	}
 	
 	/**
-	 * 获取子动作段路由信息
-	 */
-	public function getSubActionRouteSeg()
-	{
-		if (!empty($this->routeInfo[self::SEG_SUBACTION])) {
-		    return $this->routeInfo[self::SEG_SUBACTION];
-		}else{
-			return '';
-		}
-	}
-	
-	/**
 	 * 通过指定位置获取路由组件
 	 * 
 	 * @param int $number 路由索引
@@ -321,15 +308,6 @@ abstract class RequestBase
 		$this->routeInfo[self::SEG_ACTION]=strtolower($action);
 	}
 	
-	/**
-	 * 设置子动作段路由信息
-	 */
-	public function setSubActionRouteSeg($subAction)
-	{
-		$this->routeInfo[self::SEG_SUBACTION]=strtolower($subAction);
-	}
-	
-
 	/**
 	 * 修复路由索引信息
 	 *
