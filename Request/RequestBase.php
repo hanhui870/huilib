@@ -361,6 +361,7 @@ abstract class RequestBase
 	 */
 	public function getOriginalRouteSegNum($number)
 	{
+	    $this->getOriginalRouteInfo();
 	    if (!empty($this->originalRouteInfo[$number])) {
 	        return $this->originalRouteInfo[$number];
 	    }else{
