@@ -4,6 +4,7 @@ namespace HuiLib\App;
 use HuiLib\App\Front;
 use HuiLib\Request\RequestBase;
 use HuiLib\Error\Exception;
+use HuiLib\View\Helper\Proxy;
 
 /**
  * 控制器基础类
@@ -293,6 +294,17 @@ class Controller
 	protected function getSiteConfig()
 	{
 		return Front::getInstance()->getSiteConfig();
+	}
+	
+
+	/**
+	 * 快速获取View代理辅助对象
+	 *
+	 * @return \HuiLib\View\Helper\Proxy
+	 */
+	protected function getNewViewProxy()
+	{
+	    return Proxy::create();
 	}
 
 	/**
