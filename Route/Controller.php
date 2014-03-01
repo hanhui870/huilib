@@ -24,7 +24,7 @@ class Controller extends RouteBase
         $appConfig = Front::getInstance ()->getAppConfig ();
         $baseCalss = $appConfig->getByKey ( 'webRun.route.Controller.Base' );
         $baseCalss::dispatch ();
-        
+
         //重新出发路由
         $request->reRoute ();
     }

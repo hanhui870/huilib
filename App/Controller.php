@@ -5,6 +5,7 @@ use HuiLib\App\Front;
 use HuiLib\Request\RequestBase;
 use HuiLib\Error\Exception;
 use HuiLib\View\Helper\Proxy;
+use HuiLib\Error\ActionRouteException;
 
 /**
  * 控制器基础类
@@ -74,7 +75,7 @@ class Controller
 		try {
 		    $this->loadActionDispatch();
 		
-		}catch (\Exception $exception){
+		}catch (RouteActionException $exception){
 		    //App namespace route
 		    $actionRoute=new \HuiLib\Route\Action();
 		    Front::getInstance()->setActionRoute($actionRoute);
@@ -100,7 +101,7 @@ class Controller
 	        //var_dump( Front::getInstance()->getRequest()->getRouteInfo());die(); //路由后参数
 	        $this->loadActionDispatch();
 	         
-	    }catch (\Exception $exception){
+	    }catch (RouteActionException $exception){
 	        exit("Action ReDispatch failed.");
 	    }
 	}
@@ -120,7 +121,7 @@ class Controller
             }
             $this->$action();
         }else{
-            throw new Exception('Load action failed.');
+            throw new RouteActionException('Load action failed.');
         }
     }
 	

@@ -3,6 +3,9 @@ namespace HuiLib\Request;
 
 use HuiLib\App\Front;
 use HuiLib\Helper\String;
+use HuiLib\Error\RouteControllerException;
+use HuiLib\Error\RoutePackageException;
+use HuiLib\Loader\AutoLoaderException;
 
 /**
  * Request基础类
@@ -87,12 +90,12 @@ abstract class RequestBase
 		    //检测Package是否有效
 		    $controllerPath=$loader->getRegisteredPath('Controller').self::mapRouteSegToClass($this->package);
 		    if (!is_dir($controllerPath)) {
-		        throw new \Exception('Bad package, go url route.');
+		        throw new RoutePackageException('Bad package, go url route.');
 		    }
 		    
 		    $this->loadController();
 		    
-		}catch (\Exception $exception){
+		}catch (RoutePackageException $exception){
 		    $packageRoute=new \HuiLib\Route\Package();
 		    Front::getInstance()->setPackageRoute($packageRoute);
 		    
@@ -113,7 +116,7 @@ abstract class RequestBase
 	    try {
 	        $this->loadController();
 	        
-	    }catch (\Exception $exception){
+	    }catch (RoutePackageException $exception){
 	        exit("Reroute failed.");
 	    }
 	}
@@ -134,7 +137,11 @@ abstract class RequestBase
 	    try {
 	        //默认到controller级
 	        $controllerClass='Controller'.NAME_SEP.self::mapRouteSegToClass($this->package).NAME_SEP.self::mapRouteSegToClass($this->controller);
-	        $this->controllerInstance=new $controllerClass();
+	        try {
+	           $this->controllerInstance=new $controllerClass();
+	        }catch (AutoLoaderException $e){
+	            throw new RouteControllerException('Controller class not exists.');
+	        }
 	
 	        //大小写规范问题
 	        if (strtolower($this->package) != $this->getPackageRouteSeg()
@@ -144,7 +151,7 @@ abstract class RequestBase
 	        }
 	        
 	        Front::getInstance()->setController($this->controllerInstance);
-	    }catch (\Exception $exception){
+	    }catch (RouteControllerException $exception){
 	        $controllerRoute=new \HuiLib\Route\Controller();
 	        Front::getInstance()->setControllerRoute($controllerRoute);
 	        
