@@ -1,6 +1,7 @@
 <?php
 namespace HuiLib\Config\Test;
 
+use HuiLib\Helper\DateTime;
 /**
  * 数据库Query测试类
  *
@@ -16,7 +17,7 @@ class ConfigTest extends \HuiLib\Test\TestBase
 	
 	private function test(){
 		$config = new \HuiLib\Config\ConfigBase ( dirname(__FILE__).'/Test.ini' );
-		
+		echo "lastupdate:".DateTime::format(0, $config->getLastUpdate())."\n";
 		print_r($config->getByKey());
 		
 		$config->setByKey('app.domain', 'testOverwrite');
