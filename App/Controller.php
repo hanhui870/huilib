@@ -5,7 +5,7 @@ use HuiLib\App\Front;
 use HuiLib\Request\RequestBase;
 use HuiLib\Error\Exception;
 use HuiLib\View\Helper\Proxy;
-use HuiLib\Error\ActionRouteException;
+use HuiLib\Error\RouteActionException;
 
 /**
  * 控制器基础类
