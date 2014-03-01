@@ -1,6 +1,8 @@
 <?php
 namespace HuiLib\Loader;
 
+include_once dirname(__FILE__).'/AutoLoaderException.php';
+
 /**
  * 类自动加载库
  * 
@@ -56,20 +58,20 @@ class AutoLoad
 
 		//字母数字\_
 		if (preg_match("/[^\w\\\]+/i", $name)) {
-			throw new \Exception ( "Hack discovered!" );
+			throw new AutoLoaderException ( "Hack discovered!" );
 		}
 		
 		$spacePath=$this->getRegisteredPath($spaceName);
 		if (!is_dir($spacePath)) 
 		{
-			throw new \Exception ( "the SpaceName:{$spaceName} is not registered or not accessable!" );
+			throw new AutoLoaderException ( "the SpaceName:{$spaceName} is not registered or not accessable!" );
 		}
 
 		$name = $spacePath . implode(SEP, $nameInfo) . '.php';
 		if (file_exists ( $name )) {
 			include_once $name;
 		} else {
-			throw new \Exception ( "file $name doesn't exists, please check!" );
+			throw new AutoLoaderException ( "file $name doesn't exists, please check!" );
 		}
 	}
 	
