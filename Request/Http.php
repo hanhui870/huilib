@@ -15,11 +15,9 @@ class Http extends RequestBase
 {
 	/**
 	 * 重写前部分信息，不包含参数部分，不包含http部分
-	 * 默认$_SERVER['SCRIPT_URL']，重写基础信息
+	 * 默认处理$_SERVER['REQUEST_URI']，重写基础信息; SCRIPT_URL仅Apache本地支持，Nginx不支持
 	 *
 	 * 访问网址：http://iyunlin/fdsafdas/fsdafdsa/fsdafsda?hello=fsdfsda
-	 * [SCRIPT_URL] => /fdsafdas/fsdafdsa/fsdafsda
-	 * [SCRIPT_URI] => http://iyunlin/fdsafdas/fsdafdsa/fsdafsda
 	 * [REQUEST_URI] => /fdsafdas/fsdafdsa/fsdafsda?hello=fsdfsda
 	 * [QUERY_STRING] => hello=fsdfsda
 	 */
