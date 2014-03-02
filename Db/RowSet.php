@@ -50,6 +50,16 @@ class RowSet extends \HuiLib\Model\ModelBase implements \Iterator, \ArrayAccess
 	{
 		return $this->dataList;
 	}
+	
+	/**
+	 * 返回对象数据是否为空
+	 * 
+	 * @return boolean
+	 */
+	public function isEmpty()
+	{
+	    return empty($this->dataList);
+	}
 
 	public function get($iter)
 	{

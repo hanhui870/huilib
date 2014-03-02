@@ -107,6 +107,16 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	}
 	
 	/**
+	 * 返回对象数据是否为空
+	 *
+	 * @return boolean
+	 */
+	public function isEmpty()
+	{
+	    return empty($this->data);
+	}
+	
+	/**
 	 * 返回对象完整数组表示
 	 * 
 	 * 包含$this->calculated需要计算生成的字段，参考user、topic表
