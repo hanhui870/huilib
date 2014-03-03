@@ -475,7 +475,8 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 			}
 			return TRUE;
 		}elseif (array_key_exists($key, $this->calculated)){
-			return $this->calculated[$key]=$value;
+			$this->calculated[$key]=$value;
+			return TRUE;
 		}
 		return FALSE;
 	}
