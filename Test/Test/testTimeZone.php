@@ -44,3 +44,14 @@ echo "Etc/GMT+1:\n";
 date_default_timezone_set('Etc/GMT-1');
 echo date("Y-m-d H:i:s", 0);
 echo "\n\n";
+
+//代码示例
+//区时设置 通过Etc/GMT时区设置是相反的
+if (!empty($this->memberInfo->timezone)){
+    $zone=-intval($this->memberInfo->timezone);
+    date_default_timezone_set("Etc/GMT".($zone>0 ? "+$zone" : "$zone"));
+
+    //数据库区时设置
+    $db=Zend_Db_Table::getDefaultAdapter();
+    $db->query("set time_zone = '{$this->memberInfo->timezone}:00';");
+}
