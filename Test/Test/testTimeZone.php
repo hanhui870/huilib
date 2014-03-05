@@ -5,6 +5,23 @@
  * Etc/GMT设置以及不提倡。是违反直觉的。Etc/GMT-8代表东八区。
  * 
  * @see http://www.php.net/manual/en/timezones.others.php
+ * 
+ * Mysql时区设置
+ * 
+ * 可以通过修改my.cnf, 在 [mysqld] 之下加来修改时区。
+ * default-time-zone=timezone  
+ * 例如：
+ * default-time-zone='+8:00'
+ * 修改后记得重启msyql。
+ * 注意一定要在 [mysqld] 之下加 ，否则会出现错误: unknown variable ‘default-time-zone=+8:00′
+ * 
+ * 另外也可以通过命令：
+ * SET time_zone=timezone  
+ * 例如：比如北京时间（GMT+0800）  
+ * SET time_zone='+8:00' 
+ * 
+ * 这个和php的时区设置又有点差别，比如北京时间在php中是：
+ * date_default_timezone_set('Etc/GMT-8'); 
  */
 echo "unix stamp:0\n";
 
