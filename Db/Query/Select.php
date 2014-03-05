@@ -12,6 +12,7 @@ class Select extends \HuiLib\Db\Query
 	const FIELD_ANY = '*';
 	const SELECT = 'select';
 	const COLUMNS = 'columns';
+	const PLAIN_COLUMNS = 'plain_columns';
 	const TABLE = 'table';
 	const JOINS = 'joins';
 	const WHERE = 'where';
@@ -260,6 +261,9 @@ class Select extends \HuiLib\Db\Query
 			case self::COLUMNS :
 				$this->columns = array ();
 				break;
+			case self::PLAIN_COLUMNS :
+			    $this->plainColumns = array ();
+			    break;
 			case self::JOINS :
 				$this->joins = array ();
 				break;
@@ -303,6 +307,7 @@ class Select extends \HuiLib\Db\Query
 		$rawState = array(
 				self::TABLE      => $this->table,
 				self::COLUMNS    => $this->columns,
+		        self::PLAIN_COLUMNS    => $this->plainColumns,
 				self::JOINS      => $this->joins,
 				self::WHERE      => $this->where,
 				self::ORDER      => $this->order,
