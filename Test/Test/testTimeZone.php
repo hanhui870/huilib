@@ -45,13 +45,18 @@ date_default_timezone_set('Etc/GMT-1');
 echo date("Y-m-d H:i:s", 0);
 echo "\n\n";
 
-//代码示例
+//完整代码示例
 //区时设置 通过Etc/GMT时区设置是相反的
-if (!empty($this->memberInfo->timezone)){
-    $zone=-intval($this->memberInfo->timezone);
-    date_default_timezone_set("Etc/GMT".($zone>0 ? "+$zone" : "$zone"));
-
-    //数据库区时设置
+if (!empty($userObj['timezone'])){
+    $reverseZone=-intval($userObj['timezone']);
+    date_default_timezone_set("Etc/GMT".($reverseZone>0 ? "+$reverseZone" : "$reverseZone"));
+    
+    //数据库区时设置 mysql设置后php设置又是相反的
     $db=Zend_Db_Table::getDefaultAdapter();
-    $db->query("set time_zone = '{$this->memberInfo->timezone}:00';");
+    $zone=intval($userObj['timezone']);
+    if($zone > 0){
+        $db->query("set time_zone = '+{$zone}:00';");
+    }else{
+        $db->query("set time_zone = '{$zone}:00';");
+    }
 }
