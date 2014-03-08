@@ -18,6 +18,12 @@ class RowSet extends \HuiLib\Model\ModelBase implements \Iterator, \ArrayAccess
 	protected $dataList = array ();
 	
 	/**
+	 * Select对象
+	 * @var \HuiLib\Db\Query\Select
+	 */
+	protected $select = NULL;
+	
+	/**
 	 * 数组当前指针
 	 * @var int
 	 */
@@ -35,11 +41,35 @@ class RowSet extends \HuiLib\Model\ModelBase implements \Iterator, \ArrayAccess
 	 */
 	protected $tableInstance = NULL;
 
-	protected function __construct(array $dataList)
+	protected function __construct()
 	{
 		parent::__construct ();
-		
-		$this->dataList = $dataList;
+	}
+	
+	/**
+	 * 通过数组初始化
+	 * 
+	 * @param array $dataList
+	 * @return \HuiLib\Db\RowSet
+	 */
+	public function initByDataList($dataList)
+	{
+	    $this->dataList = $dataList;
+	    return $this;
+	}
+	
+	/**
+	 * 通过数组初始化
+	 *
+	 * @param \HuiLib\Db\Query\Select $select
+	 * @return \HuiLib\Db\RowSet
+	 */
+	public function initBySelect(\HuiLib\Db\Query\Select $select)
+	{
+	    $this->select = $select;
+	    $this->dataList=$select->query()->fetchAll();
+	    
+	    return $this;
 	}
 
 	/**
