@@ -1,6 +1,7 @@
 <?php
 namespace HuiLib\Db\Query;
 
+use HuiLib\Db\Result;
 /**
  * Sql语句查询类Select操作
  *
@@ -470,10 +471,15 @@ class Select extends \HuiLib\Db\Query
 	public function getItemCount()
 	{
 	    $tmpSelect=clone $this;
-	    $tmpSelect->reset(self::LIMIT)->reset(self::OFFSET)->reset(self::ORDER);
+	    $tmpSelect->reset(self::LIMIT)->reset(self::OFFSET)->reset(self::ORDER)->reset(self::ENDS);
 	    
-	    echo $tmpSelect->toString();
+	    //计数SQL
+	    $sql="select count(1) as itemCount from (".$tmpSelect->toString().") as tmpTable";
 	    
+	    $this->setAdapter();
+	    $innerStatment=$this->adapter->getConnection()->query($sql);
+	    $result=Result::create($innerStatment);
+	    return $result->fetchColumn();
 	}
 	
 	/**
