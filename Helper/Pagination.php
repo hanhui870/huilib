@@ -102,7 +102,7 @@ class Pagination
         $this->setPerpage($select->getLimit());
         
         $offset=$select->getOffset();
-        $currentPage=$offset ? ceil($this->perpage/$offset)+1 : 1;
+        $currentPage=$this->perpage ? ceil($offset/$this->perpage)+1 : 1;
         $this->setCurrentPage($currentPage);
         
         $this->setItemCount($select->getItemCount());
@@ -177,8 +177,7 @@ class Pagination
      */
     public function getPageUri($page)
     {
-        
-        if ($page>2) {
+        if ($page>1) {
             return str_ireplace(self::PAGE_HOLDER, $page, $this->getBaseUri());
         }
         return preg_replace('/\/?(\??&?page\=)?'.preg_quote(self::PAGE_HOLDER, '/').'/is', '', $this->getBaseUri());
