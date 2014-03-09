@@ -2,6 +2,7 @@
 namespace HuiLib\Db;
 
 use HuiLib\Error\Exception;
+use HuiLib\Helper\Pagination;
 
 /**
  * 数据行列表类
@@ -22,6 +23,13 @@ class RowSet extends \HuiLib\Model\ModelBase implements \Iterator, \ArrayAccess
 	 * @var \HuiLib\Db\Query\Select
 	 */
 	protected $select = NULL;
+	
+	/**
+	 * 分页对象
+	 * 
+	 * @var Pagination
+	 */
+	protected $pagination = NULL;
 	
 	/**
 	 * 数组当前指针
@@ -59,7 +67,7 @@ class RowSet extends \HuiLib\Model\ModelBase implements \Iterator, \ArrayAccess
 	}
 	
 	/**
-	 * 通过数组初始化
+	 * 通过Select对象初始化
 	 *
 	 * @param \HuiLib\Db\Query\Select $select
 	 * @return \HuiLib\Db\RowSet
@@ -98,6 +106,25 @@ class RowSet extends \HuiLib\Model\ModelBase implements \Iterator, \ArrayAccess
 		} else {
 			return NULL;
 		}
+	}
+	
+	/**
+	 * 获取分页对象
+	 * 
+	 * @return array
+	 */
+	public function getPagination()
+	{
+	    if ($this->select===NULL) {
+	        throw new Exception("Row set instance is not inited by Select instance, doesn't have pagination.");
+	    }
+	    
+	    if ($this->pagination===NULL) {
+	        $this->pagination=Pagination::create();
+	        $this->pagination->initBySelect($this->select);
+	    }
+	    
+	    return $this->pagination;
 	}
 
 	/**
