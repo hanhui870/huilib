@@ -139,7 +139,7 @@ class Insert extends \HuiLib\Db\Query
 	/**
 	 * 重置语句部分参数
 	 *
-	 * @param array $part
+	 * @param string $part
 	 * @return \HuiLib\Db\Query\Select
 	 */
 	public function reset($part)

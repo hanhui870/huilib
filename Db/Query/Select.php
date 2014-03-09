@@ -249,7 +249,7 @@ class Select extends \HuiLib\Db\Query
 	/**
 	 * 重置语句部分参数
 	 *
-	 * @param array $part
+	 * @param string $part
 	 * @return \HuiLib\Db\Query\Select
 	 */
 	public function reset($part)
@@ -463,6 +463,20 @@ class Select extends \HuiLib\Db\Query
 	}
 	
 	/**
+	 * 获取当前Select数据集的数量统计
+	 * 
+	 * explain select count(1) as itemCount from (select * from discuss where MainTopic=47) as tmpTable 
+	 */
+	public function getItemCount()
+	{
+	    $tmpSelect=clone $this;
+	    $tmpSelect->reset(self::LIMIT)->reset(self::OFFSET)->reset(self::ORDER);
+	    
+	    echo $tmpSelect->toString();
+	    
+	}
+	
+	/**
 	 * 编译成SQL语句
 	 */
 	protected function compile()
@@ -494,6 +508,16 @@ class Select extends \HuiLib\Db\Query
 	public function toString()
 	{
 		return $this->compile();
+	}
+	
+	public function getLimit()
+	{
+	    return $this->limit;
+	}
+	
+	public function getOffset()
+	{
+	    return $this->offset;
 	}
 	
 	public function table($table){
