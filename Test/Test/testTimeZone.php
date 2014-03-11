@@ -60,3 +60,15 @@ if (!empty($userObj['timezone'])){
         $db->query("set time_zone = '{$zone}:00';");
     }
 }
+
+?>
+
+//以下是JS HighChart时区设置 更改时区useUTC配置必须为true
+timezone=-60*parseInt(timezone);
+Highcharts.setOptions({
+	global: {
+		useUTC: true,
+		timezoneOffset:timezone
+	}
+});
+
