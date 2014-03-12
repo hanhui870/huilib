@@ -49,7 +49,7 @@ class Redis extends \HuiLib\Cache\CacheBase
 	 * 强制设置，强制过期
 	 *
 	 * @param string $key 缓存键
-	 * @param mix $value 缓存值
+	 * @param mix $value 缓存值 Redis不支持直接储存数组，需要json编码
 	 * @param int $expire 过期时间，0永不过期
 	 */
 	public function add($key, $value, $expire=0)
