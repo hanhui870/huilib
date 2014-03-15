@@ -464,7 +464,9 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	
 	public function __set($key, $value)
 	{
-		if (isset($this->data[$key]) && $this->data[$key]!=$value) {
+	    //这里应该使用===，因为比如数据字段ENUM默认值为0, 其实赋值为string的时候其实是true的，php很大的坑：'0'=='ddd' 为 false， 0=='ddd'为true
+	    //http://php.net/manual/en/language.operators.comparison.php 原来是转换成数值比较的
+		if (isset($this->data[$key]) && $this->data[$key]!==$value) {
 			$this->originalData[$key]=$this->data[$key];
 			$this->data[$key]=$value;
 			$this->editData[$key]=$value;
