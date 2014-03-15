@@ -365,11 +365,11 @@ class Insert extends \HuiLib\Db\Query
 	/**
 	 * 批量保存行对象
 	 * 
-	 * @param array $rows 由行对象组成的数组
+	 * @param array $rows 由行对象组成的数组 或 rowset
 	 * @bool
 	 */
 	public function batchSaveRows($rows){
-		if (!is_array($rows)) {
+		if (!is_array($rows) && !is_object($rows)) {
 			$rows=array($rows);
 		}
 		
