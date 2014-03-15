@@ -84,12 +84,13 @@ class Where
 	 */
 	public function andCase(Where $where, $hand=self::HAND_RIGHT)
 	{
-		if ($this->orObject!==NULL) {
-			throw new \HuiLib\Error\Exception ('AND, OR连接单实例仅支持一个');
+		if ($this->andObject===NUll) {
+		    $this->andObject=$where;
+		    $this->andHand=$hand;
+		}else{//给动态插入到后面的
+		    $this->andObject->andCase($where, $hand);
 		}
-		$this->andObject=$where;
-		$this->andHand=$hand;
-		
+
 		return $this;
 	}
 	
@@ -98,11 +99,12 @@ class Where
 	 */
 	public function orCase(Where $where, $hand=self::HAND_RIGHT)
 	{
-		if ($this->andObject!==NULL) {
-			throw new \HuiLib\Error\Exception ('AND, OR连接单实例仅支持一个');
-		}
-		$this->orObject=$where;
-		$this->orHand=$hand;
+	    if ($this->orObject===NUll) {
+	        $this->orObject=$where;
+	        $this->orHand=$hand;
+	    }else{//给动态插入到后面的
+	        $this->orObject->orCase($where, $hand);
+	    }
 		
 		return $this;
 	}
@@ -134,6 +136,8 @@ class Where
 	
 	/**
 	 * 生成文字表达的SQL语句
+	 * 
+	 * orObject、andObject有可能共存，or优先，最好不要共存
 	 */
 	public function toString()
 	{

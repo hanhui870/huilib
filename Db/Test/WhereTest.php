@@ -14,7 +14,7 @@ use HuiLib\Helper\Debug;
 class WhereTest extends \HuiLib\Test\TestBase
 {
 	public function run(){
-		$this->testChainWhere();
+		$this->test();
 	}
 	
 	private function test(){
@@ -29,11 +29,13 @@ class WhereTest extends \HuiLib\Test\TestBase
 		//初始化adapter后才能escape
 		$select->where($where);
 		
-		echo $where->toString();
+		echo $where->toString().PHP_EOL;
+		
+		echo Where::createPair('name', 'zhujingfa')->andCase(Where::createPlain('name is null'))->andCase(Where::createQuote('num in (?)', array(3, 5, 16)))->toString();
 	}
 	
 	private function testChainWhere(){
-		$select=Query::select('test');
+		$select=Query::select('test.test');
 				
 		$where1=Where::createPair('test', 'zzzzzzzzzzzzzzzzzzzzzzz')
 			->orCase(Where::createPlain('test is null'));

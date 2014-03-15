@@ -380,8 +380,12 @@ class Insert extends \HuiLib\Db\Query
 			
 			$kvArray=$rowInstance->toArray();
 			if (!$inited) {
-				$tableInstance=$rowInstance->getTableInstance();
-				$this->table($tableInstance::TABLE)->fields(array_keys($kvArray));
+			    if ($this->table===NULL) {
+			        $tableInstance=$rowInstance->getTableInstance();
+			        $this->table=$tableInstance::TABLE;
+			    }
+				
+				$this->table($this->table)->fields(array_keys($kvArray));
 				$inited=TRUE;
 			}
 			
