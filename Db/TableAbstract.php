@@ -83,7 +83,7 @@ class TableAbstract extends \HuiLib\Model\ModelBase
 		if ($this->dbAdapter!==NULL) {
 			$select->setAdapter($this->dbAdapter);
 		}
-		return $this->rowSetObject($select->where ( Where::createPair ( $field, $value ) )->limit ( $limit )->offset ( $offset )->query ()->fetchAll ());
+		return $this->rowSetObject($select->where ( Where::createPair ( $field, $value ) )->limit ( $limit )->offset ( $offset ));
 	}
 	
 	/**
@@ -101,7 +101,7 @@ class TableAbstract extends \HuiLib\Model\ModelBase
 			$select->setAdapter($this->dbAdapter);
 		}
 
-		return $this->rowSetObject($select->where ( Where::createQuote ( $field . ' in (?) ', $ids ) )->query ()->fetchAll ());
+		return $this->rowSetObject($select->where ( Where::createQuote ( $field . ' in (?) ', $ids ) ));
 	}
 
 	/**
@@ -205,15 +205,16 @@ class TableAbstract extends \HuiLib\Model\ModelBase
 	/**
 	 * 返回行列表数据对象
 	 * 
-	 * @param array $dataList
+	 * @param \HuiLib\Db\Query\Select $select
 	 */
-	protected function rowSetObject($dataList)
+	protected function rowSetObject($select)
 	{
-		if ($dataList===FALSE) {
+		if (!$select instanceof \HuiLib\Db\Query\Select) {
 			return NULL;
 		}
 
-		$rowSetInstance=\HuiLib\Db\RowSet::create($dataList);
+		$rowSetInstance=\HuiLib\Db\RowSet::create();
+		$rowSetInstance->initBySelect($select);
 		$rowSetInstance->setRowClass(static::ROW_CLASS);
 		$rowSetInstance->setTable($this);
 		return $rowSetInstance;

@@ -2,6 +2,10 @@
 namespace HuiLib\App;
 
 use HuiLib\App\Front;
+use HuiLib\Request\RequestBase;
+use HuiLib\Error\Exception;
+use HuiLib\View\Helper\Proxy;
+use HuiLib\Error\RouteActionException;
 
 /**
  * 控制器基础类
@@ -11,36 +15,6 @@ use HuiLib\App\Front;
  */
 class Controller
 {
-	/**
-	 * 当前主机名
-	 * @var String
-	 */
-	protected $host;
-	
-	/**
-	 * 当前处理包名
-	 * @var String
-	 */
-	protected $package;
-	
-	/**
-	 * 当前处理控制器名
-	 * @var String
-	 */
-	protected $controller;
-	
-	/**
-	 * 当前处理动作名
-	 * @var String
-	 */
-	protected $action;
-	
-	/**
-	 * 当前处理子动作名
-	 * @var String
-	 */
-	protected $subAction;
-	
 	/**
 	 * 请求对象
 	 * @var \HuiLib\View\ViewBase
@@ -80,7 +54,7 @@ class Controller
 	}
 	
 	/**
-	 * 控制器初始化接口，在dispatch前调用
+	 * init作为控制器初始化接口，在dispatch前调用
 	 */
 	protected function init()
 	{
@@ -91,16 +65,24 @@ class Controller
 	 */
 	public function dispatch()
 	{
+	    // Dispatch前执行
 		$this->onBeforeDispatch ();
 		
 		if ($this->useView) {
 			$this->initView ();
 		}
 		
-		//路由方法 附加操作后缀
-		$this->action=Front::getInstance()->getRequest()->getActionRouteSeg();
-		$action=$this->action.'Action';
-		$this->$action();
+		try {
+		    $this->loadActionDispatch();
+		
+		}catch (RouteActionException $exception){
+		    //App namespace route
+		    $actionRoute=new \HuiLib\Route\Action();
+		    Front::getInstance()->setActionRoute($actionRoute);
+		    
+		    //二级目录路由处理
+		    $actionRoute->route();
+		}
 		
 		$this->onAfterDispatch ();
 		
@@ -109,29 +91,40 @@ class Controller
 			$this->renderView ();
 		}
 	}
-	
-	/**
-	 * 控制器内二级以上路由方法
-	 * 
-	 * 由__call()转发而来
-	 * 比如:/thread/2，/thread/2/reply路由到相应方法，不存在相应方法的前提下
-	 * 两个层次：控制器层级(/thread/2)、类方法层级(thread/log/2 落到thread::log方法)
-	 * 
-	 * 可使用Redis Hash实现
-	 * 
-	 * @param string $key 路由标志 比如user, thread
-     * @param string $shortName 待路由的字符串 比如hanhui
-	 */
-	protected function shortNameRoute($methodName, $arguments)
-	{
-		$key=$this->host.URL_SEP.$this->package.URL_SEP.$this->controller.URL_SEP.$this->action;
-		
-		//不存在包 已设置二级目录路由
-		$route=new \HuiLib\Route\ShortName();
-		$route->route();
-		die();
-	}
 
+	/**
+	 * 二次分发
+	 */
+	public function reDispatch()
+	{
+	    try {
+	        //var_dump( Front::getInstance()->getRequest()->getRouteInfo());die(); //路由后参数
+	        $this->loadActionDispatch();
+	         
+	    }catch (RouteActionException $exception){
+	        exit("Action ReDispatch failed.");
+	    }
+	}
+	
+    protected function loadActionDispatch()
+    {
+        //路由方法 附加操作后缀
+        $request=Front::getInstance()->getRequest();
+        $this->action=$request->getActionRouteSeg();
+        $action=$request->mapRouteSegToMethod($this->action).'Action';
+        
+        if (method_exists($this, $action)) {
+            //路由方法：通过获取对象方法，并判断调用方法是否存在来判断参数是否精确匹配
+            if (strtolower($this->action) != $this->action
+            || !in_array($action, get_class_methods($this))) {
+                exit("Bad url route action format.");
+            }
+            $this->$action();
+        }else{
+            throw new RouteActionException('Load action failed.');
+        }
+    }
+	
 	/**
 	 * 请求派发前事件
 	 */
@@ -159,7 +152,8 @@ class Controller
 		$this->preRenderView();
 		
 		if ($view === NULL) {
-			$view = ucfirst ( $this->package ) . SEP . ucfirst ( $this->controller ) . SEP . ucfirst ( $this->action );
+		    $request=Front::getInstance()->getRequest();
+			$view = ucfirst ( $request->getPackageRouteSeg() ) . SEP . ucfirst ( $request->getControllerRouteSeg() ) . SEP . ucfirst ( $request->getActionRouteSeg() );
 		}
 		
 		$this->view->render ( $view, $ajaxDelimiter );
@@ -190,20 +184,27 @@ class Controller
 	/**
 	 * 输出JSON数据
 	 * 
-	 * JSON数据结构:{"data":{},"success":true,"message":"","code":200}
+	 * JSON数据结构:{"data":{},"success":true,"message":"","extra":{code:200, forward:'', float:true}}
+	 *     success:请求状态
+	 *     message:前台客户端用户友好的提示信息
+	 *     extra:请求相关的额外状态数据，例如返回代码，ajax链接跳转指令（是否在浮动窗口中，例如登录）等
+	 *     data:要传输给客户端的业务数据
 	 * 
 	 * @param boolean $status
 	 * @param string $message 返回代码
-	 * @param int $code 返回代码见\HuiLib\Helper\Header
+	 * @param int $extra 请求相关的额外状态数据
 	 * @param mix $data 返回数据
 	 */
-	protected function renderJson($status=self::STATUS_SUCCESS, $message='', $code=\HuiLib\Helper\Header::OK, $data=array())
+	protected function renderJson($status=self::STATUS_SUCCESS, $message='', $extra=array(), $data=array())
 	{
 		$result=array();
 		
 		$result['success']=$status;
 		$result['message']=$message;
-		$result['code']=$code;
+		if (!isset($extra['code'])) {
+		    $extra['code']=\HuiLib\Helper\Header::OK;
+		}
+		$result['extra']=$extra;
 		$result['data']=$data;
 		$json=json_encode ( $result );
 		
@@ -223,14 +224,14 @@ class Controller
 	 */
 	protected function renderJsonResult($result)
 	{
-		 $code=\HuiLib\Helper\Header::OK;
+		 $extra=array();
 		 $status=self::STATUS_SUCCESS;
 		 $message='';
 		 $data=array();
 		 
-		 if (isset($result['code'])) {
-		 	$code=$result['code'];
-		 	unset($result['code']);
+		 if (isset($result['extra'])) {
+		 	$extra=$result['extra'];
+		 	unset($result['extra']);
 		 }
 		 if (isset($result['success'])) {
 		 	$status=$result['success'];
@@ -247,7 +248,7 @@ class Controller
 		 	$data=$result;
 		 }
 		 
-		 $this->renderJson($status, $message, $code, $data);
+		 $this->renderJson($status, $message, $extra, $data);
 	}
 
 	/**
@@ -295,6 +296,17 @@ class Controller
 	{
 		return Front::getInstance()->getSiteConfig();
 	}
+	
+
+	/**
+	 * 快速获取View代理辅助对象
+	 *
+	 * @return \HuiLib\View\Helper\Proxy
+	 */
+	protected function getNewViewProxy()
+	{
+	    return Proxy::create();
+	}
 
 	/**
 	 * 取消使用view
@@ -319,62 +331,12 @@ class Controller
 	{
 		$this->autoRender = FALSE;
 	}
-	
-	public function setHost($host)
-	{
-		$this->host = $host;
-	}
 
-	public function setPackage($package)
-	{
-		$this->package = $package;
-	}
-
-	public function setController($controller)
-	{
-		$this->controller = $controller;
-	}
-
-	public function setAction($action)
-	{
-		$this->action = $action;
-	}
-	
-	public function setSubAction($subAction)
-	{
-		$this->subAction = $subAction;
-	}
-	
-	public function getPackage()
-	{
-		return $this->package;
-	}
-	
-	public function getController()
-	{
-		return $this->controller;
-	}
-	
-	public function getAction()
-	{
-		return $this->action;
-	}
-	
-	public function getSubAction()
-	{
-		return $this->subAction;
-	}
-	
 	/**
 	 * 获取翻译实例
 	 */
 	protected function getLang()
 	{
 		return Front::getInstance()->getLang();
-	}
-	
-	public function __call($name, $arguments)
-	{
-		$this->shortNameRoute($name, $arguments);
 	}
 }

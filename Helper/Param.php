@@ -98,20 +98,16 @@ class Param
 	/**
 	 * 获取重写基准路径
 	 * 
-	 * eg. [SCRIPT_URL] => /fdsafdas/fsdafdsa/fsdafsda
+	 * eg. [REQUEST_URI] => /fdsafdas/fsdafdsa/fsdafsda
 	 */
 	public static function getScriptUrl(){
-	    if (isset( $_SERVER ['SCRIPT_URL'] )){
-	        return self::server('SCRIPT_URL', self::TYPE_STRING);
+	    $requestUri = isset ( $_SERVER ['REQUEST_URI'] ) ? $_SERVER ['REQUEST_URI'] : '';
+	    if (strpos($requestUri, '?')!==FALSE){
+	        $scriptUrl=substr($requestUri, 0, strpos($requestUri, '?'));
 	    }else{
-	        $requestUri = isset ( $_SERVER ['REQUEST_URI'] ) ? $_SERVER ['REQUEST_URI'] : '';
-	        if (strpos($requestUri, '?')!==FALSE){
-	            $scriptUrl=substr($requestUri, 0, strpos($requestUri, '?')-1);
-	        }else{
-	            $scriptUrl=$requestUri;
-	        }
-	        return $scriptUrl;
+	        $scriptUrl=$requestUri;
 	    }
+	    return $scriptUrl;
 	}
 	
 	/**

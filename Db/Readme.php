@@ -68,6 +68,9 @@ $insert->enableDuplicate(true); //开启自动Dup更新模式
 $insert->fields(array('field1','field2'))->dupFields(array('field1', 'num'))
 		  ->values(array('fvalue1', 'fvalue2'), array('field2'=>'newfvalue1', array('plain'=>'num=num+1')));
 
+//2.2.4 通过row对象数组或rowset批量插入
+$insert->batchSaveRows();
+
 //2.3 更新部分
 //获取更新对象
 //update tableTest set field1='fvalue1', num=num+1 where (id='16') ;

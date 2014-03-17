@@ -73,8 +73,8 @@ abstract class HashTable extends RedisBase
 		
 		$keyList[]=self::REDIS_UPDATE_KEY;
 		$resultList=$this->getAdapter()->hMget($this->getRedisKey(), $keyList);
-		//print_r($resultList);
-		
+		//print_r($resultList);die();
+
 		//检测到未设置数据 导入数据，惰性更新
 		if (empty($resultList[self::REDIS_UPDATE_KEY])) {
 			$this->importFromDb();
@@ -183,9 +183,17 @@ abstract class HashTable extends RedisBase
 			if ($dataList) {
 				$result=array();
 				foreach ($dataList as $iter=>$valueUnit){
+				    //包含无限循环的要尽量限制严格些
+				    if (!isset($valueUnit[$this->hashKeyField])) {
+				        throw new \Exception('Field fetch error.');
+				    }
 					$result[$valueUnit[$this->hashKeyField]]=$this->getValueString($valueUnit);
 				}
-				//PHP可以这样获取最后一个
+
+				//包含无限循环的要尽量限制严格些
+				if (!isset($valueUnit[$primaryIdKey])) {
+				    throw new \Exception('Value of primary key fetch error.');
+				}
 				$primaryId=$valueUnit[$primaryIdKey];
 	
 				$this->getAdapter()->hMset($this->getRedisKey(), $result);

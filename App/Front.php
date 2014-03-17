@@ -2,10 +2,11 @@
 namespace HuiLib\App;
 
 use HuiLib\Error\Exception;
+
 /**
- * 常用对象中间储存，便于获取，各种对象注册交流中心
- *
- * 单例模式
+ * 库端常用对象中间储存
+ * 
+ * 便于获取，各种对象注册交流中心，单例模式，应用端在Controller\AppFront 
  * 
  * @author 祝景法
  * @since 2014/01/11
@@ -80,6 +81,27 @@ class Front
 	 */
 	protected $view=NULL;
 	
+	/**
+	 * Package短链对象
+	 *
+	 *  @var \HuiLib\Route\Package 
+	 */
+	protected $packageRoute=NULL;
+	
+	/**
+	 * Controller短链对象
+	 *
+	 *  @var \HuiLib\Route\Controller
+	 */
+	protected $controllerRoute=NULL;
+	
+	/**
+	 * Action短链对象
+	 *
+	 *  @var \HuiLib\Route\Action
+	 */
+	protected $actionRoute=NULL;
+
 	/**
 	 * 应用运行末期注册方法呼叫
 	 *
@@ -197,6 +219,36 @@ class Front
 	public function getView()
 	{
 		return $this->view;
+	}
+	
+	public function setPackageRoute(\HuiLib\Route\Package $route)
+	{
+	    $this->packageRoute=$route;
+	}
+	
+	public function getPackageRoute()
+	{
+	    return $this->packageRoute;
+	}
+	
+	public function setControllerRoute(\HuiLib\Route\Controller $route)
+	{
+	    $this->controllerRoute=$route;
+	}
+	
+	public function getControllerRoute()
+	{
+	    return $this->controllerRoute;
+	}
+	
+	public function setActionRoute(\HuiLib\Route\Action $route)
+	{
+	    $this->actionRoute=$route;
+	}
+	
+	public function getActionRoute()
+	{
+	    return $this->actionRoute;
 	}
 	
 	public function setShutCall(\HuiLib\Runtime\ShutCall $shutCall)

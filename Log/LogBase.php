@@ -54,30 +54,6 @@ abstract class LogBase
 	protected $identify = 'normal';
 	
 	/**
-	 * 配置实例
-	 * @var \HuiLib\Config\ConfigBase
-	 */
-	protected $configInstance = NULL;
-	
-	/**
-	 * 当前处理包名
-	 * @var String
-	 */
-	protected $package = '';
-	
-	/**
-	 * 当前处理控制器名
-	 * @var String
-	 */
-	protected $controller = '';
-	
-	/**
-	 * 当前处理动作名
-	 * @var String
-	 */
-	protected $action = '';
-	
-	/**
 	 * 当前访问用户ID
 	 * @var int
 	 */
@@ -89,15 +65,8 @@ abstract class LogBase
 	 */
 	protected $urlNow = '';
 
-	protected function __construct($config, $configInstance)
+	protected function __construct()
 	{
-		//初始化公共信息部分
-		$constroller = Front::getInstance()->getController();
-		if ($constroller instanceof \HuiLib\App\Controller) {
-			$this->package = $constroller->getPackage ();
-			$this->controller = $constroller->getController ();
-			$this->action = $constroller->getAction ();
-		}
 		if (isset ( $_SESSION ['uid'] )) {
 			$this->uid = $_SESSION ['uid'];
 		}
@@ -107,62 +76,58 @@ abstract class LogBase
 	/**
 	 * 获取系统默认缓存实例
 	 */
-	public static function getDefault(\HuiLib\Config\ConfigBase $configInstance = NULL)
+	public static function getDefault()
 	{
-		if ($configInstance === NULL) {
-			$configInstance = Front::getInstance()->getAppConfig();
-		}
+	    $configInstance = Front::getInstance()->getAppConfig();
 		
 		$adapterName = $configInstance->getByKey ( 'log.defalut' );
 		if (empty ( $adapterName )) {
 			throw new \HuiLib\Error\Exception ( 'Log default adapter has not set.' );
 		}
 		
-		return self::staticCreate ( $adapterName, $configInstance );
+		return self::staticCreate ( $adapterName );
 	}
 
 	/**
 	 * 获取Memcache默认缓存实例
 	 */
-	public static function getFile(\HuiLib\Config\ConfigBase $configInstance = NULL)
+	public static function getFile()
 	{
-		return self::staticCreate ( 'log.file', $configInstance );
+		return self::staticCreate ( 'log.file' );
 	}
 
 	/**
 	 * 获取Redis默认缓存实例
 	 */
-	public static function getMysql(\HuiLib\Config\ConfigBase $configInstance = NULL)
+	public static function getMysql()
 	{
-		return self::staticCreate ( 'log.mysql', $configInstance );
+		return self::staticCreate ( 'log.mysql' );
 	}
 
 	/**
 	 * 获取Mongo默认缓存实例
 	 */
-	public static function getMongo(\HuiLib\Config\ConfigBase $configInstance = NULL)
+	public static function getMongo()
 	{
-		return self::staticCreate ( 'log.mongo', $configInstance );
+		return self::staticCreate ( 'log.mongo' );
 	}
 
-	private static function staticCreate($adapterName, \HuiLib\Config\ConfigBase $configInstance = NULL)
+	private static function staticCreate($adapterName)
 	{
-		if ($configInstance === NULL) {
-			$configInstance = Front::getInstance()->getAppConfig();
-		}
+	    $configInstance = Front::getInstance()->getAppConfig();
 		
 		$adapterConfig = $configInstance->getByKey ( $adapterName );
 		if (empty ( $adapterConfig )) {
 			throw new \HuiLib\Error\Exception ( $adapterName . ' adapter config has not set.' );
 		}
 		
-		return self::create ( $adapterConfig, $configInstance );
+		return self::create ( $adapterConfig );
 	}
 
 	/**
 	 * 创建DB实例 DB factory方法
 	 */
-	public static function create($config, $configInstance)
+	public static function create($config)
 	{
 		if (empty ( $config ['adapter'] )) {
 			throw new \HuiLib\Error\Exception ( 'Log adapter can not be empty!' );
@@ -171,13 +136,13 @@ abstract class LogBase
 		$adapter = NULL;
 		switch ($config ['adapter']) {
 			case 'mysql' :
-				$adapter = new \HuiLib\Log\Storage\Mysql ( $config, $configInstance );
+				$adapter = new \HuiLib\Log\Storage\Mysql ( $config );
 				break;
 			case 'file' :
-				$adapter = new \HuiLib\Log\Storage\File ( $config, $configInstance );
+				$adapter = new \HuiLib\Log\Storage\File ( $config );
 				break;
 			case 'mongo' :
-				$adapter = new \HuiLib\Log\Storage\Mongo ( $config, $configInstance );
+				$adapter = new \HuiLib\Log\Storage\Mongo ( $config );
 				break;
 		}
 		

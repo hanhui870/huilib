@@ -4,6 +4,7 @@ namespace HuiLib\Log\Storage;
 use HuiLib\Db\DbBase;
 use HuiLib\Helper\DateTime;
 use HuiLib\Db\Query;
+use HuiLib\App\Front;
 
 /**
  * 日志模块Mysql适配器
@@ -15,9 +16,9 @@ class Mysql extends \HuiLib\Log\LogBase
 {
 	protected $table=NULL;
 
-	protected function __construct($config, \HuiLib\Config\ConfigBase $configInstance)
+	protected function __construct($config)
 	{
-		$driverConfig = empty ( $config ['driver'] ) ? '' : $configInstance->getByKey ( $config ['driver'] );
+		$driverConfig = empty ( $config ['driver'] ) ? '' : Front::getInstance()->getAppConfig()->getByKey ( $config ['driver'] );
 		if (empty ( $config ['driver'] ) || empty ( $driverConfig )) {
 			throw new \HuiLib\Error\Exception ( 'Log mysql driver ini error' );
 		}
@@ -32,7 +33,7 @@ class Mysql extends \HuiLib\Log\LogBase
 		}
 		$this->table=$config ['table'];
 		
-		parent::__construct($config, $configInstance);
+		parent::__construct($config);
 	}
 	
 	/**
@@ -53,9 +54,12 @@ class Mysql extends \HuiLib\Log\LogBase
 		$logArray['Type']=$this->type;
 		$logArray['Identify']=$this->identify;
 		$logArray['Info']=json_encode($logInfo);
-		$logArray['Package']=$this->package;
-		$logArray['Control']=$this->controller;
-		$logArray['Action']=$this->action;
+		
+		$request=Front::getInstance()->getRequest();
+		$logArray['Package']=$request->getPackageRouteSeg();
+		$logArray['Control']=$request->getControllerRouteSeg();
+		$logArray['Action']=$request->getActionRouteSeg();
+		
 		$logArray['Uid']=$this->uid;
 		$logArray['CreateTime']=DateTime::format();
 

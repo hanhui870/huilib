@@ -32,6 +32,12 @@ class ConfigBase
 	private $configEnv;
 	
 	/**
+	 * 配置上次更新时间
+	 * @var int
+	 */
+	private $lastUpate;
+	
+	/**
 	 * 缓存接口 默认Apc cache
 	 * 
 	 * @var \HuiLib\Cache\CacheBase
@@ -63,6 +69,7 @@ class ConfigBase
 			
 		} else {
 			$this->configFinal=$cacheContent ['data'];
+			$this->lastUpate=intval( $cacheContent ['stamp'] );
 			if ($cacheContent ['section']) {//存在section标记
 				if (isset ( $this->configFinal [APP_ENV] )) {
 					$this->configEnv = &$this->configFinal [APP_ENV];
@@ -130,6 +137,7 @@ class ConfigBase
 		$cache ['data'] = $this->configFinal;
 		$cache ['section'] = $existSection;
 		$cache ['stamp'] = filemtime ( $this->filePath );
+		$this->lastUpate=$cache ['stamp'];
 		
 		$this->cacheAdapter->add ( $this->getCacheKey (), $cache );
 	}
@@ -353,6 +361,16 @@ class ConfigBase
 		}
 		
 		return NULL;
+	}
+	
+	/**
+	 * 获取配置文件的上次更新时间
+	 * 
+	 * @return number
+	 */
+	public function getLastUpdate()
+	{
+	    return $this->lastUpate;
 	}
 
 	public function toArray()

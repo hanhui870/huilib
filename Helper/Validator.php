@@ -51,4 +51,12 @@ class Validator
 			return false;
 		}
 	}
+	
+	/**
+	 * TODO 是否是有效的短链
+	 * 3-50个字符，字母开始，由字母、数字、“.”、“-”组成，例如：Xiang.Liu。
+	 */
+	static function isShorturl($string) {
+	    
+	}
 }

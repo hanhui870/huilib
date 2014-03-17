@@ -1,6 +1,7 @@
 <?php
 namespace HuiLib\Db\Query;
 
+use HuiLib\Db\Result;
 /**
  * Sql语句查询类Select操作
  *
@@ -12,6 +13,7 @@ class Select extends \HuiLib\Db\Query
 	const FIELD_ANY = '*';
 	const SELECT = 'select';
 	const COLUMNS = 'columns';
+	const PLAIN_COLUMNS = 'plain_columns';
 	const TABLE = 'table';
 	const JOINS = 'joins';
 	const WHERE = 'where';
@@ -248,7 +250,7 @@ class Select extends \HuiLib\Db\Query
 	/**
 	 * 重置语句部分参数
 	 *
-	 * @param array $part
+	 * @param string $part
 	 * @return \HuiLib\Db\Query\Select
 	 */
 	public function reset($part)
@@ -260,6 +262,9 @@ class Select extends \HuiLib\Db\Query
 			case self::COLUMNS :
 				$this->columns = array ();
 				break;
+			case self::PLAIN_COLUMNS :
+			    $this->plainColumns = array ();
+			    break;
 			case self::JOINS :
 				$this->joins = array ();
 				break;
@@ -303,6 +308,7 @@ class Select extends \HuiLib\Db\Query
 		$rawState = array(
 				self::TABLE      => $this->table,
 				self::COLUMNS    => $this->columns,
+		        self::PLAIN_COLUMNS    => $this->plainColumns,
 				self::JOINS      => $this->joins,
 				self::WHERE      => $this->where,
 				self::ORDER      => $this->order,
@@ -324,10 +330,10 @@ class Select extends \HuiLib\Db\Query
 	{
 		$field=array();
 		foreach ($this->columns as $alias=>$column){
-			$column="`$column`";//安全过滤
-			$alias="`$alias`";
+			$columnFiltered="`$column`";//安全过滤
+			$aliasFiltered="`$alias`";
 			if (is_string($alias)) {
-				$field[]=sprintf("%s as %s", $column, $alias);
+				$field[]=sprintf("%s as %s", $columnFiltered, $aliasFiltered);
 			}else{
 				$field[]=$column;
 			}
@@ -458,6 +464,25 @@ class Select extends \HuiLib\Db\Query
 	}
 	
 	/**
+	 * 获取当前Select数据集的数量统计
+	 * 
+	 * explain select count(1) as itemCount from (select * from discuss where MainTopic=47) as tmpTable 
+	 */
+	public function getItemCount()
+	{
+	    $tmpSelect=clone $this;
+	    $tmpSelect->reset(self::LIMIT)->reset(self::OFFSET)->reset(self::ORDER)->reset(self::ENDS);
+	    
+	    //计数SQL
+	    $sql="select count(1) as itemCount from (".$tmpSelect->toString().") as tmpTable";
+	    
+	    $this->setAdapter();
+	    $innerStatment=$this->adapter->getConnection()->query($sql);
+	    $result=Result::create($innerStatment);
+	    return $result->fetchColumn();
+	}
+	
+	/**
 	 * 编译成SQL语句
 	 */
 	protected function compile()
@@ -489,6 +514,16 @@ class Select extends \HuiLib\Db\Query
 	public function toString()
 	{
 		return $this->compile();
+	}
+	
+	public function getLimit()
+	{
+	    return $this->limit;
+	}
+	
+	public function getOffset()
+	{
+	    return $this->offset;
 	}
 	
 	public function table($table){

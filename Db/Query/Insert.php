@@ -139,7 +139,7 @@ class Insert extends \HuiLib\Db\Query
 	/**
 	 * 重置语句部分参数
 	 *
-	 * @param array $part
+	 * @param string $part
 	 * @return \HuiLib\Db\Query\Select
 	 */
 	public function reset($part)
@@ -365,11 +365,11 @@ class Insert extends \HuiLib\Db\Query
 	/**
 	 * 批量保存行对象
 	 * 
-	 * @param array $rows 由行对象组成的数组
+	 * @param array $rows 由行对象组成的数组 或 rowset
 	 * @bool
 	 */
 	public function batchSaveRows($rows){
-		if (!is_array($rows)) {
+		if (!is_array($rows) && !is_object($rows)) {
 			$rows=array($rows);
 		}
 		
@@ -380,8 +380,12 @@ class Insert extends \HuiLib\Db\Query
 			
 			$kvArray=$rowInstance->toArray();
 			if (!$inited) {
-				$tableInstance=$rowInstance->getTableInstance();
-				$this->table($tableInstance::TABLE)->fields(array_keys($kvArray));
+			    if ($this->table===NULL) {
+			        $tableInstance=$rowInstance->getTableInstance();
+			        $this->table=$tableInstance::TABLE;
+			    }
+				
+				$this->table($this->table)->fields(array_keys($kvArray));
 				$inited=TRUE;
 			}
 			

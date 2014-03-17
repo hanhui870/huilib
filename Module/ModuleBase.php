@@ -24,16 +24,16 @@ class ModuleBase
 	 *
 	 * @param boolean $status
 	 * @param string $message 返回代码
-	 * @param int $code 返回代码见\HuiLib\Helper\Header
+	 * @param int $extra array()  请求相关的额外状态数据
 	 * @param mix $data 返回数据
 	 */
-	protected function format($status=self::API_SUCCESS, $message='', $code=\HuiLib\Helper\Header::OK, $data=array())
+	protected function format($status=self::API_SUCCESS, $message='', $extra=array(), $data=array())
 	{
 		$result=array();
 	
 		$result['success']=$status;
 		$result['message']=$message;
-		$result['code']=$code;
+		$result['extra']=$extra;
 		$result['data']=$data;
 	
 		return $result;

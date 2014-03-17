@@ -172,6 +172,16 @@ class HashRow extends RedisBase
 	}
 	
 	/**
+	 * 返回对象数据是否为空
+	 *
+	 * @return boolean
+	 */
+	public function isEmpty()
+	{
+	    return empty($this->data);
+	}
+	
+	/**
 	 * 将编辑的数据推送到迟久库，并删除缓存
 	 * 
 	 * 更新编辑数据到数据库 仅数字增减等非完全覆盖修改
