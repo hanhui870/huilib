@@ -434,6 +434,25 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	}
 	
 	/**
+	 * 动态增减某些键值
+	 * 
+	 * @param string $key
+	 * @param number $value
+	 */
+	public function incrValue($key, $value)
+	{
+	    if ( !is_numeric($value) ) {
+	        throw new Exception('Number of $value is required by incrKey() method.');
+	    }
+	
+	    if (isset($this->data[$key])){
+	        $this->data[$key]+=$value;
+	        return TRUE;
+	    }
+	    return FALSE;
+	}
+	
+	/**
 	 * 直接通过对象属性获取
 	 * 
 	 * 注意:以下哪怕直接获取是有值的，但还是判断失败的
