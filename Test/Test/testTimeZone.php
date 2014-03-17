@@ -54,7 +54,8 @@ if (!empty($userObj['timezone'])){
     //数据库区时设置 mysql设置后php设置又是相反的
     $db=Zend_Db_Table::getDefaultAdapter();
     $zone=intval($userObj['timezone']);
-    if($zone > 0){
+    //处理=0中间值的问题 因为设置set time_zone = '0:00';是错误的，必须有正负。set time_zone = '+0:00'; set time_zone = '-0:00';都是可以的。
+    if($zone >= 0){
         $db->query("set time_zone = '+{$zone}:00';");
     }else{
         $db->query("set time_zone = '{$zone}:00';");
