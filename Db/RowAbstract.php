@@ -446,7 +446,7 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	    }
 	
 	    if (isset($this->data[$key])){
-	        $this->data[$key]+=$value;
+	        $this->$key+=$value;
 	        return TRUE;
 	    }
 	    return FALSE;
