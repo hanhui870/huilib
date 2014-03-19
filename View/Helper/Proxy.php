@@ -64,6 +64,16 @@ class Proxy
     }
     
     /**
+     * 返回对象数据是否为空
+     *
+     * @return boolean
+     */
+    public function isEmpty()
+    {
+        return empty($this->data);
+    }
+    
+    /**
      * 添加一条数据 覆盖已有
      *
      * @param string $key
