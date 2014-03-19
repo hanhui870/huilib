@@ -291,6 +291,19 @@ class Query
 	}
 	
 	/**
+	 * 直接发起SQL请求
+	 *
+	 * @param string $string 查询的SQL
+	 * @return \HuiLib\Db\Result
+	 */
+	public function querySql($sql)
+	{
+	    $this->setAdapter();
+	    $innerStatment=$this->adapter->getConnection()->query($sql);
+	    return Result::create($innerStatment);
+	}
+	
+	/**
 	 * Prepare查询，先调用prepare，然后调用::execute($param)
 	 * @return \HuiLib\Db\Query
 	 */
