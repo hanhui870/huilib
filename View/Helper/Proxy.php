@@ -6,17 +6,24 @@ namespace HuiLib\View\Helper;
  * 视图前台对象传递辅助类
  * 
  * 提供类似DB Row对象直接在模板中的对象访问支持，避免前台模板索引应用数据等。
+ * 这种执行Iterator接口的数据必须是0,1,2这样开始的自然索引数组才能被foreach，但是可以正常数组获取。RowSet原理一样。
  * 
  * @author 祝景法
  * @since 2014/03/01
  */
-class Proxy
+class Proxy implements \Iterator, \ArrayAccess
 {
     /**
      * 数据储存
      * @var array
      */
     protected $data=array();
+    
+    /**
+     * 数组当前指针
+     * @var int
+     */
+    protected $position = 0;
     
     /**
      * 快速获取数据值
@@ -113,6 +120,65 @@ class Proxy
         $this->data=$data;
         
         return $this;
+    }
+    
+    public function rewind()
+    {
+        $this->position = 0;
+    }
+    
+    /**
+     * 获取一行数据，生成对象
+     * @return \HuiLib\Db\RowAbstract
+     */
+    public function current()
+    {
+        return $this->data [$this->position];
+    }
+    
+    public function key()
+    {
+        return $this->position;
+    }
+    
+    public function next()
+    {
+        ++ $this->position;
+    }
+    
+    public function valid()
+    {
+        return isset ( $this->data [$this->position] );
+    }
+    
+    public function offsetSet($offset, $value)
+    {
+        if (is_null ( $offset )) {
+            $this->data [] = $value;
+        } else {
+            $this->data [$offset] = $value;
+        }
+    }
+    
+    public function offsetExists($offset)
+    {
+        return isset ( $this->data [$offset] );
+    }
+    
+    public function offsetUnset($offset)
+    {
+        unset ( $this->data [$offset] );
+    }
+    
+    /**
+     * 通过数组下标获取一行数据
+     *
+     * @param int $offset
+     * @return \HuiLib\Db\RowAbstract
+     */
+    public function offsetGet($offset)
+    {
+        return isset ( $this->data [$offset] ) ? $this->data [$offset] : NULL;
     }
     
     /**
