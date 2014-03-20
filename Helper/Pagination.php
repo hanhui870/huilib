@@ -353,6 +353,19 @@ class Pagination
     
         return $this;
     }
+    
+    /**
+     * 获取数据集数量
+     *
+     * @return int
+     */
+    public function getItemCount()
+    {
+        if ($this->itemCount===NULL) {
+            throw new Exception("itemCount has not been set.");
+        }
+        return $this->itemCount;
+    }
 
     public static function create()
     {
