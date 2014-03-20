@@ -81,6 +81,16 @@ class Proxy implements \Iterator, \ArrayAccess
     }
     
     /**
+     * 返回数据的一级对象个数
+     *
+     * @return int
+     */
+    public function size()
+    {
+        return count($this->data);
+    }
+    
+    /**
      * 添加一条数据 覆盖已有
      *
      * @param string $key
