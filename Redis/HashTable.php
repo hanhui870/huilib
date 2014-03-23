@@ -187,7 +187,11 @@ abstract class HashTable extends RedisBase
 				    if (!isset($valueUnit[$this->hashKeyField])) {
 				        throw new \Exception('Field fetch error.');
 				    }
-					$result[$valueUnit[$this->hashKeyField]]=$this->getValueString($valueUnit);
+				    
+				    $valueString=$this->getValueString($valueUnit);
+				    $keyString=$valueUnit[$this->hashKeyField];
+				    if (empty($valueString) || empty($keyString)) continue;
+					$result[$keyString]=$valueString;
 				}
 
 				//包含无限循环的要尽量限制严格些
