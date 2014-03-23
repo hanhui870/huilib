@@ -98,6 +98,16 @@ class RowSet extends \HuiLib\Model\ModelBase implements \Iterator, \ArrayAccess
 	{
 	    return empty($this->dataList);
 	}
+	
+	/**
+	 * 返回数据的一级对象个数
+	 *
+	 * @return boolean
+	 */
+	public function size()
+	{
+	    return count($this->dataList);
+	}
 
 	public function get($iter)
 	{
