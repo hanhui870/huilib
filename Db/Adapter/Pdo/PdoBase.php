@@ -16,6 +16,12 @@ class PdoBase extends \HuiLib\Db\DbBase
 	 */
 	protected $connection=NULL;
 	
+	/**
+	 * 相同参数创建的不同对象的事务也是相隔离的
+	 * 
+	 * @param array $dbConfig
+	 * @throws \HuiLib\Error\Exception
+	 */
 	protected function __construct($dbConfig)
 	{
 		if (!isset($dbConfig['driver'])) {

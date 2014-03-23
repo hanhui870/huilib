@@ -27,6 +27,12 @@ abstract class DbBase
 	 * 数据库主从配置
 	 */
 	private static $config=NULL;
+	
+	/**
+	 * 数据库连接缓存
+	 * @var array 
+	 */
+	private static $dbConnectPool=array();
 
 	/**
 	 * 创建DB Master实例
@@ -35,13 +41,18 @@ abstract class DbBase
 	 */
 	public static function createMaster()
 	{
+	    if (isset(self::$dbConnectPool['master']) && self::$dbConnectPool['master'] instanceof DbBase) {
+	        return self::$dbConnectPool['master'];
+	    }
+	    
 		self::initConfig();
 		
 		if (empty(self::$config['master'])) {
 			throw new \HuiLib\Error\Exception('Db master config can not be empty!');
 		}
 
-		return self::create(self::$config['master']);
+		self::$dbConnectPool['master']=self::create(self::$config['master']);
+		return self::$dbConnectPool['master'];
 	}
 	
 	/**
@@ -59,14 +70,20 @@ abstract class DbBase
 		
 		$slaveConfig=self::$config['slave'];
 		if (empty($slaveNode)) {
-			$dbConfig=$slaveConfig[array_rand($slaveConfig)];
+		    $slaveNode=array_rand($slaveConfig);
+			$dbConfig=$slaveConfig[$slaveNode];
 		}elseif (isset(self::$slaveConfig[$slaveNode])){
 			$dbConfig=self::$slaveConfig[$slaveNode];
 		}else{
 			throw new \HuiLib\Error\Exception('Specified slave config is empty!');
 		}
 		
-		return self::create($dbConfig);
+		if (isset(self::$dbConnectPool[$slaveNode]) && self::$dbConnectPool[$slaveNode] instanceof DbBase) {
+		    return self::$dbConnectPool[$slaveNode];
+		}
+		
+		self::$dbConnectPool[$slaveNode]=self::create($dbConfig);
+		return self::$dbConnectPool[$slaveNode];
 	}
 	
 	/**
