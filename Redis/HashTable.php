@@ -50,6 +50,12 @@ abstract class HashTable extends RedisBase
 	 */
 	protected $hashValueField=NULL;
 	
+	/**
+	 * 是否大小写敏感
+	 * @var boolean
+	 */
+	protected $caseSensitive=TRUE;
+	
 	protected function __construct()
 	{
 	}
@@ -70,6 +76,8 @@ abstract class HashTable extends RedisBase
 		if (!is_array($keyList)) {
 			$keyList=array($keyList);
 		}
+		
+		$keyList=$this->formatHashKey($keyList);
 		
 		$keyList[]=self::REDIS_UPDATE_KEY;
 		$resultList=$this->getAdapter()->hMget($this->getRedisKey(), $keyList);
@@ -108,6 +116,8 @@ abstract class HashTable extends RedisBase
 			$hashKeys=array($hashKeys);
 		}
 		
+		$hashKeys=$this->formatHashKey($hashKeys);
+		
 		$multi=$this->getAdapter()->multi();
 		foreach ($hashKeys as $key){
 			$multi->hDel($this->getRedisKey(), $key);
@@ -124,7 +134,7 @@ abstract class HashTable extends RedisBase
 	public function addOne($valueUnit)
 	{
 		$result=array();
-		$result[$valueUnit[$this->hashKeyField]]=$this->getValueString($valueUnit);
+		$result[$this->formatHashKey($valueUnit[$this->hashKeyField])]=$this->getValueString($valueUnit);
 	
 		//埋Redis更新时间戳
 		$result[self::REDIS_UPDATE_KEY]=time();
@@ -146,7 +156,7 @@ abstract class HashTable extends RedisBase
 			$dataList=$dataList->toArray();
 			$result=array();
 			foreach ($dataList as $iter=>$valueUnit){
-				$result[$valueUnit[$this->hashKeyField]]=$this->getValueString($valueUnit);
+				$result[$this->formatHashKey($valueUnit[$this->hashKeyField])]=$this->getValueString($valueUnit);
 			}
 			
 			//埋Redis更新时间戳
@@ -189,7 +199,7 @@ abstract class HashTable extends RedisBase
 				    }
 				    
 				    $valueString=$this->getValueString($valueUnit);
-				    $keyString=$valueUnit[$this->hashKeyField];
+				    $keyString=$this->formatHashKey($valueUnit[$this->hashKeyField]);
 				    if (empty($valueString) || empty($keyString)) continue;
 					$result[$keyString]=$valueString;
 				}
@@ -219,6 +229,36 @@ abstract class HashTable extends RedisBase
 		}
 		$spaceInfo=explode(NAME_SEP, static::TABLE_CLASS);
 		return parent::KEY_PREFIX.self::KEY_PREFIX.array_pop($spaceInfo);
+	}
+	
+	/**
+	 * 键大小写处理
+	 * @param array $keyList
+	 * @return array
+	 */
+	protected function formatHashKey($keyList)
+	{
+	    //忽略大小写
+	    if (!$this->caseSensitive) {
+	        if (is_array($keyList)) {
+	            foreach ($keyList as $iter=>$redisKey){
+	                $keyList[$iter]=strtolower($redisKey);
+	            }
+	        }else{
+	            $keyList=strtolower($keyList);
+	        }
+	    }
+
+	    return $keyList;
+	}
+	
+
+	/**
+	 * 是否大小写敏感
+	 */
+	public function isCaseSensitive()
+	{
+	    return $this->caseSensitive;
 	}
 	
 	/**
