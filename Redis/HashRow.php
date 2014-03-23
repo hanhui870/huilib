@@ -29,13 +29,13 @@ class HashRow extends RedisBase
 	 * Hash保存修改过的键
 	 * @var string
 	 */
-	const EDIT_FIELD_KEY='RedisEdited';
+	const EDIT_FIELD_KEY='RedisEdited_jfu1o8papfeu5yir6cf5wc5tz8xjn8qw';
 	
 	/**
 	 * Hash保存增减过的键
 	 * @var string
 	 */
-	const INCR_FIELD_KEY='RedisIncred';
+	const INCR_FIELD_KEY='RedisIncred_jfu1o8papfeu5yir6cf5wc5tz8xjn8qw';
 	
 	/**
 	 * 行数据储存

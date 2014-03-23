@@ -18,10 +18,10 @@ abstract class RedisBase
 	const KEY_PREFIX='model:';
 	
 	/**
-	 * Redis更新触发时间戳
+	 * Redis更新触发时间戳，避免冲突
 	 * @var int timestamp
 	 */
-	const REDIS_UPDATE_KEY='RedisUpdate';
+	const REDIS_UPDATE_KEY='RedisUpdate_jfu1o8papfeu5yir6cf5wc5tz8xjn8qw';
 	
 	/**
 	 * 缓存更新触发机制
