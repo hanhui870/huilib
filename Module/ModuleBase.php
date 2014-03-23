@@ -27,7 +27,7 @@ class ModuleBase
 	 * @param int $extra array()  请求相关的额外状态数据
 	 * @param mix $data 返回数据
 	 */
-	protected function format($status=self::API_SUCCESS, $message='', $extra=array(), $data=array())
+	protected static function format($status=self::API_SUCCESS, $message='', $extra=array(), $data=array())
 	{
 		$result=array();
 	
@@ -42,7 +42,7 @@ class ModuleBase
 	/**
 	 * 获取翻译实例
 	 */
-	protected function getLang()
+	protected static function getLang()
 	{
 		return Front::getInstance()->getLang();
 	}
@@ -50,7 +50,7 @@ class ModuleBase
 	/**
 	 * 初始化网站配置实例
 	 */
-	protected function getSiteConfig()
+	protected static function getSiteConfig()
 	{
 		return Front::getInstance()->getSiteConfig();
 	}
