@@ -153,7 +153,7 @@ class Controller
 		
 		if ($view === NULL) {
 		    $request=Front::getInstance()->getRequest();
-			$view = ucfirst ( $request->getPackageRouteSeg() ) . SEP . ucfirst ( $request->getControllerRouteSeg() ) . SEP . ucfirst ( $request->getActionRouteSeg() );
+			$view = $request::mapRouteSegToClass ( $request->getPackageRouteSeg() ) . SEP . $request::mapRouteSegToClass ( $request->getControllerRouteSeg() ) . SEP . $request::mapRouteSegToClass ( $request->getActionRouteSeg() );
 		}
 		
 		$this->view->render ( $view, $ajaxDelimiter );
