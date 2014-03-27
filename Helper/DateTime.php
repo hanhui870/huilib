@@ -20,6 +20,8 @@ class DateTime
 	const LUNAR_DAY=10;
 	//友好模式
 	const READABLE=1000;
+	//每天的秒数
+	const DAY_SECONDS=86400;
 
 	public static function format($format = self::YMDHIS, $time = 0)
 	{
