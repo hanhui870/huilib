@@ -179,6 +179,9 @@ class Pagination
      */
     public function getPageUri($page)
     {
+        if ($page==FALSE) {
+            return 'javascript:void(0);';
+        }
         if ($page>1) {
             return str_ireplace(self::PAGE_HOLDER, $page, $this->getBaseUri());
         }
