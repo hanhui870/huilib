@@ -144,6 +144,8 @@ class Pagination
     
     /**
      * 设置页码链接
+     * 
+     * eg. $pager->setBaseUri('/discuss/100/{page}');
      *
      * @param string $baseUri
      * @return \HuiLib\Helper\Pagination
