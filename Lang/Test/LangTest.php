@@ -26,6 +26,8 @@ class LangTest extends \HuiLib\Test\TestBase
 		echo $lang->translate('HuiLib.lang.test', '芸临网');
 		echo "<br>";
 		echo $lang->translate('HuiLib.lang.testNotExist', '芸临网');
+		echo "<br>_test:<br>";
+		echo $lang->_('HuiLib.lang.test', '芸临网');
 	}
 
 	protected static function className(){

@@ -73,6 +73,17 @@ abstract class LangBase
 	{
 		$this->locale=$locale;
 	}
+	
+	/**
+	 * 快捷翻译函数
+	 *
+	 * 转发到translate
+	 */
+	public function _()
+	{
+	    $params=func_get_args();
+	    return call_user_func_array(array($this, 'translate'), $params);
+	}
 
 	/**
 	 * 请求一个翻译结果
