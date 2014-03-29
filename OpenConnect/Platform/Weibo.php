@@ -25,7 +25,7 @@ class Weibo extends \HuiLib\OpenConnect\OpenConnectBase {
 		$param ['client_id'] = $this->getAppId();
 		$param ['response_type'] = 'code';
 		$param ['redirect_uri'] = $this->getAuthReturnUrl ();
-		$param ['state'] = time ();
+		$param ['state'] = $this->geneState();
 		return self::AUTHORIZE_URL . '?' . http_build_query ( $param );
 	}
 

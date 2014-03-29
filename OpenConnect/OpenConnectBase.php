@@ -4,6 +4,8 @@ namespace HuiLib\OpenConnect;
 use HuiLib\Request\RequestBase;
 use HuiLib\Loader\AutoLoaderException;
 use HuiLib\Helper\String;
+use HuiLib\Helper\Utility;
+use HuiLib\Helper\Param;
 
 /**
  * 开放平台账号登录基础类
@@ -80,14 +82,20 @@ abstract class OpenConnectBase extends \module\base {
 	 * 生成安全校验码
 	 */
 	protected function geneState(){
-	
+	    $_SESSION['tmpOpenConnectState']=Utility::geneRandomHash(32);
+	    return $_SESSION['tmpOpenConnectState'];
 	}
 	
 	/**
 	 * 检验安全校验码
 	 */
-	protected function checkState(){
-	
+	public function checkState(){
+	    $state=Param::get('state', Param::TYPE_STRING);
+	   if (!isset($_SESSION['tmpOpenConnectState']) || $_SESSION['tmpOpenConnectState']!=$state) {
+	       return FALSE;
+	   }
+	   
+	   return TRUE;
 	}
 
 	/**
