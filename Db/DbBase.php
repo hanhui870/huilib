@@ -38,6 +38,8 @@ abstract class DbBase
 	 * 创建DB Master实例
 	 * 
 	 * 可以直接调用创建默认主库连接
+	 * 
+	 * @return \HuiLib\Db\DbBase 
 	 */
 	public static function createMaster()
 	{
@@ -59,6 +61,8 @@ abstract class DbBase
 	 * 创建DB Slave实例
 	 * 
 	 * 可以直接调用创建默认从库连接
+	 * 
+	 * @return \HuiLib\Db\DbBase 
 	 */
 	public static function createSlave($slaveNode=NULL)
 	{
