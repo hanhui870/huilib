@@ -22,11 +22,11 @@ class Baidu extends \HuiLib\OpenConnect\OpenConnectBase {
 	 */
 	public function getAuthorizeUrl() {
 		$param = array ();
-		$param ['client_id'] = self::AppID;
+		$param ['client_id'] = $this->getAppId();
 		$param ['response_type'] = 'code';
 		$param ['redirect_uri'] = $this->getAuthReturnUrl ();
 		$param ['state'] = time ();
-		return self::authorizeUrl . '?' . http_build_query ( $param );
+		return self::AUTHORIZE_URL . '?' . http_build_query ( $param );
 	}
 
 	/**
@@ -35,21 +35,21 @@ class Baidu extends \HuiLib\OpenConnect\OpenConnectBase {
 	 */
 	public function getAccessToken($code) {
 		$param = array ();
-		$param ['client_id'] = self::AppID;
-		$param ['client_secret'] = self::AppSecret;
+		$param ['client_id'] = $this->getAppId();
+		$param ['client_secret'] = $this->getAppSecret();
 		$param ['grant_type'] = 'authorization_code';
 		$param ['redirect_uri'] = $this->getAuthReturnUrl ();
 		$param ['code'] = $code;
 		//access_token=YOUR_ACCESS_TOKEN&expires_in=3600
-		$response = $this->getUrl ( self::accessTokenUrl, $param );
+		$response = $this->getUrl ( self::ACCESS_TOKEN_URL, $param );
 		$result = @json_decode ( $response, true );
 		
 		if (! empty ( $result ['access_token'] ) && ! empty ( $result ['expires_in'] )) {
 			$openInfo = array ();
-			$openInfo ['platform'] = self::platform;
-			$openInfo ['access_token'] = $result ['access_token'];
-			$openInfo ['expire'] = $result ['expires_in'];
-			$openInfo ['refresh_token'] = $result ['refresh_token'];
+			$openInfo ['Platform'] = self::PLATFORM;
+			$openInfo ['AccessToken'] = $result ['access_token'];
+			$openInfo ['Expire'] = $result ['expires_in'];
+			$openInfo ['RefreshToken'] = $result ['refresh_token'];
 
 			//获取当前登录用户信息
 			$this->setOpenInfo($openInfo);
@@ -58,9 +58,9 @@ class Baidu extends \HuiLib\OpenConnect\OpenConnectBase {
 			if (empty($response['uid'])) {
 				return false;;
 			}
-			$openInfo ['openid'] = $response ['uid'];
+			$openInfo ['OpenId'] = $response ['uid'];
 			
-			return $this->getLocalUser ( $openInfo );
+			return $openInfo;
 		} else {//失败
 			return false;
 		}

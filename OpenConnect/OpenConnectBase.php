@@ -3,6 +3,7 @@ namespace HuiLib\OpenConnect;
 
 use HuiLib\Request\RequestBase;
 use HuiLib\Loader\AutoLoaderException;
+use HuiLib\Helper\String;
 
 /**
  * 开放平台账号登录基础类
@@ -162,7 +163,7 @@ abstract class OpenConnectBase extends \module\base {
 	 */
 	protected function getUrl($url, $param=array()){
 	    if ($param && is_array($param)) {
-	        $url=$url. ( strexists($url, '?') ? '&' : '?' ) . http_build_query($param);
+	        $url=$url. ( String::exist($url, '?') ? '&' : '?' ) . http_build_query($param);
 	    }
 	
 	    return $this->request($url);
