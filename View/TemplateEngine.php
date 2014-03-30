@@ -13,8 +13,8 @@ namespace HuiLib\View;
  *   4、{if}{/if}对应if循环；{loop}{/loop}对应foreach循环；{for}{/for}对应for循环
  *   5、{eval} 对应php的eval函数。
  *   6、{php}在模板执行php代码。
- *   7、<$!--note--$> 会被保留的HTML注释。
- *   8、{block blockname}{/block blockname} 用于代码块模板文件中前后替换。替换用{blockHolder blockname}
+ *   7、{block blockname}{/block blockname} 用于代码块模板文件中前后替换。替换用{blockHolder blockname}
+ *   8、增加{pre}{/pre}解析标签，这里面的标签不做任何解析，优先级仅次于sub标签。便于在页面中放一些包含{}的静态内容
  *   9、会清除HTML、JS注释
  *   
  * @author hanhui
@@ -77,6 +77,13 @@ class TemplateEngine
 	 * @var array
 	 */
 	private $preFetchSource=NULL;
+	
+	/**
+	 * {pre}标签解析缓存
+	 *
+	 * @var array
+	 */
+	private $preTagCache=NULL;
 
 	function __construct($view, $ajaxDelimiter = NULL)
 	{
@@ -224,6 +231,9 @@ class TemplateEngine
 		//{sub member_header}
 		$source = preg_replace ( "/\{sub\s+([^\}]+)\}/ies", "\$this->procSubSource('\\1')", $source );
 		
+		//{pre}***{/pre} 原内容标签解析
+		$source = preg_replace ( "/\{pre\}(.*?)\{\/pre\}/ies", "\$this->procPreSourceView('\\1')", $source );
+		
 		//删除模板注释
 		$source = preg_replace ( '/\<\!\-\-.*?\-\-\>[\r\n\s]*/is', '', $source );
 		
@@ -259,6 +269,9 @@ class TemplateEngine
 		$source = preg_replace ( '/\{\/for\}/', '<?php }?>' . "\n", $source );
 		$source = preg_replace ( '/\{php\s+([^\}]*?)\}/', '<?php \\1 ?>', $source );
 		
+		
+		$source = preg_replace ( "/\{pre\}(.*?)\{\/pre\}/ies", "\$this->procPreSourceView('\\1')", $source );
+		
 		/**
 		 * 变量、属性、常量、方法解析 
 		 * {MYROOT} echo MYROOT 放在最后
@@ -268,8 +281,8 @@ class TemplateEngine
 		 */
 		$source = preg_replace ( '/\{([$]?[a-zA-Z_\x7f-\xff\\\\][a-zA-Z0-9_\x7f-\xff\[\]\'\"\-\>\(\)\$\:\\\\\,\s]*)\}/is', '<?php echo \1; ?>', $source );
 		
-		//保留必要注释<$!--note--$>
-		$source = preg_replace ( '/\<\$\!\-\-(.*?)\-\-\$\>/is', '<!--\1-->', $source );
+		//替换{pre}***{/pre}生成的临时标签
+		$source = preg_replace ( "/\{@tmpPreSha ([\w]{40})@\}/ies", "\$this->finishPreSource('\\1')", $source );
 		
 		return $source;
 	}
@@ -320,6 +333,32 @@ class TemplateEngine
 		}
 		
 		return $vNew;
+	}
+	
+	/**
+	 * 解析{pre}{/pre}原内容显示标签
+	 * 
+	 * @param string $content
+	 */
+	private function procPreSourceView($content)
+	{
+	    $sha1=sha1($content);
+	    $this->preTagCache[$sha1]=$content;
+	    return '{@tmpPreSha '.$sha1.'@}';
+	}
+	
+	/**
+	 * 将临时{tmpPreSha sha1}值替换为内容
+	 *
+	 * @param string $sha1
+	 */
+	private function finishPreSource($sha1)
+	{
+	    if (isset($this->preTagCache[$sha1])) {
+	        return $this->preTagCache[$sha1];
+	    }else{
+	        return '';
+	    }
 	}
 
 	/**
@@ -392,8 +431,6 @@ class TemplateEngine
 	 * 
 	 * {block var}{/block var}
 	 * 注：能否使用看匹配是否完整 未匹配的位置不变，清除模板符号。
-	 * update:
-	 * 20130921: 结尾也要加上var区分
 	 * 
 	 * @param string $source
 	 * 
