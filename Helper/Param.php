@@ -123,7 +123,7 @@ class Param
 	 */
 	public static function isXmlHttpRequest()
 	{
-		return (self::server('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest' || self::request('ajax'));
+		return (self::server('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest' || self::request('ajax', self::TYPE_BOOL));
 	}
 	
 	/**

@@ -36,9 +36,11 @@ class Controller
 	/**
 	 * 是否Ajax请求
 	 * 
+	 *  初始状态是未判断的，一般默认非ajax，判断为真才处理ajax
+	 * 
 	 * @var boolean
 	 */
-	protected $ajax = FALSE;
+	protected $ajax = NULL;
 	
 	//Ajax状态返回
 	const STATUS_SUCCESS=TRUE;
@@ -46,9 +48,6 @@ class Controller
 
 	public function __construct()
 	{
-		//是否Ajax请求
-		$this->ajax=\HuiLib\Helper\Param::isXmlHttpRequest();
-		
 		//控制器子类初始化接口
 		$this->init();
 	}
@@ -58,6 +57,20 @@ class Controller
 	 */
 	protected function init()
 	{
+	}
+	
+	/**
+	 * 是否Ajax请求
+	 * 
+	 * @return boolean
+	 */
+	public function isAjax()
+	{
+	    if ($this->ajax===NULL) {
+	        $this->ajax=\HuiLib\Helper\Param::isXmlHttpRequest();
+	    }
+	    
+	    return $this->ajax;
 	}
 
 	/**
