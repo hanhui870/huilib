@@ -83,6 +83,9 @@ class TableAbstract extends \HuiLib\Model\ModelBase
 		if ($this->dbAdapter!==NULL) {
 			$select->setAdapter($this->dbAdapter);
 		}
+		if ($this->forUpdate) {
+		    $select->enableForUpdate();
+		}
 		return $this->rowSetObject($select->where ( Where::createPair ( $field, $value ) )->limit ( $limit )->offset ( $offset ));
 	}
 	
@@ -100,7 +103,9 @@ class TableAbstract extends \HuiLib\Model\ModelBase
 		if ($this->dbAdapter!==NULL) {
 			$select->setAdapter($this->dbAdapter);
 		}
-
+		if ($this->forUpdate) {
+		    $select->enableForUpdate();
+		}
 		return $this->rowSetObject($select->where ( Where::createQuote ( $field . ' in (?) ', $ids ) ));
 	}
 
