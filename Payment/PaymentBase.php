@@ -1,5 +1,5 @@
 <?php
-namespace HuiLib\App;
+namespace HuiLib\Payment;
 
 /**
  * 支付模块基础类
