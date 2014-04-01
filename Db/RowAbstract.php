@@ -485,7 +485,8 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	{
 	    //这里应该使用===，因为比如数据字段ENUM默认值为0, 其实赋值为string的时候其实是true的，php很大的坑：'0'=='ddd' 为 false， 0=='ddd'为true
 	    //http://php.net/manual/en/language.operators.comparison.php 原来是转换成数值比较的
-		if (isset($this->data[$key]) && $this->data[$key]!==$value) {
+	    //array[ele]=NULL; isset当值为NULL的时候是为false的，哪怕数组元素真的存在，数据库时间戳值默认为NULL。
+		if (array_key_exists($key, $this->data) && $this->data[$key]!==$value) {
 			$this->originalData[$key]=$this->data[$key];
 			$this->data[$key]=$value;
 			$this->editData[$key]=$value;

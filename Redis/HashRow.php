@@ -198,7 +198,7 @@ class HashRow extends RedisBase
 		$tableClass=static::TABLE_CLASS;
 		$rowObj=$tableClass::create()->enableForUpdate()->getRowByField($this->primaryIdKey, $this->data[$this->primaryIdKey]);
 
-		if ((!empty($this->editData) || !empty($this->incrData)) && !empty($rowObj)) {
+		if ((!empty($this->editData) || !empty($this->incrData)) && $rowObj) {
 			//更新增减影响值
 			foreach ($this->incrData as $key=>$value){
 				$rowObj->$key+=$value;
@@ -210,7 +210,6 @@ class HashRow extends RedisBase
 				if (isset($this->incrData[$key])) continue;
 				$rowObj->$key=$value;
 			}
-			
 			//echo $rowObj->getSaveSql();
 			if($rowObj->save()){
 				$this->editData=array();
@@ -331,7 +330,7 @@ class HashRow extends RedisBase
 			throw new Exception('Redis Hash row model can not edit primary key value.');
 		}
 		
-		if (isset($this->data[$key])) {
+		if (array_key_exists($key, $this->data)) {
 			$this->data[$key]=$value;
 			$this->editData[$key]=$value;
 			return TRUE;
