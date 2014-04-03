@@ -40,6 +40,9 @@ class BlockTextFormator
     
     /*
      * strip_ixcel功能Utf8版 替换为正常空格 因为有些通过这个间隔 删掉很难看
+     * 
+     * 空字符貌似好多，今天发现226 128 131的字符序列也是空字符。
+     * http://hz.house.sina.com.cn/scan/2014-04-01/00404029391.shtml
     */
     public static function stripIxcel($leachmessage) {
         $str = '';
