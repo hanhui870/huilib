@@ -43,7 +43,7 @@ class Bootstrap
 	 */
 	private $shutCall;
 	
-	private $allowedEnv = array ('production', 'testing', 'develop' );
+	private $allowedEnv = array ('production', 'staging', 'testing', 'development' );
 	
 	/**
 	 * 加载器实例
