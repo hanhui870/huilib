@@ -15,6 +15,7 @@ class UtilityTest extends \HuiLib\Test\TestBase
 	}
 	
 	private function test(){
+	    echo Utility::geneRandomHash().PHP_EOL;
 		echo Utility::genUuid();
 	}
 
