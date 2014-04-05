@@ -1,5 +1,5 @@
 <?php
-namespace HuiLib\Runtime;
+namespace HuiLib\Module\Runtime;
 
 /**
  * 应用执行期末方法回调
@@ -7,7 +7,7 @@ namespace HuiLib\Runtime;
  * @author 祝景法
  * @since 2013/08/11
  */
-class ShutCall
+class ShutCall extends  \HuiLib\Module\ModuleBase
 {
 	private $callbacks=array();
 	

@@ -1,5 +1,5 @@
 <?php
-namespace HuiLib\Runtime;
+namespace HuiLib\Module\Runtime;
 
 use HuiLib\Helper\Param;
 
@@ -9,7 +9,7 @@ use HuiLib\Helper\Param;
  * @author 祝景法
  * @since 2013/09/24
  */
-class Output
+class Output extends  \HuiLib\Module\ModuleBase
 {
 	/**
 	 * 是否启用Gzip压缩

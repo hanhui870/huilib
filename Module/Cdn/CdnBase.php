@@ -1,5 +1,5 @@
 <?php
-namespace HuiLib\Cdn;
+namespace HuiLib\Module\Cdn;
 
 /**
  * HuiLib CDN基础类库
@@ -7,6 +7,9 @@ namespace HuiLib\Cdn;
  * @author 祝景法
  * @since 2014/03/25
  */
-class CdnBase{
+class CdnBase extends  \HuiLib\Module\ModuleBase
+{
+    
+    
     
 }

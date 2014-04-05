@@ -1,12 +1,12 @@
 <?php
-namespace HuiLib\Secure;
+namespace HuiLib\Module\Secure;
 
 /**
  * Xss攻击过滤处理类
  *
  * @since 2013/08/11
  */
-class XssFilter
+class XssFilter extends \HuiLib\Module\ModuleBase
 {
 
 	/**

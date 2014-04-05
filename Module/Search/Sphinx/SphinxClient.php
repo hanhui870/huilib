@@ -1,5 +1,5 @@
 <?php
-namespace HuiLib\Search\Sphinx;
+namespace HuiLib\Module\Search\Sphinx;
 //
 // $Id$
 //
@@ -383,7 +383,7 @@ function sphFixUint ( $value )
 
 
 /// sphinx searchd client class
-class SphinxClient
+class SphinxClient  extends \HuiLib\Module\ModuleBase
 {
 	var $_host;			///< searchd host (default is "localhost")
 	var $_port;			///< searchd port (default is 9312)

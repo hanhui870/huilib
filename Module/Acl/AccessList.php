@@ -1,12 +1,12 @@
 <?php
-namespace HuiLib\Acl;
+namespace HuiLib\Module\Acl;
 
 /**
  * 角色权限模块
  * @author 祝景法
  * @date 2013/06/18
  */
-class AccessList
+class AccessList extends \HuiLib\Module\ModuleBase
 {
 	/**
      * 绑定类型
