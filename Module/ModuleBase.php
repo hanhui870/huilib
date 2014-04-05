@@ -48,6 +48,14 @@ class ModuleBase
 	}
 	
 	/**
+	 * 获取库翻译实例
+	 */
+	protected static function getHuiLang()
+	{
+	    return Front::getInstance()->getHuiLang();
+	}
+	
+	/**
 	 * 初始化网站配置实例
 	 */
 	protected static function getSiteConfig()

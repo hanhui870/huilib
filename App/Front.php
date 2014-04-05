@@ -75,6 +75,13 @@ class Front
 	protected $lang=NULL;
 	
 	/**
+	 * HuiLib库的翻译
+	 *
+	 *  @var \HuiLib\Lang\LangBase
+	 */
+	protected $huiLang=NULL;
+	
+	/**
 	 * 前台视图View实例
 	 *
 	 *  @var \HuiLib\View\ViewBase
@@ -202,13 +209,22 @@ class Front
 		$this->lang=$lang;
 	}
 	
-	public function getLang()
+	public function getLang($default=NULL)
 	{
 		if ($this->lang===NULL) {
-			$this->lang=\HuiLib\Lang\LangBase::getDefault();
+			$this->lang=\HuiLib\Lang\LangBase::getDefault($default);
 		}
 	
 		return $this->lang;
+	}
+	
+	public function getHuiLang($default=NULL)
+	{
+	    if ($this->huiLang===NULL) {
+	        $this->huiLang=\HuiLib\Lang\LangBase::getHuiLibLang($default);
+	    }
+	
+	    return $this->huiLang;
 	}
 	
 	public function setView(\HuiLib\View\ViewBase $view)
