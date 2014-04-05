@@ -20,7 +20,7 @@ class BlockTextFormator
         $output = '';
         
         //stripIxcel，除了一般新闻网站很少出现这个字符
-        $message = self::stripIxcel ( $message ); 
+        //$message = self::stripIxcel ( $message ); 
     
         // 兼容英文，仅保留一个空格 \s包括\n\r
         $message = preg_replace ( array ("/[ \f\t\v]{2,}/", "/[\r\n]+/" ), array (' ', "\n" ), trim ( $message ) );
