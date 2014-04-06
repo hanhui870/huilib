@@ -30,11 +30,11 @@ class Utility
 			$charList [] = chr ( $iter );
 		}
 		
-		srand ( microtime ( 1 ) );
+		//不用mt_strand，播种了反而在高并发下一致了
 		$result = array ();
 		$charCount = count ( $charList );
 		for($iter = 0; $iter < $length; $iter ++) {
-			$result [] = $charList [rand ( 0, 999 ) % $charCount];
+			$result [] = $charList [mt_rand ( 0, mt_rand(5,600) ) % $charCount];
 		}
 		
 		return implode ( '', $result );
