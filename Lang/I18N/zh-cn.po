@@ -2,21 +2,65 @@ msgid ""
 msgstr ""
 "Project-Id-Version: HuiLib框架翻译\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-10-24 23:51+0800\n"
-"PO-Revision-Date: 2013-10-26 01:35+0800\n"
-"Last-Translator: 祝景法 <zhujingfa@gmail.com>\n"
+"POT-Creation-Date: 2014-04-06 22:27+0800\n"
+"PO-Revision-Date: 2014-04-06 22:27+0800\n"
+"Last-Translator: zhujingfa <zhujingfa@gmail.com>\n"
 "Language-Team: \n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: translate\n"
 "X-Poedit-Basepath: .\n"
-"X-Poedit-Language: Chinese\n"
-"X-Poedit-Country: CHINA\n"
 "X-Poedit-SourceCharset: utf-8\n"
+"X-Generator: Poedit 1.6.4\n"
 "X-Poedit-SearchPath-0: D:\\webDeveloper\\HuiLib\n"
 
-#: D:\webDeveloper\HuiLib/Lang/Test/LangTest.php:19
+#: D:\webDeveloper\HuiLib/Lang/Readme.php:22
+#: D:\webDeveloper\HuiLib/Lang/Test/LangTest.php:20
+#: D:\webDeveloper\HuiLib/Lang/Test/LangTest.php:26
+#: D:\webDeveloper\HuiLib/Lang/Test/LangTest.php:30
 msgid "HuiLib.lang.test"
 msgstr "%sHuiLib框架%s自带lang组件%d测试%0.2f。"
 
+#: D:\webDeveloper\HuiLib/Lang/Test/LangTest.php:28
+msgid "HuiLib.lang.testNotExist"
+msgstr "%sHuiLib框架%s自带lang组件%d测试%0.2f。"
+
+#: D:\webDeveloper\HuiLib/Module/Cdn/Client/Uploader.php:38
+msgid "cdn.post.empty.type.need"
+msgstr "上传的文件类型不能为空。"
+
+#: D:\webDeveloper\HuiLib/Module/Cdn/Client/Uploader.php:46
+msgid "cdn.post.files.error"
+msgstr "上传的文件有错误，停止发送。"
+
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:20
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:29
+msgid "cdn.upload.type.error"
+msgstr "CDN上传文件类型错误。"
+
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:47
+msgid "cdn.upload.app_id.null"
+msgstr "CDN AppId错误。"
+
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:51
+msgid "cdn.upload.files.empty"
+msgstr "上传文件不能为空。"
+
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:60
+msgid "cdn.upload.decode.failed"
+msgstr "上传安全校验失败。"
+
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:73
+msgid "cdn.upload.files.error"
+msgstr "上传的文件有错误。"
+
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:76
+msgid "cdn.upload.files.finger.print.error"
+msgstr "上传文件指纹校验错误。"
+
+#: D:\webDeveloper\HuiLib/Module/Cdn/Utility.php:21
+#: D:\webDeveloper\HuiLib/Module/Cdn/Utility.php:39
+msgid "cdn.encrypt.data.error"
+msgstr "加密数据或密钥错误。"

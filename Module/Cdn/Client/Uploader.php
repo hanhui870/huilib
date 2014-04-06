@@ -2,6 +2,7 @@
 namespace HuiLib\Module\Cdn\Client;
 
 use HuiLib\Error\Exception;
+use HuiLib\Module\Cdn\Utility;
 /**
  * HuiLib CDN Uploader库
  * 
@@ -49,6 +50,7 @@ class Uploader extends Base
             $post[$field.'[type]']=$file['type'];
             $post[$field.'[error]']=$file['error'];
             $post[$field.'[size]']=$file['size'];
+            $post[$field.'[sha1]']=sha1_file($file['tmp_name']);
         }
 
         return $this->curl($post, $attches);
@@ -69,11 +71,10 @@ class Uploader extends Base
      */
     protected function curl($post, $attches)
     {
-        
         $config=parent::getConfig();
         $post['app_id']=$config['app_id'];
         try {
-            $post['secret']=$this->encrypt($post, $config['app_secret']);
+            $post['hash']=Utility::encrypt($post, $config['app_secret']);
         }catch (Exception $e){
             return $this->format(self::API_FAIL, $e->getMessage());
         }
@@ -88,23 +89,5 @@ class Uploader extends Base
         $result=curl_exec($handle);
         
         print_r($result);
-    }
-    
-    /**
-     * 完整性加密
-     * 
-     * @param array $data
-     * @param string $secret
-     */
-    protected function encrypt($post, $secret)
-    {
-        if (!is_array($post) || empty($secret)) {
-            throw new Exception($this->getHuiLang()->_('cdn.encrypt.data.error'));
-        }
-        
-         ksort($post, SORT_STRING);
-         $post['app_secret']=$secret;
-
-         return md5(http_build_query($post));
     }
 }
