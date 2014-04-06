@@ -7,11 +7,12 @@ use HuiLib\Error\Exception;
  * Redis HashRow基础管理类
  * 
  * 通过在变量中嵌入RedisUpdate字段值触发更新机制
+ * 全局单个对象唯一机制，确保读写数据一致。不然可能存在脏写现象。
  *
  * @author 祝景法
  * @since 2013/12/14
  */
-class HashRow extends RedisBase
+abstract class HashRow extends RedisBase
 {
 	/**
 	 * 表类常量定义
@@ -84,6 +85,18 @@ class HashRow extends RedisBase
 	 * @var boolean
 	 */
 	protected $fromDb=FALSE;
+	
+	/**
+	 * 内部对象缓存
+	 * @var array
+	 */
+	private static $innerInstance=array();
+	
+	/**
+	 * 是否被删除 被删除 不回写
+	 * @var boolean
+	 */
+	private $isDeleted=FALSE;
 	
 	protected function __construct()
 	{
@@ -189,14 +202,15 @@ class HashRow extends RedisBase
 	 *
 	 * @param array $data 缓存数据
 	 */
-	protected function flushEditedAndDelete()
+	public function flushEditedAndDelete()
 	{
+	    $primaryValue=$this->data[$this->primaryIdKey];
 		//先删除缓存，避免可能在行对象保存后事件中激发refresh引发递归，只尝试保存一次
-		$this->getAdapter()->del($this->getRedisKey($this->data[$this->primaryIdKey]));
+		$this->getAdapter()->del($this->getRedisKey($primaryValue));
 		
 		//通过主键尝试数据表获取行数据，锁定
 		$tableClass=static::TABLE_CLASS;
-		$rowObj=$tableClass::create()->enableForUpdate()->getRowByField($this->primaryIdKey, $this->data[$this->primaryIdKey]);
+		$rowObj=$tableClass::create()->enableForUpdate()->getRowByField($this->primaryIdKey, $primaryValue);
 
 		if ((!empty($this->editData) || !empty($this->incrData)) && $rowObj) {
 			//更新增减影响值
@@ -217,6 +231,10 @@ class HashRow extends RedisBase
 				$this->data=array();
 			}
 		}
+		
+		//清空缓存
+		self::$innerInstance[static::getClass()][$primaryValue]=NULL;
+		$this->isDeleted=TRUE;
 
 		return TRUE;
 	}
@@ -277,35 +295,54 @@ class HashRow extends RedisBase
 	 */
 	public static function create($primaryIdValue=NULL)
 	{
+	    if ($primaryIdValue===NULL) {
+	        return NULL;
+	    }
+	    if (isset(self::$innerInstance[static::getClass()][$primaryIdValue])) {
+	        $instance=self::$innerInstance[static::getClass()][$primaryIdValue];
+	        if ($instance instanceof static) {
+	            return $instance;
+	        }
+	    }
+	    
 		$instance=new static();
-		if ($primaryIdValue!==NULL) {
-			$instance->initByPrimaryIdKey($primaryIdValue);
-		}
-		
+		$instance->initByPrimaryIdKey($primaryIdValue);
+		//缓存
+		self::$innerInstance[static::getClass()][$primaryIdValue]=$instance;
+
 		return $instance;
 	}
 	
 	/**
 	 * 强制刷新Redis数据缓存，同时更新编辑过的数据
+	 * 
+	 * 有编辑的情况下请调用flushEditedAndDelete，不然修改的数据会被覆盖。
 	 *
 	 * @param string $primaryIdValue
 	 * @return \HuiLib\Redis\HashTable
 	 */
 	public static function refresh($primaryIdValue)
 	{
-		$instance=new static();
+	    if ($primaryIdValue===NULL) {
+	        return false;
+	    }
+	    
+	    //是否存在缓存
+	    if (isset(self::$innerInstance[static::getClass()][$primaryIdValue])) {
+	        $instance=self::$innerInstance[static::getClass()][$primaryIdValue];
+	        if ($instance instanceof static) {
+	            return $instance->flushEditedAndDelete();
+	        }
+	    }
 
-		//首先尝试Redis获取
-		$data=$instance->getAdapter()->hGetAll($instance->getRedisKey($primaryIdValue));
-		if (empty($data)) {//不存在不用处理
-			return TRUE;
-		}
-		$instance->applyData($data);
-		
-		//写入数据库
-		$instance->flushEditedAndDelete();
-		
-		return TRUE;
+	    //首先尝试Redis获取数据库的
+	    $instance=new static();
+	    $data=$instance->getAdapter()->hGetAll($instance->getRedisKey($primaryIdValue));
+	    if (empty($data)) {
+	        return TRUE;
+	    }
+	    $instance->applyData($data);
+	    return $instance->flushEditedAndDelete();
 	}
 	
 	public function __get($key)
@@ -408,8 +445,10 @@ class HashRow extends RedisBase
 	public function __destruct()
 	{
 		//对象销毁自动触发保存到redis
-		if ($this->fromDb || !empty($this->editData) || !empty($this->incrData)) {
+		if (!$this->isDeleted && ($this->fromDb || !empty($this->editData) || !empty($this->incrData))) {
 			$this->getAdapter()->hMset($this->getRedisKey($this->data[$this->primaryIdKey]), $this->getFinalData());
 		}
 	}
+	
+	protected static function getClass(){}
 }
