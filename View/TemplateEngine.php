@@ -355,7 +355,7 @@ class TemplateEngine
 	private function finishPreSource($sha1)
 	{
 	    if (isset($this->preTagCache[$sha1])) {
-	        return $this->preTagCache[$sha1];
+	        return stripcslashes($this->preTagCache[$sha1]);
 	    }else{
 	        return '';
 	    }
