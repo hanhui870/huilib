@@ -9,17 +9,37 @@ use HuiLib\Module\Cdn\Utility;
 /**
  * HuiLib CDN Uploader库
  * 
+ * 单次上传只能一种类型
+ * 
  * @author 祝景法
  * @since 2014/04/05
  */
 class Uploader extends Base
 {
+    /**
+     * 图片上传允许的mime类型
+     * @var array
+     */
+    private $allowImageMime=array ('image/jpeg', 'image/pjpeg', 'image/gif', 'image/png', 'image/x-png', 'image/bmp' );
+    
     public function uploadImages()
     {
         if (Param::post('type', Param::TYPE_STRING)!='image') {
             return $this->format(self::API_FAIL, Front::getInstance()->getHuiLang()->_('cdn.upload.type.error'));
         }
         
+        $result=$this->preCheck();
+        if (!$result['success']) {
+            return $result;
+        }
+        
+        foreach ($_FILES as $key=>$file){
+            $meta=Param::post($key, Param::TYPE_ARRAY);
+            if (!in_array($meta['type'], $this->allowImageMime)) {
+                return $this->format(self::API_FAIL, Front::getInstance()->getHuiLang()->_('cdn.upload.image.mime.error'));
+            }
+        }
+
         return $this->upload();
     }
     
@@ -29,37 +49,38 @@ class Uploader extends Base
             return $this->format(self::API_FAIL, Front::getInstance()->getHuiLang()->_('cdn.upload.type.error'));
         }
         
+        $result=$this->preCheck();
+        if (!$result['succss']) {
+            return $result;
+        }
+        
         return $this->upload();
     }
     
-    /**
-     * 上传操作
-     * @param array $post
-     */
-    protected function upload()
+    protected function preCheck()
     {
-        print_r($_FILES);
-        print_r($_POST);
-        $huiLang=Front::getInstance()->getHuiLang();
-        
-        $appId=Param::post('app_id', Param::TYPE_STRING);
-        if (!$appId) {
-            return $this->format(self::API_FAIL, $huiLang->_('cdn.upload.app_id.null'));
-        }
-        
-        if (empty($_FILES)) {
-            return $this->format(self::API_FAIL, $huiLang->_('cdn.upload.files.empty'));
-        }
-        
         try{
+            $huiLang=Front::getInstance()->getHuiLang();
+        
+            $appId=Param::post('app_id', Param::TYPE_STRING);
+            if (!$appId) {
+                return $this->format(self::API_FAIL, $huiLang->_('cdn.upload.app_id.null'));
+            }
+        
+            if (empty($_FILES)) {
+                return $this->format(self::API_FAIL, $huiLang->_('cdn.upload.files.empty'));
+            }
+        
             $secret=$this->getAppSecret($appId);
         
             $post=$this->remapPostArray($_POST);
         
+            //字符安全解密
             if (!Utility::decrypt($post, $secret)) {
                 return $this->format(self::API_FAIL, $huiLang->_('cdn.upload.decode.failed'));
             }
-
+            
+            $config=$this->getConfig();
             //上传文件校验处理 一个有错，全部终止
             foreach ($_FILES as $key=>$file){
                 $meta=Param::post($key, Param::TYPE_ARRAY);
@@ -69,7 +90,25 @@ class Uploader extends Base
                 if ($file['error'] || $file['size']!=$meta['size'] || sha1_file($file['tmp_name'])!=$meta['sha1']) {
                     return $this->format(self::API_FAIL, $huiLang->_('cdn.upload.files.finger.print.error'));
                 }
+                if (!empty($config['max_filesize']) && $file['size']>$config['max_filesize']*1024*1024) {
+                    return $this->format(self::API_FAIL, $huiLang->_('cdn.upload.files.maxsize.error', $config['max_filesize']));
+                }
             }
+            
+            return $this->format(self::API_SUCCESS, 'ok');
+        }catch (Exception $e){
+            return $this->format(self::API_FAIL, $e->getMessage());
+        }
+    }
+    
+    /**
+     * 上传操作
+     * @param array $post
+     */
+    protected function upload()
+    {
+        try{
+            $huiLang=Front::getInstance()->getHuiLang();
             
             //上传处理
             $result=array();

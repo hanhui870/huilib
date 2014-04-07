@@ -3,6 +3,7 @@ namespace HuiLib\Module\Cdn\Server;
 
 use HuiLib\Error\Exception;
 use HuiLib\App\Front;
+use HuiLib\Helper\Param;
 
 /**
  * HuiLib CDN基础类库
@@ -65,7 +66,41 @@ class Base extends  \HuiLib\Module\ModuleBase
         }
         
         $config=$this->getConfig();
+        $miniHash=24;
+        if ($config['hash_length']<$miniHash) {
+            throw new Exception(Front::getInstance()->getHuiLang()->_('cdn.upload.hash_length.error', $miniHash));
+        }
+        $miniDepth=0;
+        $maxDepth=5;
+        if ($config['directory_depth']<$miniDepth || $config['directory_depth']>$maxDepth) {
+            throw new Exception(Front::getInstance()->getHuiLang()->_('cdn.upload.directory_depth.error', $miniDepth, $maxDepth));
+        }
         
-        return $config['save_path'].\HuiLib\Helper\Utility::geneRandomHash(32).'.jpg';
+        $hash=\HuiLib\Helper\Utility::geneRandomHash($config['hash_length']);
+        $type=Param::post('type', Param::TYPE_STRING);
+        $filePath=$config['save_path'].$type.SEP.date('Y').SEP;
+        
+        //每级包含的字母
+        $charPerStep=2;
+        for ($iter=0; $iter<$config['directory_depth']; $iter++){
+            $filePath.=substr($hash, $iter*$charPerStep, $charPerStep).SEP;
+        }
+        
+        //创建目录
+        if (!is_dir($filePath)) {
+            mkdir($filePath, 0777, TRUE);
+        }
+        
+        $ext=$this->getExt($meta['name']);
+        $file=$filePath.substr($hash, $iter*$charPerStep).$ext;
+        
+        $result=array();
+        $result['file']=$file;
+        $result['url']=str_ireplace(SEP, URL_SEP, str_ireplace($config['save_path'], '', $file));
+        return $result;
+    }
+    
+    protected function getExt($fileName){
+        return substr($fileName, strrpos($fileName, '.'));
     }
 }
