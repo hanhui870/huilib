@@ -299,10 +299,9 @@ abstract class HashRow extends RedisBase
 	{
 		$tableClass=static::TABLE_CLASS;
 		$rowClass=$tableClass::ROW_CLASS;
-		
-		$tmpData=$this->data;
-		unset($tmpData[self::REDIS_UPDATE_KEY]);
-		return $rowClass::create($tmpData);
+
+		//不用删除多余键，多余的设置不了
+		return $rowClass::create($this->data);
 	}
 	
 	/**
