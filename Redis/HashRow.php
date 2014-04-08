@@ -6,8 +6,8 @@ use HuiLib\Error\Exception;
 /**
  * Redis HashRow基础管理类
  * 
- * 通过在变量中嵌入RedisUpdate字段值触发更新机制
- * 全局单个对象唯一机制，确保读写数据一致。不然可能存在脏写现象。
+ * 通过在变量中嵌入RedisUpdate字段值触发更新机制。
+ * 全局单个对象唯一机制，改为覆盖影响值，编辑时不回写原值。确保读写数据一致。不然可能存在脏写现象。
  *
  * @author 祝景法
  * @since 2013/12/14
@@ -152,12 +152,14 @@ abstract class HashRow extends RedisBase
 		//redis更新时间戳 $data->RedisUpdate更新失败，非库中键
 		$this->data[self::REDIS_UPDATE_KEY]=time();
 		$this->fromDb=TRUE;
+		$this->isDeleted=FALSE;
 		
 		return $data->toArray();
 	}
 	
 	/**
 	 * 将键值数据应用到对象上
+	 * 
 	 * @param array $data
 	 */
 	protected function applyData($data)
@@ -177,8 +179,23 @@ abstract class HashRow extends RedisBase
 			if(isset(static::$initData[$key])){
 				$this->data[$key]=$value;
 			}elseif (in_array($key, array(self::REDIS_UPDATE_KEY))){
+			    //redis update等元数据映射
 				$this->data[$key]=$value;
 			}
+		}
+		
+		if ((!empty($this->editData) || !empty($this->incrData))) {
+		    //更新增减影响值
+		    foreach ($this->incrData as $key=>$value){
+		        $this->data[$key]+=$value;
+		    }
+		    	
+		    //更新影响值
+		    foreach ($this->editData as $key=>$value){
+		        //有增减影响，直接忽略编辑的
+		        if (isset($this->incrData[$key])) continue;
+		        $this->data[$key]=$value;
+		    }
 		}
 		
 		return TRUE;
@@ -283,8 +300,9 @@ abstract class HashRow extends RedisBase
 		$tableClass=static::TABLE_CLASS;
 		$rowClass=$tableClass::ROW_CLASS;
 		
-		unset($this->data[self::REDIS_UPDATE_KEY]);
-		return $rowClass::create($this->data);
+		$tmpData=$this->data;
+		unset($tmpData[self::REDIS_UPDATE_KEY]);
+		return $rowClass::create($tmpData);
 	}
 	
 	/**
@@ -397,6 +415,9 @@ abstract class HashRow extends RedisBase
 		return FALSE;
 	}
 	
+	/**
+	 * 获取最终数据表示
+	 */
 	protected function getFinalData()
 	{
 		if (!empty($this->editData)) {
@@ -406,6 +427,24 @@ abstract class HashRow extends RedisBase
 			$this->data[self::INCR_FIELD_KEY]=json_encode($this->incrData);
 		}
 		return $this->data;
+	}
+	
+	/**
+	 * 获取编辑过的元数据
+	 */
+	protected function getEditedData()
+	{
+	    $data=array();
+	    if (!empty($this->editData)) {
+	        $data[self::EDIT_FIELD_KEY]=json_encode($this->editData);
+	    }
+	    if (!empty($this->incrData)) {
+	        $data[self::INCR_FIELD_KEY]=json_encode($this->incrData);
+	    }
+	    if (!empty($this->data[self::REDIS_UPDATE_KEY])) {
+	        $data[self::REDIS_UPDATE_KEY]=$this->data[self::REDIS_UPDATE_KEY];
+	    }
+	    return $data;
 	}
 	
 	/**
@@ -445,8 +484,14 @@ abstract class HashRow extends RedisBase
 	public function __destruct()
 	{
 		//对象销毁自动触发保存到redis
-		if (!$this->isDeleted && ($this->fromDb || !empty($this->editData) || !empty($this->incrData))) {
-			$this->getAdapter()->hMset($this->getRedisKey($this->data[$this->primaryIdKey]), $this->getFinalData());
+		if (!$this->isDeleted){
+		  if($this->fromDb) {
+		      //从数据库读取的回写所有数据，也有可能编辑
+			  $this->getAdapter()->hMset($this->getRedisKey($this->data[$this->primaryIdKey]), $this->getFinalData());
+		  }elseif (!empty($this->editData) || !empty($this->incrData)){
+		      //编辑模式，仅更新编辑数据
+		      $this->getAdapter()->hMset($this->getRedisKey($this->data[$this->primaryIdKey]), $this->getEditedData());
+		  }
 		}
 	}
 	
