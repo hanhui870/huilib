@@ -59,6 +59,16 @@ class Param
 	}
 	
 	/**
+	 * 获取$_FILES参数
+	 *
+	 * @param string $key
+	 */
+	public static function file($key)
+	{
+	    return isset($_FILES[$key]) ?  self::typeCheck($_FILES[$key], self::TYPE_ARRAY) : array();
+	}
+	
+	/**
 	 * 获取Cookie参数
 	 *
 	 * @param string $key
