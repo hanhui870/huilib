@@ -2,10 +2,9 @@
 namespace HuiLib\App;
 
 use HuiLib\App\Front;
-use HuiLib\Request\RequestBase;
-use HuiLib\Error\Exception;
 use HuiLib\View\Helper\Proxy;
 use HuiLib\Error\RouteActionException;
+use HuiLib\Helper\Param;
 
 /**
  * 控制器基础类
@@ -224,6 +223,10 @@ class Controller
 		$callback=\HuiLib\Helper\Param::get('callback', \HuiLib\Helper\Param::TYPE_STRING);
 		if ($callback) {
 			$json=$callback."($json)";
+		}
+		//如果通过iframe传输，不同于jsonp，因为有时是文件上传
+		if (Param::get('iframe', Param::TYPE_BOOL)) {
+		    $json='<script type="text/javascript">window.top.'.$json.'</script>';
 		}
 		
 		echo $json;
