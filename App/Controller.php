@@ -182,7 +182,6 @@ class Controller
 	protected function preRenderView()
 	{
 		//有View类型的才像前台赋值配置数据
-		$this->getSiteConfig();
 		$this->view->assign(Front::getInstance()->getSiteConfig()->getByKey());
 	}
 	
