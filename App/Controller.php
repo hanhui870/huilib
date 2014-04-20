@@ -114,7 +114,7 @@ class Controller
 	        $this->loadActionDispatch();
 	         
 	    }catch (RouteActionException $exception){
-	        exit("Action ReDispatch failed.");
+	        throw new RouteActionException("Action ReDispatch failed.");
 	    }
 	}
 	
@@ -129,7 +129,7 @@ class Controller
             //路由方法：通过获取对象方法，并判断调用方法是否存在来判断参数是否精确匹配
             if (strtolower($this->action) != $this->action
             || !in_array($action, get_class_methods($this))) {
-                exit("Bad url route action format.");
+                throw new RouteActionException("Bad url route action format.");
             }
             $this->$action();
         }else{
