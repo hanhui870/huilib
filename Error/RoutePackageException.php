@@ -7,7 +7,7 @@ namespace HuiLib\Error;
  * @author 祝景法
  * @since 2014/03/01
  */
-class RoutePackageException extends Exception
+class RoutePackageException extends RouteException
 {
 	
 }
