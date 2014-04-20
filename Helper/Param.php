@@ -181,7 +181,7 @@ class Param
 	 * 	返回是类型安全的，根据具体类型
 	 */
 	public static function typeCheck($var, $type=self::TYPE_NONE){
-		$type && settype($var, $type);
+		$type && @settype($var, $type);
 	
 		return $var;
 	}
