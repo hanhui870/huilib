@@ -53,11 +53,13 @@ class PdoTest extends \HuiLib\Test\TestBase
 	    try {
 	        \HuiLib\Db\DbBase::createMaster()->beginTransaction();
 	
-	        $db->query("update test.test set field1='$time' where id=2 ");
+	        $affect=$db->exec("update test.test set field1='$time' where id=2 ");
 	         
 	        //! 优先级高于 %
 	        if (!($time%2)) {
 	            throw new \Exception('error');
+	        }else{
+	            echo $affect.PHP_EOL;
 	        }
 	         
 	        \HuiLib\Db\DbBase::createMaster()->commit();
