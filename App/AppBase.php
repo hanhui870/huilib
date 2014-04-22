@@ -60,6 +60,9 @@ abstract class AppBase
 		//初始化请求对象 具体可能在子类初始化
 		$this->initRequest ();
 		Front::getInstance()->setRequest($this->requestInstance);
+		
+		$this->initErrorHandle();
+		$this->initExceptionHandle();
 	}
 
 	/**
@@ -179,6 +182,7 @@ abstract class AppBase
 	 */
 	protected function initErrorHandle()
 	{
+	    set_error_handler(array('HuiLib\Error\ErrorHandler', 'errorHandle'));
 	}
 
 	/**
@@ -186,6 +190,7 @@ abstract class AppBase
 	 */
 	protected function initExceptionHandle()
 	{
+	    set_exception_handler(array('HuiLib\Error\ErrorHandler', 'exceptionHandle'));
 	}
 
 	/**

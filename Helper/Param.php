@@ -59,6 +59,16 @@ class Param
 	}
 	
 	/**
+	 * 获取$_FILES参数
+	 *
+	 * @param string $key
+	 */
+	public static function file($key)
+	{
+	    return isset($_FILES[$key]) ?  self::typeCheck($_FILES[$key], self::TYPE_ARRAY) : array();
+	}
+	
+	/**
 	 * 获取Cookie参数
 	 *
 	 * @param string $key
@@ -171,7 +181,7 @@ class Param
 	 * 	返回是类型安全的，根据具体类型
 	 */
 	public static function typeCheck($var, $type=self::TYPE_NONE){
-		$type && settype($var, $type);
+		$type && @settype($var, $type);
 	
 		return $var;
 	}

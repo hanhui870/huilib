@@ -6,7 +6,7 @@ use HuiLib\Error\Exception;
 /**
  * Redis HashRow基础管理类
  * 
- * TODO 如果数据从数据库提取出来即被编辑incrdata会被覆盖两遍。但是还好不会影响数据库一致性。这个必须重新设计，现在太复杂了。Hold不住。
+ * 如果数据从数据库提取出来即被编辑incrdata会被覆盖两遍。但是还好不会影响数据库一致性。
  * 
  * 通过在变量中嵌入RedisUpdate字段值触发更新机制。
  * 全局单个对象唯一机制，改为覆盖影响值，编辑时不回写原值。确保读写数据一致。不然可能存在脏写现象。
@@ -88,6 +88,9 @@ abstract class HashRow extends RedisBase
 	 */
 	protected $fromDb=FALSE;
 	
+	//数据中获取的数据
+	private $dbData=NULL;
+	
 	/**
 	 * 内部对象缓存
 	 * @var array
@@ -151,12 +154,15 @@ abstract class HashRow extends RedisBase
 			return array();
 		}
 		
+		//数据库数据缓存
+		$this->dbData=$data->toArray();
+		
 		//redis更新时间戳 $data->RedisUpdate更新失败，非库中键
 		$this->data[self::REDIS_UPDATE_KEY]=time();
 		$this->fromDb=TRUE;
 		$this->isDeleted=FALSE;
 		
-		return $data->toArray();
+		return $this->dbData;
 	}
 	
 	/**
@@ -431,6 +437,29 @@ abstract class HashRow extends RedisBase
 	}
 	
 	/**
+	 * 获取初始数据表示
+	 */
+	protected function getInitedData()
+	{
+	    if (!$this->fromDb || !$this->dbData) {
+	        return array();
+	    }
+	    
+	    $data=$this->dbData;
+	    if (!empty($this->editData)) {
+	        $data[self::EDIT_FIELD_KEY]=json_encode($this->editData);
+	    }
+	    if (!empty($this->incrData)) {
+	        $data[self::INCR_FIELD_KEY]=json_encode($this->incrData);
+	    }
+	    if (!empty($this->data[self::REDIS_UPDATE_KEY])) {
+	        $data[self::REDIS_UPDATE_KEY]=$this->data[self::REDIS_UPDATE_KEY];
+	    }
+	    
+	    return $this->data;
+	}
+	
+	/**
 	 * 获取编辑过的元数据
 	 */
 	protected function getEditedData()
@@ -488,7 +517,7 @@ abstract class HashRow extends RedisBase
 		if (!$this->isDeleted){
 		  if($this->fromDb) {
 		      //从数据库读取的回写所有数据，也有可能编辑
-			  $this->getAdapter()->hMset($this->getRedisKey($this->data[$this->primaryIdKey]), $this->getFinalData());
+			  $this->getAdapter()->hMset($this->getRedisKey($this->data[$this->primaryIdKey]), $this->getInitedData());
 		  }elseif (!empty($this->editData) || !empty($this->incrData)){
 		      //编辑模式，仅更新编辑数据
 		      $this->getAdapter()->hMset($this->getRedisKey($this->data[$this->primaryIdKey]), $this->getEditedData());

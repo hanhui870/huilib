@@ -2,10 +2,9 @@
 namespace HuiLib\App;
 
 use HuiLib\App\Front;
-use HuiLib\Request\RequestBase;
-use HuiLib\Error\Exception;
 use HuiLib\View\Helper\Proxy;
 use HuiLib\Error\RouteActionException;
+use HuiLib\Helper\Param;
 
 /**
  * 控制器基础类
@@ -115,7 +114,7 @@ class Controller
 	        $this->loadActionDispatch();
 	         
 	    }catch (RouteActionException $exception){
-	        exit("Action ReDispatch failed.");
+	        throw new RouteActionException("Action ReDispatch failed.");
 	    }
 	}
 	
@@ -130,7 +129,7 @@ class Controller
             //路由方法：通过获取对象方法，并判断调用方法是否存在来判断参数是否精确匹配
             if (strtolower($this->action) != $this->action
             || !in_array($action, get_class_methods($this))) {
-                exit("Bad url route action format.");
+                throw new RouteActionException("Bad url route action format.");
             }
             $this->$action();
         }else{
@@ -183,7 +182,6 @@ class Controller
 	protected function preRenderView()
 	{
 		//有View类型的才像前台赋值配置数据
-		$this->getSiteConfig();
 		$this->view->assign(Front::getInstance()->getSiteConfig()->getByKey());
 	}
 	
@@ -224,6 +222,10 @@ class Controller
 		$callback=\HuiLib\Helper\Param::get('callback', \HuiLib\Helper\Param::TYPE_STRING);
 		if ($callback) {
 			$json=$callback."($json)";
+		}
+		//如果通过iframe传输，不同于jsonp，因为有时是文件上传
+		if (Param::get('iframe', Param::TYPE_BOOL)) {
+		    $json='<script type="text/javascript">window.top.'.$json.'</script>';
 		}
 		
 		echo $json;

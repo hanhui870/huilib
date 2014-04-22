@@ -25,7 +25,7 @@ class Action extends RouteBase
         $baseCalss = $appConfig->getByKey ( 'webRun.route.Action.Base' );
         
         if (empty($baseCalss) && !method_exists($baseCalss, 'dispatch')) {
-            throw new \HuiLib\Error\RouteException('App.ini webRun.route.Action.Base not set or available.');
+            throw new \HuiLib\Error\RouteActionException('App.ini webRun.route.Action.Base not set or available.');
         }
         $baseCalss::dispatch ();
         
