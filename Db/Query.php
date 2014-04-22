@@ -277,7 +277,7 @@ class Query
 	}
 	
 	/**
-	 * 直接发起默认数据库请求
+	 * 直接发起默认数据库查询请求
 	 * 
 	 * 注意：非类同名构造函数
 	 * 
@@ -288,6 +288,20 @@ class Query
 		$this->setAdapter();
 		$innerStatment=$this->adapter->getConnection()->query($this->toString());
 		return Result::create($innerStatment);
+	}
+	
+	/**
+	 * 直接执行一条语句 
+	 * 
+	 * 返回影响行数
+	 *
+	 * @return number
+	 */
+	public function exec()
+	{
+	    $this->setAdapter();
+	    $affectRows=$this->adapter->getConnection()->exec($this->toString());
+	    return $affectRows;
 	}
 	
 	/**
