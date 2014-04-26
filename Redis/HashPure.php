@@ -174,5 +174,14 @@ abstract class HashPure extends RedisBase
 	    }
 	}
 	
+	/**
+	 * 返回对象的数组表示
+	 * @return array
+	 */
+	public function toArray()
+	{
+	    return $this->data;
+	}
+	
 	protected static function getClass(){}
 }
