@@ -9,14 +9,18 @@ namespace HuiLib\Test\Test;
  */
 class TestTemplate extends \HuiLib\Test\TestBase
 {
-	public function run(){
-		$this->test();
-	}
-	
-	private function test(){
-	}
 
-	protected static function className(){
-		return __CLASS__;
-	}
+    public function run()
+    {
+        $this->test ();
+    }
+
+    private function test()
+    {
+    }
+
+    protected static function className()
+    {
+        return __CLASS__;
+    }
 }
