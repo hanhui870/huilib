@@ -411,7 +411,7 @@ abstract class HashRow extends RedisBase
 			throw new Exception('Number of $value is required by incrKey() method.');
 		}
 		
-		if (isset($this->data[$key])){
+		if (array_key_exists($key, $this->data)){
 			$this->data[$key]+=$value;
 			if (!isset($this->incrData[$key])) {
 				$this->incrData[$key]=0;
