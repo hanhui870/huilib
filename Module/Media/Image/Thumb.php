@@ -122,19 +122,45 @@ class Thumb extends ImageBase
         $original=$this->getOriginalSize();
         $ratio=$original['width']/$original['height'];
     
-        $width=$height=0;
-        if ($ratio > 1 && $original['width'] > $this->maxWidth) { // width过长 超过maxWidth压缩。
+        $width=$original['width'];
+        $height=$original['height'];
+        if ($ratio >= 1 && $original['width'] > $this->maxWidth) { // width过长 超过maxWidth压缩。
             $width = $this->maxWidth;
             $height = ceil ( $width / $ratio );
-        } elseif ($ratio < 1 && $ratio > 0.5 && $original['height'] > $this->maxWidth) { // 数码大图片压缩专用
+        } elseif ($ratio > 0.333 && $ratio < 1 && $original['height'] > $this->maxWidth) { // 数码大图片压缩专用
             $height = $this->maxWidth;
             $width = ceil ( $height * $ratio );
-        } elseif ($original['height'] > $this->maxHeight) { // height过高
-            $height = $this->maxHeight;
-            $width = ceil ( $height * $ratio );
+        } elseif ($ratio <= 0.333) { // height过高 微博长图片压缩
+            //宽度处理
+            if ($original['width'] > $this->maxWidth) {
+                $width=$this->maxWidth;
+                $height = ceil ( $width / $ratio );
+            }
+            //长度处理
+            if ($original['height'] > $this->maxHeight) {
+                $height = $this->maxHeight;
+                $width = ceil ( $height * $ratio );
+            }
         }
 
-        return $this->thumb ( $width, $height, $savepath);
+        $this->thumb ( $width, $height, $savepath);
+        //取缩略图
+        if (!empty($savepath) && file_exists($savepath)) {
+            $this->thumbByCrop(100, 100, self::getThumbPath($savepath));
+        }
+        return $this;
+    }
+    
+    /**
+     * 获取略缩图路径
+     * 
+     * 因为不直接去处理路径，所以网络地址和本地地址通用
+     */
+    public static function getThumbPath($path)
+    {
+        $dotpos=strrpos($path, '.');
+        $ext=substr($path, $dotpos);
+        return substr($path, 0, $dotpos).'.thumb'.$ext;
     }
     
     /**

@@ -28,7 +28,7 @@ class ImageBase extends \HuiLib\Module\ModuleBase
     //最宽
     protected $maxWidth = 800;
     // 最高
-    protected $maxHeight = 8000;
+    protected $maxHeight = 6000;
     
     // 压缩比例
     protected $compressionquality = 80;
