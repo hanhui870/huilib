@@ -17,7 +17,13 @@ class ImageBase extends \HuiLib\Module\ModuleBase
 	 * Imagick对象
 	 * @var \Imagick
 	 */
-    protected $image;
+    protected $image=NULL;
+    
+    /**
+     * Imagick对象
+     * @var \Imagick
+     */
+    protected $backImageInstance=NULL;
     
     // 图像初始高度、宽度信息
     protected $originalSize = array ();
@@ -37,7 +43,7 @@ class ImageBase extends \HuiLib\Module\ModuleBase
     protected $waterImage = NULL;
     
     //大于这个尺寸的图片才水印
-    protected $waterStart=500;
+    protected $waterStart=250;
 
     /**
 	 * 初始化imagick对象
@@ -107,10 +113,7 @@ class ImageBase extends \HuiLib\Module\ModuleBase
             $this->image = $tmpImage;
         } else {
             //写入储存
-            $tmpImage->coalesceImages ();
-            $tmpImage->setImageFormat ( $format );
-            $tmpImage->setImageCompressionQuality ( $this->compressionquality );
-            $tmpImage->writeimages ( $savepath, 1 );
+            $this->writeToPath($savepath, $tmpImage);
         }
         
         return $this;
@@ -156,10 +159,7 @@ class ImageBase extends \HuiLib\Module\ModuleBase
             $this->image = $tmpImage;
         } else {
             //写入储存
-            $tmpImage->coalesceImages ();
-            $tmpImage->setImageFormat ( $format );
-            $tmpImage->setImageCompressionQuality ( $this->compressionquality );
-            $tmpImage->writeimages ( $savepath, 1 );
+            $this->writeToPath($savepath, $tmpImage);
         }
         
         return $this;
@@ -212,10 +212,7 @@ class ImageBase extends \HuiLib\Module\ModuleBase
             $this->image = $tmpImage;
         } else {
             //写入储存
-            $tmpImage->coalesceImages ();
-            $tmpImage->setImageFormat ( $format );
-            $tmpImage->setImageCompressionQuality ( $this->compressionquality );
-            $tmpImage->writeimages ( $savepath, 1 );
+            $this->writeToPath($savepath, $tmpImage);
         }
         
         return $this;
@@ -293,7 +290,7 @@ class ImageBase extends \HuiLib\Module\ModuleBase
     }
 
     /**
-	 * 设置水印图片
+	 * 设置水印图片，设置后自动打水印
 	 * 
 	 * 仅允许静态图，不允许动图
 	 *
@@ -312,5 +309,49 @@ class ImageBase extends \HuiLib\Module\ModuleBase
         } catch ( \ImagickException $e ) {
             throw new MediaException ( $e->getMessage () );
         }
+        
+        return $this;
+    }
+    
+    /**
+     * 停用水印
+     */
+    public function disableWatermark()
+    {
+        $this->waterImage=NULL;
+    }
+    
+    /**
+     * 将当前图像对象写到磁盘
+     * @param string $savepath
+     * @return boolean
+     */
+    public function writeToPath($savepath, $imageInstance=NULL)
+    {
+        if ($imageInstance===NULL) {
+            $imageInstance=$this->image;
+        }
+        
+        //写入储存
+        $imageInstance->coalesceImages ();
+        $imageInstance->setImageFormat ( $imageInstance->getImageFormat () );
+        $imageInstance->setImageCompressionQuality ( $this->compressionquality );
+        $imageInstance->writeimages ( $savepath, 1 );
+        return $this;
+    }
+    
+    public function backupImageInstance()
+    {
+        $this->backImageInstance=clone $this->image;
+        return $this;
+    }
+    
+    public function resetImageInstance()
+    {
+        if (!$this->backImageInstance instanceof \Imagick) {
+            throw new MediaException('self::backImageInstance is Invalid or NULL.');
+        }
+        $this->image=clone $this->backImageInstance;
+        return $this;
     }
 }

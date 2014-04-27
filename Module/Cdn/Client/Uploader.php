@@ -67,7 +67,7 @@ class Uploader extends Base
      * data['file1[size]']=13245
      * 
      * @param array $post 提交的数据
-     * @param array $post 上传的附件地址 不参与加密
+     * @param array $attches 上传的附件储存地址 不参与加密
      */
     protected function curl($post, $attches)
     {
@@ -82,12 +82,14 @@ class Uploader extends Base
 
         $handle=curl_init();
         
+        //http://rpc.iyunlin.com/cdn/upload/type
         curl_setopt($handle, CURLOPT_URL, $config['upload'].$post['type']);
         curl_setopt($handle, CURLOPT_POSTFIELDS, $post);
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, TRUE);
         
         $result=curl_exec($handle);
+        echo $result;die();
         
-        print_r($result);
+        return json_decode($result, TRUE);
     }
 }

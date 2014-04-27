@@ -4,6 +4,8 @@ namespace HuiLib\Module\Media\Image;
 /**
  * iYunLin图像缩放处理模块
  * 
+ * 除thumbNormalUpload(通过参数实现)外，其他可以先同步不传储存参数压缩，然后调用水印，实现双重操作。
+ * 
  * @author HanHui
  * @since 2014/04/26
  */
@@ -13,6 +15,8 @@ class Thumb extends ImageBase
      * 截取中间部分缩放
      *
      * 比要求规格小的也同样进行裁剪，会自动放大。取两个参数中合适的一个值
+     * 
+     * 有备份还原image对象
      * 
      * @param int $width 目标宽度 
 	 * @param int $height 目标高度
@@ -40,8 +44,10 @@ class Thumb extends ImageBase
             }
         }
 
+        $this->backupImageInstance();//备份image对象
         $this->thumb( $idealWidth, $idealHeight);
         $this->crop($x, $y, $width, $height, $savepath);
+        $this->resetImageInstance();//还原对象
     
         return true;
     }
@@ -116,9 +122,10 @@ class Thumb extends ImageBase
     /**
      * 普通文件上传
      * 
-     * @param $savepath string 文件存放路径，未提供则修改当前
+     * @param string $savepath 文件存放路径，未提供则修改当前
+     * @param string $watermark 水印位置，不传则取消水印
      */
-    function thumbNormalUpload($savepath=NULL) {
+    function thumbNormalUpload($savepath=NULL, $watermark=NULL) {
         $original=$this->getOriginalSize();
         $ratio=$original['width']/$original['height'];
     
@@ -142,12 +149,21 @@ class Thumb extends ImageBase
                 $width = ceil ( $height * $ratio );
             }
         }
+        
+        //缩放到相当水平
+        $this->thumb ( $width, $height );
 
-        $this->thumb ( $width, $height, $savepath);
-        //取缩略图
-        if (!empty($savepath) && file_exists($savepath)) {
+        if (!empty($savepath)) {
+            //取缩略图，放前面，没水印
             $this->thumbByCrop(100, 100, self::getThumbPath($savepath));
+            
+            if ($watermark && method_exists($this, $watermark)) {
+                $this->$watermark($savepath);
+            }else{
+                $this->writeToPath($savepath);
+            }
         }
+
         return $this;
     }
     
@@ -182,7 +198,7 @@ class Thumb extends ImageBase
     {
         $size=$this->getOriginalSize();
         $water=$this->getWaterSize();
-        
+
         return $this->watchmark(10, ($size['height']-$water['height']-10), $savepath);
     }
     

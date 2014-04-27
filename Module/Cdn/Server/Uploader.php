@@ -5,6 +5,7 @@ use HuiLib\Helper\Param;
 use HuiLib\App\Front;
 use HuiLib\Error\Exception;
 use HuiLib\Module\Cdn\Utility;
+use HuiLib\Module\Media\Image\Thumb;
 
 /**
  * HuiLib CDN Uploader库
@@ -40,7 +41,33 @@ class Uploader extends Base
             }
         }
 
-        return $this->upload();
+        try{
+            $huiLang=Front::getInstance()->getHuiLang();
+        
+            //上传处理
+            $result=array();
+            //水印图片
+            $water=Front::getInstance()->getAppConfig()->getByKey('cdn.water_mark');
+            if (!file_exists($water)) {
+                return $this->format(self::API_FAIL, Front::getInstance()->getHuiLang()->_('cdn.upload.water.file.miss'));
+            }
+            //水印位置
+            $waterPosition=Front::getInstance()->getAppConfig()->getByKey('cdn.water_position');
+            foreach ($_FILES as $key=>$file){
+                $meta=Param::post($key, Param::TYPE_ARRAY);
+        
+                $path=$this->getNewFilePath($meta);
+                
+                //上传并打水印
+                Thumb::create($file['tmp_name'])->setWaterImage($water)->thumbNormalUpload($path['file'], $waterPosition);
+        
+                $result[$key]['url']=$path['url'];
+            }
+        
+            return $this->format(self::API_SUCCESS, $huiLang->_('cdn.upload.suceess'), array(), $result);
+        }catch (Exception $e){
+            return $this->format(self::API_FAIL, $e->getMessage());
+        }
     }
     
     public function uploadFiles()
@@ -54,7 +81,65 @@ class Uploader extends Base
             return $result;
         }
         
-        return $this->upload();
+        try{
+            $huiLang=Front::getInstance()->getHuiLang();
+        
+            //上传处理
+            $result=array();
+            foreach ($_FILES as $key=>$file){
+                $meta=Param::post($key, Param::TYPE_ARRAY);
+        
+                $path=$this->getNewFilePath($meta);
+                move_uploaded_file($file['tmp_name'], $path['file']);
+        
+                $result[$key]['url']=$path['url'];
+            }
+        
+            return $this->format(self::API_SUCCESS, $huiLang->_('cdn.upload.suceess'), array(), $result);
+        }catch (Exception $e){
+            return $this->format(self::API_FAIL, $e->getMessage());
+        }
+    }
+    
+    /**
+     * 上传头像
+     */
+    public function uploadAvatar()
+    {
+        if (Param::post('type', Param::TYPE_STRING)!='image') {
+            return $this->format(self::API_FAIL, Front::getInstance()->getHuiLang()->_('cdn.upload.type.error'));
+        }
+    
+        $result=$this->preCheck();
+        if (!$result['success']) {
+            return $result;
+        }
+    
+        foreach ($_FILES as $key=>$file){
+            $meta=Param::post($key, Param::TYPE_ARRAY);
+            if (!in_array($meta['type'], $this->allowImageMime)) {
+                return $this->format(self::API_FAIL, Front::getInstance()->getHuiLang()->_('cdn.upload.image.mime.error'));
+            }
+        }
+    
+        try{
+            $huiLang=Front::getInstance()->getHuiLang();
+        
+            //上传处理
+            $result=array();
+            foreach ($_FILES as $key=>$file){
+                $meta=Param::post($key, Param::TYPE_ARRAY);
+        
+                $path=$this->getNewFilePath($meta);
+                move_uploaded_file($file['tmp_name'], $path['file']);
+        
+                $result[$key]['url']=$path['url'];
+            }
+        
+            return $this->format(self::API_SUCCESS, $huiLang->_('cdn.upload.suceess'), array(), $result);
+        }catch (Exception $e){
+            return $this->format(self::API_FAIL, $e->getMessage());
+        }
     }
     
     protected function preCheck()
@@ -100,33 +185,6 @@ class Uploader extends Base
             return $this->format(self::API_FAIL, $e->getMessage());
         }
     }
-    
-    /**
-     * 上传操作
-     * @param array $post
-     */
-    protected function upload()
-    {
-        try{
-            $huiLang=Front::getInstance()->getHuiLang();
-            
-            //上传处理
-            $result=array();
-            foreach ($_FILES as $key=>$file){
-                $meta=Param::post($key, Param::TYPE_ARRAY);
-            
-                $path=$this->getNewFilePath($meta);
-                move_uploaded_file($file['tmp_name'], $path['file']);
-                
-                $result[$key]['url']=$path['url'];
-            }
-        
-            return $this->format(self::API_SUCCESS, $huiLang->_('cdn.upload.suceess'), array(), $result);
-        }catch (Exception $e){
-            return $this->format(self::API_FAIL, $e->getMessage());
-        }
-    }
-    
     
     /**
      * 
