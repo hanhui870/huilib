@@ -133,8 +133,7 @@ class Thumb extends ImageBase
             $height = $this->maxHeight;
             $width = ceil ( $height * $ratio );
         }
-        print_r($original);
-    echo $height, $width;die();
+
         return $this->thumb ( $width, $height, $savepath);
     }
     
@@ -145,7 +144,7 @@ class Thumb extends ImageBase
      */
     public function waterLeftTop($savepath=NULL)
     {
-        $this->watchmark(10, 10, $savepath);
+        return $this->watchmark(10, 10, $savepath);
     }
     
     /**
@@ -155,6 +154,48 @@ class Thumb extends ImageBase
      */
     public function waterLeftBottom($savepath=NULL)
     {
+        $size=$this->getOriginalSize();
+        $water=$this->getWaterSize();
+        
+        return $this->watchmark(10, ($size['height']-$water['height']-10), $savepath);
+    }
     
+    /**
+     * 右上水印
+     *
+     * @param string $savepath 文件存放路径
+     */
+    public function waterRightTop($savepath=NULL)
+    {
+        $size=$this->getOriginalSize();
+        $water=$this->getWaterSize();
+    
+        return $this->watchmark(($size['width']-$water['width']-10), 10, $savepath);
+    }
+    
+    /**
+     * 右下水印
+     *
+     * @param string $savepath 文件存放路径
+     */
+    public function waterRightBottom($savepath=NULL)
+    {
+        $size=$this->getOriginalSize();
+        $water=$this->getWaterSize();
+    
+        return $this->watchmark(($size['width']-$water['width']-10), ($size['height']-$water['height']-10), $savepath);
+    }
+    
+    /**
+     * 中间水印
+     *
+     * @param string $savepath 文件存放路径
+     */
+    public function waterCenter($savepath=NULL)
+    {
+        $size=$this->getOriginalSize();
+        $water=$this->getWaterSize();
+    
+        return $this->watchmark(($size['width']-$water['width'])/2, ($size['height']-$water['height'])/2, $savepath);
     }
 }

@@ -30,11 +30,14 @@ class ImageBase extends \HuiLib\Module\ModuleBase
     // 最高
     protected $maxHeight = 8000;
     
+    // 压缩比例
+    protected $compressionquality = 80;
+    
     //水印资源
     protected $waterImage = NULL;
     
-    // 压缩比例
-    protected $compressionquality = 80;
+    //大于这个尺寸的图片才水印
+    protected $waterStart=500;
 
     /**
 	 * 初始化imagick对象
@@ -186,7 +189,9 @@ class ImageBase extends \HuiLib\Module\ModuleBase
                 $tmp = new \Imagick ();
                 $tmp->newImage ( $page ['width'], $page ['height'], $transparent, $format );
                 $tmp->compositeImage ( $frame, \Imagick::COMPOSITE_DEFAULT, $page ['x'], $page ['y'] );
-                $tmp->compositeImage ( $this->waterImage, \Imagick::COMPOSITE_DEFAULT, $x, $y );
+                if (min($this->getOriginalSize())>$this->waterStart) {
+                    $tmp->compositeImage ( $this->waterImage, \Imagick::COMPOSITE_DEFAULT, $x, $y );
+                }
                 
                 $tmpImage->addImage ( $tmp );
                 $tmpImage->setImagePage ( $tmp->getImageWidth (), $tmp->getImageHeight (), 0, 0 );
@@ -197,7 +202,9 @@ class ImageBase extends \HuiLib\Module\ModuleBase
             $tmpImage = new \Imagick ();
             $tmpImage->addimage ( $this->image );
             
-            $tmpImage->compositeImage ( $this->waterImage, \Imagick::COMPOSITE_DEFAULT, $x, $y );
+            if (min($this->getOriginalSize())>$this->waterStart) {
+                $tmpImage->compositeImage ( $this->waterImage, \Imagick::COMPOSITE_DEFAULT, $x, $y );
+            }
         }
         
         if ($savepath == NULL) {
@@ -246,6 +253,17 @@ class ImageBase extends \HuiLib\Module\ModuleBase
         
         return $result;
     }
+    
+    /**
+     * 获取水印图片的大小信息
+     */
+    public function getWaterSize()
+    {
+        if (! $this->waterImage instanceof \Imagick) {
+            throw new MediaException ( 'Watermark source is invalid.' );
+        }
+        return $this->waterImage->getimagegeometry ();
+    }
 
     public function setMaxWidth($width)
     {
@@ -276,6 +294,8 @@ class ImageBase extends \HuiLib\Module\ModuleBase
 
     /**
 	 * 设置水印图片
+	 * 
+	 * 仅允许静态图，不允许动图
 	 *
 	 * @param string $filepath
 	 */
@@ -286,6 +306,9 @@ class ImageBase extends \HuiLib\Module\ModuleBase
         try {
             // imagick::readImage 在win下5.3版本居然不能直接用。改为readImageBlob可用。
             $this->waterImage->readImageBlob ( $isBinary ? $filepath : file_get_contents ( $filepath ) );
+            if ($this->waterImage->getnumberimages ()>1) {
+                throw new MediaException('Water image of dynamic is not allowed.');
+            }
         } catch ( \ImagickException $e ) {
             throw new MediaException ( $e->getMessage () );
         }

@@ -14,7 +14,7 @@ class ImageTest extends \HuiLib\Test\TestBase
 {
     public function run()
     {
-        $this->testThumbOpt ();
+        $this->testWaterPosition ();
     }
 
     /**
@@ -124,6 +124,23 @@ class ImageTest extends \HuiLib\Test\TestBase
         $imageGif->thumbNormalUpload();
         $imageGif->setWaterImage(dirname(__FILE__).'/watermark.png');
         $imageGif->waterLeftTop(dirname(__FILE__).'/testWater.gif');
+    }
+    
+    /**
+     * 添加水印位置
+     */
+    private function testWaterPosition()
+    {
+        $file=dirname(__FILE__).'/test.jpg';
+        $imageJpg=Thumb::create($file, FALSE);
+        $imageJpg->thumbNormalUpload();
+        $imageJpg->setWaterImage(dirname(__FILE__).'/watermark.png');
+        $imageJpg->waterLeftTop(dirname(__FILE__).'/testWater1.jpg');
+    
+        $imageJpg->waterLeftBottom(dirname(__FILE__).'/testWater2.jpg');
+        $imageJpg->waterRightTop(dirname(__FILE__).'/testWater3.jpg');
+        $imageJpg->waterRightBottom(dirname(__FILE__).'/testWater4.jpg');
+        $imageJpg->waterCenter(dirname(__FILE__).'/testWater5.jpg');
     }
 
     protected static function className()
