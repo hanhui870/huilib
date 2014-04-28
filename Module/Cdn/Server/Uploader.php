@@ -23,6 +23,9 @@ class Uploader extends Base
      */
     private $allowImageMime=array ('image/jpeg', 'image/pjpeg', 'image/gif', 'image/png', 'image/x-png', 'image/bmp' );
     
+    /**
+     * 上传图片
+     */
     public function uploadImages()
     {
         if (Param::post('type', Param::TYPE_STRING)!='image') {
@@ -70,6 +73,11 @@ class Uploader extends Base
         }
     }
     
+    /**
+     * 上传文件
+     * 
+     * 其他全部改名为.attach格式，不允许上传图片，图片使用uploadImages
+     */
     public function uploadFiles()
     {
         if (Param::post('type', Param::TYPE_STRING)!='file') {
@@ -103,39 +111,82 @@ class Uploader extends Base
     
     /**
      * 上传头像
+     * 
+     * 一次只能上传单个文件
      */
     public function uploadAvatar()
     {
-        if (Param::post('type', Param::TYPE_STRING)!='image') {
+        if (Param::post('type', Param::TYPE_STRING)!='avatar') {
             return $this->format(self::API_FAIL, Front::getInstance()->getHuiLang()->_('cdn.upload.type.error'));
         }
-    
+        
         $result=$this->preCheck();
         if (!$result['success']) {
             return $result;
         }
-    
-        foreach ($_FILES as $key=>$file){
-            $meta=Param::post($key, Param::TYPE_ARRAY);
-            if (!in_array($meta['type'], $this->allowImageMime)) {
-                return $this->format(self::API_FAIL, Front::getInstance()->getHuiLang()->_('cdn.upload.image.mime.error'));
-            }
+        
+        $postAvatar=Param::post('avatar', Param::TYPE_ARRAY);
+        $postImage=Param::file('avatar', Param::TYPE_ARRAY);
+        
+        if (empty($postAvatar['uid'])) {
+            return $this->format(self::API_FAIL, Front::getInstance()->getHuiLang()->_('cdn.avatar.need.uid'));
         }
-    
+        $uid=$postAvatar['uid'];
+        
+        //需要检测原始上传的post参数
+        if (!in_array($postAvatar['type'], $this->allowImageMime)) {
+            return $this->format(self::API_FAIL, Front::getInstance()->getHuiLang()->_('cdn.upload.image.mime.error'));
+        }
+
         try{
             $huiLang=Front::getInstance()->getHuiLang();
         
             //上传处理
             $result=array();
+            $path=$this->getAvatarPath($postAvatar);
+            
+            foreach ( array ('180', '100', '50', '30' ) as $size ) {
+                $filepath=str_ireplace('size', $size, $path['file']);
+                Thumb::create($postImage['tmp_name'])->thumbByCrop($size, $size, $filepath);
+            }
+            
+            $result['url']=$path['url'];
+            return $this->format(self::API_SUCCESS, $huiLang->_('cdn.upload.suceess'), array(), $result);
+        }catch (Exception $e){
+            return $this->format(self::API_FAIL, $e->getMessage());
+        }
+    }
+    
+    /**
+     * 上传静态文件
+     *
+     * 此图片默认不做压缩和水印
+     */
+    public function uploadStatic()
+    {
+        if (Param::post('type', Param::TYPE_STRING)!='static') {
+            return $this->format(self::API_FAIL, Front::getInstance()->getHuiLang()->_('cdn.upload.type.error'));
+        }
+    
+        $result=$this->preCheck();
+        if (!$result['succss']) {
+            return $result;
+        }
+    
+        try{
+            $huiLang=Front::getInstance()->getHuiLang();
+    
+            //上传处理
+            $result=array();
             foreach ($_FILES as $key=>$file){
                 $meta=Param::post($key, Param::TYPE_ARRAY);
-        
+    
                 $path=$this->getNewFilePath($meta);
                 move_uploaded_file($file['tmp_name'], $path['file']);
-        
+    
                 $result[$key]['url']=$path['url'];
             }
-        
+    
             return $this->format(self::API_SUCCESS, $huiLang->_('cdn.upload.suceess'), array(), $result);
         }catch (Exception $e){
             return $this->format(self::API_FAIL, $e->getMessage());

@@ -100,6 +100,39 @@ class Base extends  \HuiLib\Module\ModuleBase
         return $result;
     }
     
+    /**
+     * 生成一个头像储存路径
+     * 
+     * 需要将size替换为相应规格号
+     */
+    protected function getAvatarPath($meta)
+    {
+        if (empty($meta['size']) || empty($meta['type']) || empty($meta['name']) || empty($meta['uid'])) {
+            throw new Exception(Front::getInstance()->getHuiLang()->_('cdn.upload.files.error'));
+        }
+        
+        $uid=$meta['uid'];
+        $config=$this->getConfig();
+        $type=Param::post('type', Param::TYPE_STRING);
+        
+        //替换为10位，刚好10亿 1000,000,000
+        $uidStr = sprintf ( "%010d",  $uid);
+        $filePath=$config['save_path'].$type.SEP. substr ( $uidStr, 0, 4 ) . SEP . substr ( $uidStr, 4, 3 ) . SEP . substr ( $uidStr, 7, 3 ) . SEP;
+        
+        //创建目录
+        if (!is_dir($filePath)) {
+            mkdir($filePath, 0777, TRUE);
+        }
+        
+        $ext=$this->getExt($meta['name']);
+        $file=$filePath.'size'.$ext;
+        
+        $result=array();
+        $result['file']=$file;
+        $result['url']=str_ireplace(SEP, URL_SEP, str_ireplace($config['save_path'], '', $file));
+        return $result;
+    }
+    
     protected function getExt($fileName){
         return substr($fileName, strrpos($fileName, '.'));
     }
