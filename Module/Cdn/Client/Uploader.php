@@ -12,23 +12,9 @@ use HuiLib\Module\Cdn\Utility;
 class Uploader extends Base
 {
     /**
-     * 上传一个文件
-     *
-     * @param array $file
-     */
-    public function upload($file)
-    {
-        //if (!file_exists($file)) {
-        // return $this->format(parent::API_FAIL, 'File not exsits.');
-        //}
-    
-        return Uploader::create()->transfer($file);
-    }
-    
-    /**
      * 上传前端传过来的文件
      * 
-     * 内容取自$_FILES
+     * 内容结构和$_FILES一致，多了些验证信息
      *
      * @param array $file
      */
@@ -46,11 +32,13 @@ class Uploader extends Base
                 return $this->format(self::API_FAIL, $this->getHuiLang()->_('cdn.post.files.error'));
             }
             $attches[$field]='@'.$file['tmp_name'];
-            $post[$field.'[name]']=$file['name'];
-            $post[$field.'[type]']=$file['type'];
-            $post[$field.'[error]']=$file['error'];
-            $post[$field.'[size]']=$file['size'];
             $post[$field.'[sha1]']=sha1_file($file['tmp_name']);
+            unset($file['tmp_name']);
+            
+            //重建表单数组 主要是name, type, error, size字段，头像可能包含uid
+            foreach ($file as $key=>$value){
+                $post[$field.'['.$key.']']=$value;
+            }
         }
 
         return $this->curl($post, $attches);
