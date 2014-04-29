@@ -125,7 +125,7 @@ class Base extends  \HuiLib\Module\ModuleBase
         }
         
         $ext=$this->getExt($meta['name']);
-        $file=$filePath.'size'.$ext;
+        $file=$filePath.'{size}'.$ext;
         
         $result=array();
         $result['file']=$file;

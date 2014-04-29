@@ -76,7 +76,7 @@ class Uploader extends Base
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, TRUE);
         
         $result=curl_exec($handle);
-        echo $result;die();
+        //echo $result;die();
         
         return json_decode($result, TRUE);
     }

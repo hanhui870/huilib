@@ -113,6 +113,8 @@ class Uploader extends Base
      * 上传头像
      * 
      * 一次只能上传单个文件
+     * 
+     * @return array size.url
      */
     public function uploadAvatar()
     {
@@ -146,7 +148,7 @@ class Uploader extends Base
             $path=$this->getAvatarPath($postAvatar);
             
             foreach ( array ('180', '100', '50', '30' ) as $size ) {
-                $filepath=str_ireplace('size', $size, $path['file']);
+                $filepath=str_ireplace('{size}', $size, $path['file']);
                 Thumb::create($postImage['tmp_name'])->thumbByCrop($size, $size, $filepath);
             }
             
