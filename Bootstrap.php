@@ -18,6 +18,21 @@ use HuiLib\App\Front;
  */
 class Bootstrap
 {
+	//运行方式
+	const RUN_BIN='Bin';
+	const RUN_WEB='Web';
+	
+	//运行环境
+	//产品环境
+	const ENV_PRODUCTION='production';
+	//演示环境
+	const ENV_STAGING='staging';
+	//测试环境
+	const ENV_TESTING='testing';
+	//开发环境
+	const ENV_DEVELOPMENT='development';
+	
+	//默认环境
 	const DEFAULT_ENV = 'production';
 	
 	/**
@@ -28,6 +43,8 @@ class Bootstrap
 	
 	/**
 	 * 运行入口
+	 * 
+	 * 支持运行方式：web、bin
 	 */
 	private $runMethod;
 	
@@ -43,7 +60,7 @@ class Bootstrap
 	 */
 	private $shutCall;
 	
-	private $allowedEnv = array ('production', 'staging', 'testing', 'development' );
+	private $allowedEnv = array (self::ENV_PRODUCTION, self::ENV_STAGING, self::ENV_TESTING, self::ENV_DEVELOPMENT );
 	
 	/**
 	 * 加载器实例
