@@ -73,8 +73,11 @@ abstract class AppBase
 		//初始化Session Test需要独立初始化
 		$this->initSession();
 		
-		$this->requestInstance->init();
-		
+		/**
+		 * url路由处理
+		 */
+		$this->requestInstance->urlRoute();
+
 		if (method_exists(Front::getInstance()->getController(), 'dispatch')) {
 			Front::getInstance()->getController()->dispatch();
 		}else{
@@ -92,15 +95,27 @@ abstract class AppBase
 	    if (!\HuiLib\Request\RequestBase::isCli() && (APP_ENV=='production' || APP_ENV=='staging')) {
 	        exit('not support.');
 	    }
-	    
-		$queryString = \HuiLib\Helper\Param::getQueryString ();
-		parse_str($queryString, $info);
-		if (empty($info)) {
-			exit('empty param.');
-		}
-		//获取类名
-		$class=key($info);
-		
+
+	    //bin运行
+	    if (RUN_METHOD==\HuiLib\Bootstrap::RUN_BIN) {
+	        if (!empty($_SERVER['argv'][1])) {
+	            $class=trim($_SERVER['argv'][1]);
+	        }else{
+	            exit('empty bin param.');
+	        }      
+	        
+	        echo 'RUN_EVN:'. APP_ENV.PHP_EOL;
+	    }else{
+	        //web运行
+	        $queryString = \HuiLib\Helper\Param::getQueryString ();
+	        parse_str($queryString, $info);
+	        if (empty($info)) {
+	            exit('empty web param.');
+	        }
+	        //获取类名
+	        $class=key($info);
+	    }
+
 		//初始化测试库
 		$instance = $class::getInstance ();
 		

@@ -73,13 +73,14 @@ abstract class RequestBase
 	
 	function __construct()
 	{
+	    $this->init();
 	}
 	
 	/**
 	 * 网站URL路由控制
 	 *
 	 */
-	protected function urlRoute() {
+	public function urlRoute() {
 	    $this->host=$this->getHostRouteSeg();
 	    $this->package=$this->getPackageRouteSeg();
 	    $this->controller=$this->getControllerRouteSeg();

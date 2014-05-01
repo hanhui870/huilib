@@ -36,11 +36,6 @@ class Http extends RequestBase
 		//设置路由资源定位符，并初始化路由信息
 		$this->routeUri=$this->httpHost.$this->scriptUrl;
 		$this->initRouteInfo();
-		
-		/**
-		 * url路由处理 调用父方法
-		 */
-		$this->urlRoute ();
 	}
 	
 	/**

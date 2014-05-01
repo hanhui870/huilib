@@ -20,6 +20,8 @@ class Bin extends AppBase
 	 * 初始化请求
 	 */
 	protected function initRequest(){
-	
+	    $this->requestInstance=new \HuiLib\Request\Bin();
+	    
+	    return $this->requestInstance;
 	}
 }
