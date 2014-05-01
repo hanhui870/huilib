@@ -377,6 +377,15 @@ abstract class RequestBase
 	}
 	
 	/**
+	 * 是否通过命令行访问
+	 * @return boolean
+	 */
+	public static function isCli()
+	{
+	    return php_sapi_name() == 'cli';
+	}
+	
+	/**
 	 * 请求对象初始化
 	 */
 	abstract public function init();

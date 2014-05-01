@@ -354,4 +354,13 @@ class Controller
 	{
 		return Front::getInstance()->getLang();
 	}
+	
+	/**
+	 * 是否通过命令行访问
+	 * @return boolean
+	 */
+	protected function isCli()
+	{
+	    return \HuiLib\Request\RequestBase::isCli();
+	}
 }

@@ -1,5 +1,5 @@
 <?php
-namespace HuiLib\Tool\Utility;
+namespace HuiLib\Module\Tool\Utility;
 
 use HuiLib\Db\DbBase;
 use HuiLib\Error\Exception;
@@ -11,19 +11,15 @@ use HuiLib\Helper\String;
  * @author 祝景法
  * @since 2013/11/30
  */
-abstract class TableField extends \HuiLib\Tool\ToolBase
+class TableField extends \HuiLib\Module\ModuleBase
 {
-	protected $table=NULL;
-	
-	public function run(){
-		$this->getTable();
-		
-		if (!$this->table) {
+	public function run($table){
+		if (!$table) {
 			throw new Exception('Tool class table name has not been set.');
 		}
 		
 		$db=DbBase::createMaster();
-		$fieldList=$db->getConnection()->query('describe '.$this->table)->fetchAll(\Pdo::FETCH_ASSOC);
+		$fieldList=$db->getConnection()->query('describe '.$table)->fetchAll(\Pdo::FETCH_ASSOC);
 		
 		$result=array();
 		foreach ($fieldList as $field)
@@ -43,11 +39,5 @@ abstract class TableField extends \HuiLib\Tool\ToolBase
 		
 		//print_r($fieldList);
 		echo "<pre>".var_export($result, TRUE)."</pre>";
-	}
-	
-	protected abstract function getTable();
-	
-	protected static function className(){
-		return __CLASS__;
 	}
 }

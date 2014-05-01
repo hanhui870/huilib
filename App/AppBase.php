@@ -89,6 +89,10 @@ abstract class AppBase
 	 */
 	public function runTest()
 	{
+	    if (!\HuiLib\Request\RequestBase::isCli() && (APP_ENV=='production' || APP_ENV=='staging')) {
+	        exit('not support.');
+	    }
+	    
 		$queryString = \HuiLib\Helper\Param::getQueryString ();
 		parse_str($queryString, $info);
 		if (empty($info)) {
@@ -100,31 +104,6 @@ abstract class AppBase
 		//初始化测试库
 		$instance = $class::getInstance ();
 		
-		//执行
-		$instance->run ();
-	}
-	
-	/**
-	 * 工具集执行入口
-	 * 
-	 * eg. 
-	 * 第一个是类名，其他是参数；默认执行run方法
-	 * tool.php?Tool\TableField\Fetch&table=tablename
-	 * 
-	 */
-	public function runTool()
-	{
-		$queryString = \HuiLib\Helper\Param::getQueryString ();
-		parse_str($queryString, $info);
-		if (empty($info)) {
-			exit('empty param.');
-		}
-		//获取类名
-		$class=key($info);
-		
-		//初始化Tool库
-		$instance = $class::getInstance ();
-	
 		//执行
 		$instance->run ();
 	}
