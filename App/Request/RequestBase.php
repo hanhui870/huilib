@@ -97,7 +97,7 @@ abstract class RequestBase
 		    $this->loadController();
 		    
 		}catch (RoutePackageException $exception){
-		    $packageRoute=new \HuiLib\Route\Package();
+		    $packageRoute=new \HuiLib\App\Route\Package();
 		    Front::getInstance()->setPackageRoute($packageRoute);
 		    
 		    //二级目录路由处理
@@ -153,7 +153,7 @@ abstract class RequestBase
 	        
 	        Front::getInstance()->setController($this->controllerInstance);
 	    }catch (RouteControllerException $exception){
-	        $controllerRoute=new \HuiLib\Route\Controller();
+	        $controllerRoute=new \HuiLib\App\Route\Controller();
 	        Front::getInstance()->setControllerRoute($controllerRoute);
 	        
 	        //Controller路由处理 /topic/2

@@ -1,5 +1,5 @@
 <?php
-namespace HuiLib\Route;
+namespace HuiLib\App\Route;
 
 /**
  * 路由模块基类

@@ -1,5 +1,5 @@
 <?php
-namespace HuiLib\Route;
+namespace HuiLib\App\Route;
 
 /**
  * 定位于2级子域名路由

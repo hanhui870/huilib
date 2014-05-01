@@ -89,7 +89,7 @@ class Controller
 		
 		}catch (RouteActionException $exception){
 		    //App namespace route
-		    $actionRoute=new \HuiLib\Route\Action();
+		    $actionRoute=new \HuiLib\App\Route\Action();
 		    Front::getInstance()->setActionRoute($actionRoute);
 		    
 		    //二级目录路由处理

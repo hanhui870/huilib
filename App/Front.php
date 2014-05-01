@@ -91,21 +91,21 @@ class Front
 	/**
 	 * Package短链对象
 	 *
-	 *  @var \HuiLib\Route\Package 
+	 *  @var \HuiLib\App\Route\Package 
 	 */
 	protected $packageRoute=NULL;
 	
 	/**
 	 * Controller短链对象
 	 *
-	 *  @var \HuiLib\Route\Controller
+	 *  @var \HuiLib\App\Route\Controller
 	 */
 	protected $controllerRoute=NULL;
 	
 	/**
 	 * Action短链对象
 	 *
-	 *  @var \HuiLib\Route\Action
+	 *  @var \HuiLib\App\Route\Action
 	 */
 	protected $actionRoute=NULL;
 
@@ -237,7 +237,7 @@ class Front
 		return $this->view;
 	}
 	
-	public function setPackageRoute(\HuiLib\Route\Package $route)
+	public function setPackageRoute(\HuiLib\App\Route\Package $route)
 	{
 	    $this->packageRoute=$route;
 	}
@@ -247,7 +247,7 @@ class Front
 	    return $this->packageRoute;
 	}
 	
-	public function setControllerRoute(\HuiLib\Route\Controller $route)
+	public function setControllerRoute(\HuiLib\App\Route\Controller $route)
 	{
 	    $this->controllerRoute=$route;
 	}
@@ -257,7 +257,7 @@ class Front
 	    return $this->controllerRoute;
 	}
 	
-	public function setActionRoute(\HuiLib\Route\Action $route)
+	public function setActionRoute(\HuiLib\App\Route\Action $route)
 	{
 	    $this->actionRoute=$route;
 	}
