@@ -90,6 +90,8 @@ abstract class LogBase
 
 	/**
 	 * 获取Memcache默认缓存实例
+	 * 
+	 * @return \HuiLib\Log\Storage\File 
 	 */
 	public static function getFile()
 	{
@@ -98,6 +100,8 @@ abstract class LogBase
 
 	/**
 	 * 获取Redis默认缓存实例
+	 * 
+	 * @return \HuiLib\Log\Storage\Mysql 
 	 */
 	public static function getMysql()
 	{
@@ -106,6 +110,8 @@ abstract class LogBase
 
 	/**
 	 * 获取Mongo默认缓存实例
+	 * 
+	 * @return \HuiLib\Log\Storage\Mongo
 	 */
 	public static function getMongo()
 	{
