@@ -39,7 +39,7 @@ class Front
 	
 	/**
 	 * 请求对象
-	 * @var \HuiLib\Request\RequestBase
+	 * @var \HuiLib\App\Request\RequestBase
 	 */
 	protected $request=NULL;
 	
@@ -146,7 +146,7 @@ class Front
 		return $this->loader;
 	}
 	
-	public function setRequest(\HuiLib\Request\RequestBase $request)
+	public function setRequest(\HuiLib\App\Request\RequestBase $request)
 	{
 		$this->request=$request;
 	}

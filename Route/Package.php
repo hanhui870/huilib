@@ -2,7 +2,7 @@
 namespace HuiLib\Route;
 
 use HuiLib\App\Front;
-use HuiLib\Request\RequestBase;
+use HuiLib\App\Request\RequestBase;
 
 /**
  * Package层短链模块

@@ -361,6 +361,6 @@ class Controller
 	 */
 	protected function isCli()
 	{
-	    return \HuiLib\Request\RequestBase::isCli();
+	    return \HuiLib\App\Request\RequestBase::isCli();
 	}
 }

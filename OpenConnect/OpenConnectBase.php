@@ -1,7 +1,7 @@
 <?php
 namespace HuiLib\OpenConnect;
 
-use HuiLib\Request\RequestBase;
+use HuiLib\App\Request\RequestBase;
 use HuiLib\Loader\AutoLoaderException;
 use HuiLib\Helper\String;
 use HuiLib\Helper\Utility;

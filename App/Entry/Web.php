@@ -1,5 +1,7 @@
 <?php
-namespace HuiLib\App;
+namespace HuiLib\App\Entry;
+
+use HuiLib\App\AppBase;
 
 /**
  * Web运行应用初始化
@@ -23,7 +25,7 @@ class Web extends AppBase
 	 */
 	protected function initRequest()
 	{
-		$this->requestInstance=new \HuiLib\Request\Http();
+		$this->requestInstance=new \HuiLib\App\Request\Http();
 		
 		return $this->requestInstance;
 	}

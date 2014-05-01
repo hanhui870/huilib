@@ -1,5 +1,7 @@
 <?php
-namespace HuiLib\App;
+namespace HuiLib\App\Entry;
+
+use HuiLib\App\AppBase;
 
 /**
  * Bin运行应用初始化
@@ -20,7 +22,7 @@ class Bin extends AppBase
 	 * 初始化请求
 	 */
 	protected function initRequest(){
-	    $this->requestInstance=new \HuiLib\Request\Bin();
+	    $this->requestInstance=new \HuiLib\App\Request\Bin();
 	    
 	    return $this->requestInstance;
 	}

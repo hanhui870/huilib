@@ -1,5 +1,5 @@
 <?php
-namespace HuiLib\Request;
+namespace HuiLib\App\Request;
 
 use HuiLib\App\Front;
 use HuiLib\Helper\String;

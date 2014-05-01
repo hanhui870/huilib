@@ -13,7 +13,7 @@ abstract class AppBase
 {
 	/**
 	 * 请求对象
-	 * @var \HuiLib\Request\RequestBase
+	 * @var \HuiLib\App\Request\RequestBase
 	 */
 	protected $requestInstance;
 	
@@ -92,7 +92,7 @@ abstract class AppBase
 	 */
 	public function runTest()
 	{
-	    if (!\HuiLib\Request\RequestBase::isCli() && (APP_ENV=='production' || APP_ENV=='staging')) {
+	    if (!\HuiLib\App\Request\RequestBase::isCli() && (APP_ENV=='production' || APP_ENV=='staging')) {
 	        exit('not support.');
 	    }
 
@@ -239,7 +239,7 @@ abstract class AppBase
 	 */
 	public static function factory($runMethod, $config)
 	{
-		$appClass = '\\HuiLib\\App\\' . ucfirst ( $runMethod );
+		$appClass = '\\HuiLib\\App\\Entry\\' . ucfirst ( $runMethod );
 		$appInstance = new $appClass ( $config );
 		return $appInstance;
 	}
