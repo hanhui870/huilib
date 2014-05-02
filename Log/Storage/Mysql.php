@@ -46,11 +46,11 @@ class Mysql extends \HuiLib\Log\LogBase
 	/**
 	 * 增加一条日志信息
 	 *
-	 * @param string $info
+	 * @param string $message
 	 */
-	public function add($info)
+	public function add($message)
 	{
-		$logInfo=array('log'=>$info);
+		$logInfo=array('log'=>$message);
 		$trace=self::getDebugTrace(2);//过滤两级
 		if (!empty($trace)) {//保留最近一条执行路径
 			$logInfo['trace']=array_shift($trace);

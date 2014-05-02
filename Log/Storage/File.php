@@ -73,10 +73,10 @@ class File extends \HuiLib\Log\LogBase
 	/**
 	 * 增加一条日志信息
 	 *
-	 * @param string $info
-	 * @return int 写入的长度
+	 * @param string $message
+	 * @return $this
 	 */
-	public function add($info)
+	public function add($message)
 	{
 	    //初始化储存文件
 		$this->getFileFd();
@@ -87,14 +87,10 @@ class File extends \HuiLib\Log\LogBase
 		
 		$request=Front::getInstance()->getRequest();
 		if ($request->getPackageRouteSeg() && $request->getControllerRouteSeg()) {
-		    if (RUN_METHOD==\HuiLib\Bootstrap::RUN_WEB) {
-		        $logInfo['Route']=" {$request->getPackageRouteSeg()}/{$request->getControllerRouteSeg()}/{$request->getActionRouteSeg()}";
-		    }else{
-		        $logInfo['Route']=" ".$request->getPackageRouteSeg();
-		    }
+		    $logInfo['Route']=" {$request->getPackageRouteSeg()}/{$request->getControllerRouteSeg()}/{$request->getActionRouteSeg()}";
 		}
 		$logInfo['Append']=']:';
-		$logInfo['Info']="\"$info\"";
+		$logInfo['Info']="\"$message\"";
 		
 		$trace=self::getDebugTrace(2);//过滤两级
 		$traceInfo=array('file'=>'', 'line'=>'');

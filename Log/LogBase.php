@@ -149,6 +149,8 @@ abstract class LogBase
 
 	/**
 	 * 创建DB实例 DB factory方法
+	 * 
+	 * @return \HuiLib\Log\LogBase 
 	 */
 	public static function create($config)
 	{
@@ -249,9 +251,9 @@ abstract class LogBase
 	/**
 	 * 增加一条日志信息
 	 *
-	 * @param string $info
+	 * @param string $message
 	 */
-	abstract public function add($info);
+	abstract public function add($message);
 	
 	/**
 	 * 将日志写入到磁盘

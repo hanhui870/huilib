@@ -14,7 +14,7 @@ class Mongo extends \HuiLib\Log\LogBase
 		var_dump($config);
 	}
 	
-	public function add($info)
+	public function add($message)
 	{
 	    
 	}
@@ -22,6 +22,11 @@ class Mongo extends \HuiLib\Log\LogBase
 	public function flush()
 	{
 	     
+	}
+	
+	public function clean()
+	{
+	
 	}
 	
 	public function toString(){
