@@ -88,7 +88,10 @@ class Mysql extends \HuiLib\Log\LogBase
 	    if (!$this->buffer) return FALSE;
 	    
 	    $this->lastFlush=time();
-	    return Query::insert($this->table)->batchSaveRows($this->buffer)->exec();
+	    $rows=Query::insert($this->table)->batchSaveRows($this->buffer)->exec();
+	    $this->buffer=array();
+	    
+	    return $rows;
 	}
 	
 	/**

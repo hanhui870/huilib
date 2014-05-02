@@ -121,7 +121,11 @@ class File extends \HuiLib\Log\LogBase
 	    if (!$this->buffer) return FALSE;
 	    
 	    $this->lastFlush=time();
-	    return fwrite($this->fileFd, implode('', $this->buffer));
+	    fwrite($this->fileFd, implode('', $this->buffer));
+	    $rows=count($this->buffer);
+	    $this->buffer=array();
+	    
+	    return $rows;
 	}
 	
 	/**
