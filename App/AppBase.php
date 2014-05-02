@@ -92,7 +92,7 @@ abstract class AppBase
 	 */
 	public function runTest()
 	{
-	    if (!\HuiLib\App\Request\RequestBase::isCli() && (APP_ENV=='production' || APP_ENV=='staging')) {
+	    if (!\HuiLib\App\Request\RequestBase::isCli() && (APP_ENV==\HuiLib\Bootstrap::ENV_PRODUCTION || APP_ENV==\HuiLib\Bootstrap::ENV_STAGING)) {
 	        exit('not support.');
 	    }
 
