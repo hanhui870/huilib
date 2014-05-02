@@ -124,6 +124,9 @@ class Param
 	 * 获取当前被访问的页面完整网址
 	 */
 	public static function getRequestUrl(){
+	    if (RUN_METHOD == \HuiLib\Bootstrap::RUN_BIN) {
+	        return '';
+	    }
 		return self::getScheme().'://'.self::server('HTTP_HOST', self::TYPE_STRING).self::server('REQUEST_URI', self::TYPE_STRING);
 	}
 	

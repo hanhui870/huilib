@@ -252,8 +252,9 @@ abstract class LogBase
 	 * 增加一条日志信息
 	 *
 	 * @param string $message
+	 * @param bool $trace 是否添加调试信息
 	 */
-	abstract public function add($message);
+	abstract public function add($message, $isTrace=TRUE);
 	
 	/**
 	 * 将日志写入到磁盘

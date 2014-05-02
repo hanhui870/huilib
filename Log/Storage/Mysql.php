@@ -47,13 +47,16 @@ class Mysql extends \HuiLib\Log\LogBase
 	 * 增加一条日志信息
 	 *
 	 * @param string $message
+	 * @param bool $trace 是否添加调试信息
 	 */
-	public function add($message)
+	public function add($message, $isTrace=TRUE)
 	{
 		$logInfo=array('log'=>$message);
-		$trace=self::getDebugTrace(2);//过滤两级
-		if (!empty($trace)) {//保留最近一条执行路径
-			$logInfo['trace']=array_shift($trace);
+		if ($isTrace) {
+		    $trace=self::getDebugTrace(2);//过滤两级
+		    if (!empty($trace)) {//保留最近一条执行路径
+		        $logInfo['trace']=array_shift($trace);
+		    }
 		}
 
 		$logInstance=SystemLog::create()->createRow();

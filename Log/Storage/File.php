@@ -74,9 +74,9 @@ class File extends \HuiLib\Log\LogBase
 	 * 增加一条日志信息
 	 *
 	 * @param string $message
-	 * @return $this
+	 * @param bool $trace 是否添加调试信息
 	 */
-	public function add($message)
+	public function add($message, $isTrace=FALSE)
 	{
 	    //初始化储存文件
 		$this->getFileFd();
@@ -90,14 +90,17 @@ class File extends \HuiLib\Log\LogBase
 		    $logInfo['Route']=" {$request->getPackageRouteSeg()}/{$request->getControllerRouteSeg()}/{$request->getActionRouteSeg()}";
 		}
 		$logInfo['Append']=']:';
-		$logInfo['Info']="\"$message\"";
+		$logInfo['Info']=" $message";
 		
-		$trace=self::getDebugTrace(2);//过滤两级
-		$traceInfo=array('file'=>'', 'line'=>'');
-		if (!empty($trace)) {//保留最近一条执行路径
-			$traceInfo=array_shift($trace);
+		if ($isTrace) {
+		    $trace=self::getDebugTrace(2);//过滤两级
+		    $traceInfo=array('file'=>'', 'line'=>'');
+		    if (!empty($trace)) {//保留最近一条执行路径
+		        $traceInfo=array_shift($trace);
+		    }
+		    $logInfo['Trace']=" Trace::$traceInfo[file]:$traceInfo[line]";
 		}
-		$logInfo['Trace']=" Trace::$traceInfo[file]:$traceInfo[line]\n";
+		$logInfo['End']=PHP_EOL;
 		
 		$log= implode('', $logInfo);
 		$this->buffer[]=$log;
