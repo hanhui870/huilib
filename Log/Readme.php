@@ -20,8 +20,18 @@ $cache=LogBase::getFile();
 //快速获取一个Memcache Log缓存实例
 $cache=LogBase::getMongo();
 
-//完整示例
+//File完整示例 支持批量保存多条，但必须在同个log实例
+$log=LogBase::getFile();
+$log->setType(LogBase::TYPE_USERERROR);
+$log->setIdentify('PHPFrameTest');//会放置到文件名中作为区分
+$log->add('sorry, db falied');
+$log->add('sorry, db falied');
+$log->add('sorry, db falied');
+
+//Mysql完整示例 支持批量保存多条，但必须在同个log实例
 $log=LogBase::getMysql();
 $log->setType(LogBase::TYPE_USERERROR);
 $log->setIdentify('PHPFrameTest');
+$log->add('sorry, db falied');
+$log->add('sorry, db falied');
 $log->add('sorry, db falied');

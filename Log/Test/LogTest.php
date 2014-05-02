@@ -19,14 +19,21 @@ class LogTest extends \HuiLib\Test\TestBase
 		$log=LogBase::getMysql();
 		$log->setType(LogBase::TYPE_USERERROR);
 		$log->setIdentify('PHPFrameTest');
-		echo $log->add('sorry, db falied');
+		//支持批量插入
+		$log->add('sorry, db falied');
+		$log->add('sorry, db falied');
+		$log->add('sorry, db falied');
 	}
 	
 	private function testFile(){
 		$log=LogBase::getFile();
 		$log->setType(LogBase::TYPE_DBERROR);
 		$log->setIdentify('PHPFrameTest');
-		echo $log->add('sorry, db falied');
+		$log->add('sorry, db falied');
+		$log->add('sorry, db falied');
+		$log->add('sorry, db falied');
+		
+		LogBase::getFile()->setType(LogBase::TYPE_DAEMON)->setIdentify('Up201405')->add('Find 1 thing wrong.');
 	}
 
 	protected static function className(){

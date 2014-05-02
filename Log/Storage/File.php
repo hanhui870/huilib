@@ -2,6 +2,7 @@
 namespace HuiLib\Log\Storage;
 
 use HuiLib\App\Front;
+
 /**
  * 日志模块File适配器
  * 
@@ -12,6 +13,7 @@ use HuiLib\App\Front;
  */
 class File extends \HuiLib\Log\LogBase
 {
+   
 	/**
 	 * 日志文件储存路径
 	 * 
@@ -25,7 +27,6 @@ class File extends \HuiLib\Log\LogBase
 	 */
 	protected $fileFd=NULL;
 	
-	
 	protected function __construct($config)
 	{
 		if (empty($config['path']) || !is_dir($config['path'])) {
@@ -38,15 +39,22 @@ class File extends \HuiLib\Log\LogBase
 	/**
 	 * 获取Log的储存路径
 	 */
-	private function iniFileFd()
+	private function getFileFd()
 	{
-		if ($this->fileFd!==NULL) {
-			return TRUE;
+		if ($this->fileFd!==NULL && date('d', $this->startTime)==date('d')) {
+			return $this->fileFd;
 		}
+		
 		if ($this->type===NULL) {
 			throw new \HuiLib\Error\Exception ( 'Please set Log Type firstly.' );
 		}
-		$file=$this->filePath.date('Y').SEP.date('m-d').'.'.$this->type.'.log';
+		if (!$this->startTime || date('d', $this->startTime)!=date('d')){
+		    $this->startTime=time();
+		}
+		
+		$pathAdd=$this->identify ? '.'.$this->identify :'';
+		$file=$this->filePath.date('Y-m-d', $this->startTime).$pathAdd.'.'.$this->type.'.log';
+
 		if (file_exists($file)) {
 			$this->fileFd=fopen($file, 'ab+');
 		}else{
@@ -57,8 +65,9 @@ class File extends \HuiLib\Log\LogBase
 				}
 			}
 			$this->fileFd=fopen($file, 'wb+');
+			chmod($file, 0666);
 		}
-		return TRUE;
+		return $this->fileFd;
 	}
 	
 	/**
@@ -69,15 +78,22 @@ class File extends \HuiLib\Log\LogBase
 	 */
 	public function add($info)
 	{
-		$fileFd=$this->iniFileFd();
+	    //初始化储存文件
+		$this->getFileFd();
 		
 		$logInfo=array();
-		$logInfo['Time']=date("[H:i:s]:");
+		$mtime=number_format(microtime(1), 4, '.', '');
+		$logInfo['Time']=date("[H:i:s").substr($mtime, strrpos($mtime, '.'));
 		
 		$request=Front::getInstance()->getRequest();
 		if ($request->getPackageRouteSeg() && $request->getControllerRouteSeg()) {
-			$logInfo['Route']="[{$request->getPackageRouteSeg()}/{$request->getControllerRouteSeg()}/{$request->getActionRouteSeg()}]:";
+		    if (RUN_METHOD==\HuiLib\Bootstrap::RUN_WEB) {
+		        $logInfo['Route']=" {$request->getPackageRouteSeg()}/{$request->getControllerRouteSeg()}/{$request->getActionRouteSeg()}";
+		    }else{
+		        $logInfo['Route']=" ".$request->getPackageRouteSeg();
+		    }
 		}
+		$logInfo['Append']=']:';
 		$logInfo['Info']="\"$info\"";
 		
 		$trace=self::getDebugTrace(2);//过滤两级
@@ -88,7 +104,43 @@ class File extends \HuiLib\Log\LogBase
 		$logInfo['Trace']=" Trace::$traceInfo[file]:$traceInfo[line]\n";
 		
 		$log= implode('', $logInfo);
-		return fwrite($this->fileFd, $log);
+		$this->buffer[]=$log;
+		
+		//超出缓存允许长度、超出缓存生命期输出到磁盘
+		if (count($this->buffer)>self::MAX_BUFFER_NUM || time()-$this->lastFlush>self::FLUSH_INTERVAL){
+		    $this->flush();
+		}
+		
+		return $this;
+	}
+	
+	/**
+	 * 刷入磁盘
+	 */
+	public function flush()
+	{
+	    if (!$this->buffer) return FALSE;
+	    
+	    $this->lastFlush=time();
+	    return fwrite($this->fileFd, implode('', $this->buffer));
+	}
+	
+	/**
+	 * 清除老的日志
+	 */
+	public function clean()
+	{
+	    $files=glob($this->filePath.'*.log');
+	    if (!$files) return false;
+	
+	    //print_r($files);
+	    foreach ($files as $file){
+	        $mtime=filemtime($file);
+	        if (time()-$mtime>self::LOG_KEEP_DAYS*86400){//一周后的数据清除
+	            @unlink($file);
+	        }
+	    }
+	    return true;
 	}
 	
 	public function toString(){
@@ -97,6 +149,11 @@ class File extends \HuiLib\Log\LogBase
 	
 	public function __destruct()
 	{
-		fclose($this->fileFd);
+	    //退出前输出缓存
+	    $this->flush();
+	
+	    if ($this->fileFd){
+	        fclose($this->fileFd);
+	    }
 	}
 }

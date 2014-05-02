@@ -19,6 +19,11 @@ class Mongo extends \HuiLib\Log\LogBase
 	    
 	}
 	
+	public function flush()
+	{
+	     
+	}
+	
 	public function toString(){
 		return 'mongo';
 	}

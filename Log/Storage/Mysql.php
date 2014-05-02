@@ -5,6 +5,8 @@ use HuiLib\Db\DbBase;
 use HuiLib\Helper\DateTime;
 use HuiLib\Db\Query;
 use HuiLib\App\Front;
+use HuiLib\Helper\Param;
+use Model\Table\SystemLog;
 
 /**
  * 日志模块Mysql适配器
@@ -14,6 +16,11 @@ use HuiLib\App\Front;
  */
 class Mysql extends \HuiLib\Log\LogBase
 {
+    /**
+     * Log内部连接
+     */
+    protected $driver = NULL;
+    
 	protected $table=NULL;
 
 	protected function __construct($config)
@@ -48,26 +55,55 @@ class Mysql extends \HuiLib\Log\LogBase
 		if (!empty($trace)) {//保留最近一条执行路径
 			$logInfo['trace']=array_shift($trace);
 		}
-		
-		$logArray=array();
-		$logArray['UrlNow']=$this->urlNow;
-		$logArray['Type']=$this->type;
-		$logArray['Identify']=$this->identify;
-		$logArray['Info']=json_encode($logInfo);
+
+		$logInstance=SystemLog::create()->createRow();
+		$logInstance['UrlNow']=Param::getRequestUrl ();;
+		$logInstance['Type']=$this->type;
+		$logInstance['Identify']=$this->identify;
+		$logInstance['Info']=json_encode($logInfo);
 		
 		$request=Front::getInstance()->getRequest();
-		$logArray['Package']=$request->getPackageRouteSeg();
-		$logArray['Control']=$request->getControllerRouteSeg();
-		$logArray['Action']=$request->getActionRouteSeg();
+		$logInstance['Package']=$request->getPackageRouteSeg();
+		$logInstance['Control']=$request->getControllerRouteSeg();
+		$logInstance['Action']=$request->getActionRouteSeg();
 		
-		$logArray['Uid']=$this->uid;
-		$logArray['CreateTime']=DateTime::format();
+		$logInstance['Uid']=$this->getLoginUid();
+		$logInstance['CreateTime']=DateTime::format();
 
-		return Query::insert($this->table)->kvInsert($logArray)->query();
+		$this->buffer[]=$logInstance;
+		
+		//超出缓存允许长度、超出缓存生命期输出到磁盘
+		if (count($this->buffer)>self::MAX_BUFFER_NUM || time()-$this->lastFlush>self::FLUSH_INTERVAL){
+		    $this->flush();
+		}
+		
+		return $this;
+	}
+	
+	public function flush()
+	{
+	    if (!$this->buffer) return FALSE;
+	    
+	    $this->lastFlush=time();
+	    return Query::insert($this->table)->batchSaveRows($this->buffer)->exec();
+	}
+	
+	/**
+	 * 清除老的日志
+	 */
+	public function clean()
+	{
+	    return SystemLog::create()->clean(self::LOG_KEEP_DAYS);
 	}
 
 	public function toString()
 	{
 		return 'mysql';
+	}
+
+	public function __destruct()
+	{
+	    //退出前输出缓存
+	    $this->flush();
 	}
 }

@@ -1,8 +1,6 @@
 <?php
 namespace HuiLib\Log;
 
-use HuiLib\Bootstrap;
-use HuiLib\Helper\Param;
 use HuiLib\App\Front;
 
 /**
@@ -24,25 +22,60 @@ abstract class LogBase
 	const TYPE_RUNTIME = 'Runtime';
 	
 	/**
-	 * DAEMON执行的相关人物
+	 * DAEMON执行的相关日志
 	 */
 	const TYPE_DAEMON = 'Daemon';
 	
 	/**
-	 * 数据库相关人物
+	 * 数据库相关日志
 	 */
 	const TYPE_DBERROR = 'DBError';
 	
 	/**
-	 * 用户行为相关人物
+	 * 用户行为相关日志
 	 */
 	const TYPE_USERERROR = 'UserError';
 	
 	/**
-	 * Log内部连接
+	 * 最多缓存条数
+	 * @var int
 	 */
-	protected $driver = NULL;
+	const MAX_BUFFER_NUM=50;
 	
+	/**
+	 * 多少时间同步一次
+	 * 
+	 * 单位秒
+	 */
+	const FLUSH_INTERVAL=30;
+	
+	/**
+	 * 日志保存时间
+	 *
+	 * 单位天，默认三个月
+	 *
+	 * @var
+	 */
+	const LOG_KEEP_DAYS=90;
+	
+	/**
+	 * 日志缓存
+	 * @var array
+	 */
+	protected $buffer=array();
+	
+	/**
+	 * Log对象创建时间
+	 * @var int
+	 */
+	protected $startTime=NULL;
+	
+	/**
+	 * 上次刷新时间
+	 * @var int
+	 */
+	protected $lastFlush=NULL;
+
 	/**
 	 * Log类型
 	 */
@@ -52,27 +85,11 @@ abstract class LogBase
 	 * Log 识别类型
 	 */
 	protected $identify = 'normal';
-	
-	/**
-	 * 当前访问用户ID
-	 * @var int
-	 */
-	protected $uid = 0;
-	
-	/**
-	 * 当前访问的页面
-	 * @var string
-	 */
-	protected $urlNow = '';
 
-	protected function __construct()
+	protected function __construct($config)
 	{
-		if (isset ( $_SESSION ['uid'] )) {
-			$this->uid = $_SESSION ['uid'];
-		}
-		$this->urlNow = Param::getRequestUrl ();
 	}
-
+	
 	/**
 	 * 获取系统默认缓存实例
 	 */
@@ -152,6 +169,13 @@ abstract class LogBase
 				break;
 		}
 		
+		//设置对象创建时间
+		$adapter->startTime=time();
+		//初始化上次刷入
+		$adapter->lastFlush=time();
+		//清除老日志，默认不启用
+		$adapter->clean();
+
 		return $adapter;
 	}
 
@@ -169,6 +193,9 @@ abstract class LogBase
 
 	/**
 	 * 设置识别符
+	 * 
+	 * File:会放置到文件名中作为区分
+	 * Mysql:会专门插入到表的一个字段
 	 *
 	 * @param string $identify
 	 */
@@ -207,11 +234,32 @@ abstract class LogBase
 		}
 		return $result;
 	}
-
+	
+	/**
+	 * 当前访问用户ID
+	 */
+	protected function getLoginUid()
+	{
+	    if (isset ( $_SESSION ['uid'] )) {
+	        return $_SESSION ['uid'];
+	    }
+	    return 0;
+	}
+	
 	/**
 	 * 增加一条日志信息
 	 *
 	 * @param string $info
 	 */
 	abstract public function add($info);
+	
+	/**
+	 * 将日志写入到磁盘
+	 */
+	abstract public function flush();
+	
+	/**
+	 * 清除过期日志
+	 */
+	abstract public function clean();
 }
