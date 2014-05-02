@@ -238,7 +238,7 @@ abstract class RequestBase
 	public function getPackageRouteSeg()
 	{
 		if (!empty($this->routeInfo[self::SEG_PACKAGE])) {
-		    return $this->routeInfo[self::SEG_PACKAGE];
+		    return trim($this->routeInfo[self::SEG_PACKAGE]);
 		}else{
 			return 'index';
 		}
@@ -252,7 +252,7 @@ abstract class RequestBase
 	public function getControllerRouteSeg()
 	{
 		if (!empty($this->routeInfo[self::SEG_CONTROLLER])) {
-			return $this->routeInfo[self::SEG_CONTROLLER];
+			return trim($this->routeInfo[self::SEG_CONTROLLER]);
 		}else{
 			return 'index';
 		}
@@ -266,7 +266,7 @@ abstract class RequestBase
 	public function getActionRouteSeg()
 	{
 		if (!empty($this->routeInfo[self::SEG_ACTION])) {
-			return $this->routeInfo[self::SEG_ACTION];
+			return trim($this->routeInfo[self::SEG_ACTION]);
 		}else{
 			return 'index';
 		}
@@ -280,7 +280,7 @@ abstract class RequestBase
 	public function getRouteSegNum($number)
 	{
 	    if (!empty($this->routeInfo[$number])) {
-	        return $this->routeInfo[$number];
+	        return trim($this->routeInfo[$number]);
 	    }else{
 	        return '';
 	    }
