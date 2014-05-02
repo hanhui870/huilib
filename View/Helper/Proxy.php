@@ -143,7 +143,7 @@ class Proxy implements \Iterator, \ArrayAccess
      */
     public function current()
     {
-        return $this->data [$this->position];
+        return $this->get($this->position);
     }
     
     public function key()
@@ -188,7 +188,7 @@ class Proxy implements \Iterator, \ArrayAccess
      */
     public function offsetGet($offset)
     {
-        return isset ( $this->data [$offset] ) ? $this->data [$offset] : NULL;
+        return $this->get($offset);
     }
     
     /**
