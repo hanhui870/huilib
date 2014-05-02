@@ -161,6 +161,16 @@ class Query
 	{
 		return new \HuiLib\Db\Query\Delete ($table);
 	}
+	
+	/**
+	 * 返回一个Query实例
+	 *
+	 * @return \HuiLib\Db\Query
+	 */
+	public static function create()
+	{
+	    return new self ();
+	}
 
 	/**
 	 * 设置操作表
@@ -305,7 +315,7 @@ class Query
 	}
 	
 	/**
-	 * 直接发起SQL请求
+	 * 直接发起SQL查询请求
 	 *
 	 * @param string $string 查询的SQL
 	 * @return \HuiLib\Db\Result
@@ -315,6 +325,21 @@ class Query
 	    $this->setAdapter();
 	    $innerStatment=$this->adapter->getConnection()->query($sql);
 	    return Result::create($innerStatment);
+	}
+	
+	/**
+	 * 直接执行一条SQL语句
+	 *
+	 * 返回影响行数
+	 *
+	 * @param string $string 查询的SQL
+	 * @return number
+	 */
+	public function execSql($sql)
+	{
+	    $this->setAdapter();
+	    $affectRows=$this->adapter->getConnection()->exec($sql);
+	    return $affectRows;
 	}
 	
 	/**
