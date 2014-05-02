@@ -16,24 +16,24 @@ class LogTest extends \HuiLib\Test\TestBase
 	}
 	
 	private function test(){
-		$log=LogBase::getMysql();
-		$log->setType(LogBase::TYPE_USERERROR);
-		$log->setIdentify('PHPFrameTest');
-		//支持批量插入
-		$log->add('sorry, db falied');
-		$log->add('sorry, db falied');
-		$log->add('sorry, db falied');
+		$logFile=LogBase::getFile()->setType(LogBase::TYPE_DAEMON)->setIdentify('Up201405')->add('Find some thing wrong.');
+		//支持批量插入 需要同一个日志实例
+        $logFile->add('Find 1 thing wrong.');
+        $logFile->add('Find 2 thing wrong.');
+		$logFile->add('sorry, db falied');
+		$logFile->add('sorry, db falied');
+		$logFile->add('sorry, db falied');
 	}
 	
 	private function testFile(){
-		$log=LogBase::getFile();
-		$log->setType(LogBase::TYPE_DBERROR);
-		$log->setIdentify('PHPFrameTest');
-		$log->add('sorry, db falied');
-		$log->add('sorry, db falied');
-		$log->add('sorry, db falied');
-		
-		LogBase::getFile()->setType(LogBase::TYPE_DAEMON)->setIdentify('Up201405')->add('Find 1 thing wrong.');
+	    $logMysql=LogBase::getMysql()->setType(LogBase::TYPE_DAEMON)->setIdentify('Up201405')->add('Find some thing wrong.');
+	    //支持批量插入 需要同一个日志实例
+	    $logMysql->add('Find 1 thing wrong.');
+	    $logMysql->add('Find 2 thing wrong.');
+	    $logMysql->add('Find 1 thing wrong.');
+		$logMysql->add('sorry, db falied');
+		$logMysql->add('sorry, db falied');
+		$logMysql->add('sorry, db falied');
 	}
 
 	protected static function className(){
