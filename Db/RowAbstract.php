@@ -14,7 +14,7 @@ use HuiLib\Db\Query\Where;
  * @author 祝景法
  * @since 2013/10/20
  */
-class RowAbstract extends \HuiLib\Model\ModelBase
+class RowAbstract extends \HuiLib\Model\ModelBase  implements \Iterator, \ArrayAccess
 {
 	/**
 	 * 主键字段键名
@@ -85,6 +85,12 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 	 * @var boolean
 	 */
 	protected $autoSave=FALSE;
+	
+	/**
+	 * 数组当前指针
+	 * @var int
+	 */
+	protected $position = 0;
 	
 	protected function __construct(array $data)
 	{
@@ -501,6 +507,65 @@ class RowAbstract extends \HuiLib\Model\ModelBase
 			return TRUE;
 		}
 		return FALSE;
+	}
+	
+	public function rewind()
+	{
+	    $this->position = 0;
+	}
+	
+	/**
+	 * 获取一行数据，生成对象
+	 */
+	public function current()
+	{
+	    return $this->data [$this->position];
+	}
+	
+	public function key()
+	{
+	    return $this->position;
+	}
+	
+	public function next()
+	{
+	    ++ $this->position;
+	}
+	
+	public function valid()
+	{
+	    return isset ( $this->data [$this->position] );
+	}
+	
+	public function offsetSet($offset, $value)
+	{
+	    if (is_null ( $offset )) {
+	        $this->data [] = $value;
+	    } else {
+	        $this->data [$offset] = $value;
+	    }
+	}
+	
+	public function offsetExists($offset)
+	{
+	    return isset ( $this->data [$offset] );
+	}
+	
+	public function offsetUnset($offset)
+	{
+	    unset ( $this->data [$offset] );
+	}
+	
+	/**
+	 * 通过数组下标获取一行数据，生成对象
+	 *
+	 * 注意: 必须保存return[iter]值，不然会无效，每次生成新对象
+	 *
+	 * @param int $offset
+	 */
+	public function offsetGet($offset)
+	{
+	    return isset ( $this->data [$offset] ) ? $this->data [$offset] : NULL;
 	}
 	
 	public function __destruct()
