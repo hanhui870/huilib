@@ -466,6 +466,7 @@ class Select extends \HuiLib\Db\Query
 	/**
 	 * 获取当前Select数据集的数量统计
 	 * 
+	 * //涉及数据量大了，通过子查询实现就非常低效。
 	 * explain select count(1) as itemCount from (select * from discuss where MainTopic=47) as tmpTable 
 	 */
 	public function getItemCount()
@@ -474,8 +475,14 @@ class Select extends \HuiLib\Db\Query
 	    $tmpSelect->reset(self::LIMIT)->reset(self::OFFSET)->reset(self::ORDER)->reset(self::ENDS);
 	    
 	    //计数SQL
-	    $sql="select count(1) as itemCount from (".$tmpSelect->toString().") as tmpTable";
-	    
+	    if ($this->group) {//有Group的情况
+	        $sql="select count(1) as itemCount from (".$tmpSelect->toString().") as tmpTable";
+	    }else{
+	        $tmpSelect->reset(self::COLUMNS)->plainColumns(array('count(*)'));
+	        $sql=$tmpSelect->toString();
+	    }
+	    //echo $sql;die();
+
 	    $this->setAdapter();
 	    $innerStatment=$this->adapter->getConnection()->query($sql);
 	    $result=Result::create($innerStatment);
