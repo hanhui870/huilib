@@ -90,6 +90,14 @@ class File extends \HuiLib\Log\LogBase
 		    $logInfo['Route']=" {$request->getPackageRouteSeg()}/{$request->getControllerRouteSeg()}/{$request->getActionRouteSeg()}";
 		}
 		$logInfo['Append']=']:';
+		
+		if (!is_string($message)) {
+		    if (is_array($message)) {
+		        $message=json_encode($message);
+		    }else{
+		        $message=var_export($message, TRUE);
+		    }
+		}
 		$logInfo['Info']=" $message";
 		
 		if ($isTrace) {
