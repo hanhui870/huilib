@@ -64,7 +64,9 @@ class Query
 	}
 
 	/**
-	 * 设置适配器，需要compile的时候必须设置
+	 * 设置适配器
+	 * 
+	 * 必须在where等前，需要compile或where escape前必须设置
 	 * 
 	 * @param \HuiLib\Db\DbBase $adapter
 	 * @return \HuiLib\Db\Query
