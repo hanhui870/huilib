@@ -197,8 +197,9 @@ class SessionManager
 	{
 		if ($this->sessionModel===NULL) {
 			$config=$this->sessionBase->getConfig();
-			if (!isset($config['model']) || !class_exists($config['model'])) {
-				throw new Exception('App.ini setting of session.model has not been set or not valid.');
+			if (!isset($config['model']) || !class_exists($config['model'], FALSE)) {
+				$this->sessionModel=FALSE;
+				return $this->sessionModel;
 			}
 			
 			$modelClass=$config['model'];
