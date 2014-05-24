@@ -217,53 +217,46 @@ class Controller
 		}
 		$result['extra']=$extra;
 		$result['data']=$data;
-		$json=json_encode ( $result );
 		
-		$callback=\HuiLib\Helper\Param::get('callback', \HuiLib\Helper\Param::TYPE_STRING);
-		if ($callback) {
-			$json=$callback."($json)";
-		}
-		//如果通过iframe传输，不同于jsonp，因为有时是文件上传
-		if (Param::get('iframe', Param::TYPE_BOOL)) {
-		    $json='<script type="text/javascript">window.top.'.$json.'</script>';
-		}
-		
-		echo $json;
-		die();
+		return $this->renderJsonResult($result);
 	}
 	
 	/**
 	 * 直接将结果集作为数组输出
 	 * 
+	 * resut除必须字段后可自定义拓展
+	 * 
 	 * @param array $result
 	 */
 	protected function renderJsonResult($result)
 	{
-		 $extra=array();
-		 $status=self::STATUS_SUCCESS;
-		 $message='';
-		 $data=array();
-		 
-		 if (isset($result['extra'])) {
-		 	$extra=$result['extra'];
-		 	unset($result['extra']);
+		 if (!isset($result['extra']['code'])) {
+		    $result['extra']['code']=\HuiLib\Helper\Header::OK;
 		 }
-		 if (isset($result['success'])) {
-		 	$status=$result['success'];
-		 	unset($result['success']);
+		 if (!isset($result['success'])) {
+		 	$result['success']=self::STATUS_SUCCESS;
 		 }
-		 if (isset($result['message'])) {
-		 	$message=$result['message'];
-		 	unset($result['message']);
+		 if (!isset($result['message'])) {
+		 	$result['message']='';
 		 }
-		 if (isset($result['data'])) {
-		 	$data=$result['data'];
-		 	unset($result['data']);
-		 }else{
-		 	$data=$result;
+		 if (!isset($result['data'])) {
+		 	$result['data']=array();
 		 }
 		 
-		 $this->renderJson($status, $message, $extra, $data);
+		 //编码json，之所以没有发送application/json的头，因为统一便于前台处理，特别是发生错误的时候。
+		 $json=json_encode ( $result );
+		 
+		 $callback=\HuiLib\Helper\Param::get('callback', \HuiLib\Helper\Param::TYPE_STRING);
+		 if ($callback) {
+		     $json=$callback."($json)";
+		 }
+		 //如果通过iframe传输，不同于jsonp，因为有时是文件上传
+		 if (Param::get('iframe', Param::TYPE_BOOL)) {
+		     $json='<script type="text/javascript">window.top.'.$json.'</script>';
+		 }
+		 
+		 echo $json;
+		 die();
 	}
 
 	/**
