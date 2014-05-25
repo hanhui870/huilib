@@ -259,10 +259,10 @@ class NongLi {
 			list ( $year, $month, $day ) = explode ( "-", $date );
 		}elseif (!empty($extra)){
 			list ( $year, $month, $day ) = $extra;
-			if ($month > 12) {
-				$month = substr ( $month, 0, - 1 );
-				$type = 1;
-			}
+		}
+		if ($month > 12) {
+		    $month = substr ( $month, 0, - 1 );
+		    $type = 1;
 		}
 		
 		if ($year <= 1951 || $month <= 0 || $day <= 0 || $year >= 2051)

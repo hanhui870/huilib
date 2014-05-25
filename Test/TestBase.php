@@ -33,10 +33,15 @@ abstract class TestBase
 	 * @param mix $expected 期望结果
 	 */
 	public function assert($runResult, $expected=FALSE){
+	    $debug=debug_backtrace();
+	    if (!empty($debug[1])) {
+	        $info=$debug[1];
+	        echo 'Exec: '.$info['class'].'::'.$info['function'].' line:'.$debug[0]['line'].PHP_EOL;
+	    }
 		if ($runResult===$expected) {
-			echo '<br>True</br>';
+			echo 'True'.PHP_EOL;
 		}else{
-			echo '<br>Expected:<span style="color:green">'.var_export($expected, 1).'</span>， RunResult:<span style="color:red">'.var_export($runResult, 1).'</span></br>';
+			echo 'Expected:'.var_export($expected, 1).', RunResult:'.var_export($runResult, 1).PHP_EOL;
 		}
 	}
 	
