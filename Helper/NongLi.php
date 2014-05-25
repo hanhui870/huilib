@@ -313,7 +313,10 @@ class NongLi {
 	 * 考虑闰月需求 $m参数可能大于12 比如69代表闰6月
 	 * 传入年份需要更新到最新
 	 */
-	public function getYangBirth($year, $month, $day){
+	public function getYangBirth($year, $month=NULL, $day=NULL){
+	    if ($month===NULL && $day===NULL) {
+	        list ( $year, $month, $day ) = explode ( "-", $year );
+	    }
 		if ($year< 1 || $day> 31 || $day< 1)
 			return false;
 		
@@ -334,7 +337,11 @@ class NongLi {
 	/*
 	 * 从农历年月日转为文字描述
 	 */
-	public function getNongLiDay($year, $month, $day){
+	public function getNongLiDay($year, $month=NULL, $day=NULL){
+	    if ($month===NULL && $day===NULL) {
+	        list ( $year, $month, $day ) = explode ( "-", $year );
+	    }
+	    
 		$runyue = 0;
 		if ($month > 12) {
 			$month = substr ( $month, 0, - 1 );
