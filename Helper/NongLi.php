@@ -251,7 +251,8 @@ class NongLi {
 	
 	/**
 	 * 农历转公历(date：农历日期； type：是否闰月)
-	 * 或直接从$extra传递农历年月日
+	 * 
+	 * 或直接从$extra传递农历年月日，月份大于12表示闰月
 	 */
 	public function L2S($date, $type = 0, $extra=array()) {
 		if (!empty($date)){
