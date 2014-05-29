@@ -26,6 +26,24 @@ abstract class CacheBase
 	 */
 	protected $config=NULL;
 	
+	/**
+	 * memcache缓存
+	 * @var \HuiLib\Cache\Storage\Memcache
+	 */
+	private static $memcacheCache=NULL;
+	
+	/**
+	 * redis缓存
+	 * @var \HuiLib\Cache\Storage\Redis
+	 */
+	private static $redisCache=NULL;
+	
+	/**
+	 * apc缓存
+	 * @var \HuiLib\Cache\Storage\Apc
+	 */
+	private static $apcCache=NULL;
+	
 	protected function __construct()
 	{
 	}
@@ -73,21 +91,30 @@ abstract class CacheBase
 	 * 获取Memcache默认缓存实例
 	 */
 	public static function getMemcache(){
-		return self::staticCreate('cache.memcache');
+	    if (self::$memcacheCache===NULL) {
+	        self::$memcacheCache=self::staticCreate('cache.memcache');
+	    }
+	    return self::$memcacheCache;
 	}
 	
 	/**
 	 * 获取Redis默认缓存实例
 	 */
 	public static function getRedis(){
-		return self::staticCreate('cache.redis');
+	    if (self::$redisCache===NULL) {
+	        self::$redisCache=self::staticCreate('cache.redis');
+	    }
+	    return self::$redisCache;
 	}
 	
 	/**
 	 * 获取APC默认缓存实例
 	 */
 	public static function getApc(){
-		return self::staticCreate('cache.apc');
+	    if (self::$apcCache===NULL) {
+	        self::$apcCache=self::staticCreate('cache.apc');
+	    }
+	    return self::$apcCache;
 	}
 	
 	/**
