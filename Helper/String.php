@@ -66,7 +66,7 @@ class String
 	{
 		if (is_array ( $string )) {
 			foreach ( $string as $k => $v ) {
-				$string [$k] = zjsustripslashes ( $v );
+				$string [$k] = self::stripslashes ( $v );
 			}
 		} else {
 			$string = stripslashes ( $string );
