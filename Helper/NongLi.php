@@ -251,17 +251,18 @@ class NongLi {
 	
 	/**
 	 * 农历转公历(date：农历日期； type：是否闰月)
-	 * 或直接从$extra传递农历年月日
+	 * 
+	 * 或直接从$extra传递农历年月日，月份大于12表示闰月
 	 */
 	public function L2S($date, $type = 0, $extra=array()) {
 		if (!empty($date)){
 			list ( $year, $month, $day ) = explode ( "-", $date );
 		}elseif (!empty($extra)){
 			list ( $year, $month, $day ) = $extra;
-			if ($month > 12) {
-				$month = substr ( $month, 0, - 1 );
-				$type = 1;
-			}
+		}
+		if ($month > 12) {
+		    $month = substr ( $month, 0, - 1 );
+		    $type = 1;
 		}
 		
 		if ($year <= 1951 || $month <= 0 || $day <= 0 || $year >= 2051)
@@ -312,7 +313,10 @@ class NongLi {
 	 * 考虑闰月需求 $m参数可能大于12 比如69代表闰6月
 	 * 传入年份需要更新到最新
 	 */
-	public function getYangBirth($year, $month, $day){
+	public function getYangBirth($year, $month=NULL, $day=NULL){
+	    if ($month===NULL && $day===NULL) {
+	        list ( $year, $month, $day ) = explode ( "-", $year );
+	    }
 		if ($year< 1 || $day> 31 || $day< 1)
 			return false;
 		
@@ -333,7 +337,11 @@ class NongLi {
 	/*
 	 * 从农历年月日转为文字描述
 	 */
-	public function getNongLiDay($year, $month, $day){
+	public function getNongLiDay($year, $month=NULL, $day=NULL){
+	    if ($month===NULL && $day===NULL) {
+	        list ( $year, $month, $day ) = explode ( "-", $year );
+	    }
+	    
 		$runyue = 0;
 		if ($month > 12) {
 			$month = substr ( $month, 0, - 1 );

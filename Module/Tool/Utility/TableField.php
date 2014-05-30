@@ -21,23 +21,6 @@ class TableField extends \HuiLib\Module\ModuleBase
 		$db=DbBase::createMaster();
 		$fieldList=$db->getConnection()->query('describe '.$table)->fetchAll(\Pdo::FETCH_ASSOC);
 		
-		$result=array();
-		foreach ($fieldList as $field)
-		{
-			if (!empty($field['Default'])) {
-				$result[$field['Field']]=$field['Default'];
-			}else{
-				if (String::exist($field['Type'], 'int')) {
-					$result[$field['Field']]=0;
-				}elseif (String::exist($field['Type'], 'varchar')) {
-					$result[$field['Field']]='';
-				}else{
-					$result[$field['Field']]='';
-				}
-			}
-		}
-		
-		//print_r($fieldList);
-		echo "<pre>".var_export($result, TRUE)."</pre>";
+		return $fieldList;
 	}
 }

@@ -478,7 +478,7 @@ class Select extends \HuiLib\Db\Query
 	    if ($this->group) {//有Group的情况
 	        $sql="select count(1) as itemCount from (".$tmpSelect->toString().") as tmpTable";
 	    }else{
-	        $tmpSelect->reset(self::COLUMNS)->plainColumns(array('count(*)'));
+	        $tmpSelect->reset(self::COLUMNS)->reset(self::PLAIN_COLUMNS)->plainColumns(array('count(*)'));
 	        $sql=$tmpSelect->toString();
 	    }
 	    //echo $sql;die();

@@ -17,6 +17,8 @@ class Bin extends RequestBase
      * 路由信息
      * 
      *  [argv] => Array ([0] => run.php, [1] => index/index/index, [2]=>name=hanhui&age=23&fdas )
+     *  
+     *  win下mingw环境，不能传递为/index/index/index，会强制转换为D:/Program Files/Git/tool/upgrade/up201405
      */
     protected $scriptUrl=NULL;
     
@@ -39,7 +41,7 @@ class Bin extends RequestBase
         }
         //print_r($_SERVER);die();
         
-        $this->scriptUrl = '/'.$_SERVER['argv'][1];
+        $this->scriptUrl =(substr($_SERVER['argv'][1], 0, 1)==='/' ? '' : '/').$_SERVER['argv'][1];
         $this->httpHost = Front::getInstance()->getAppConfig()->getByKey('app.domain');
 
         //设置路由资源定位符，并初始化路由信息
