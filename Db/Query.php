@@ -221,6 +221,15 @@ class Query
 	}
 	
 	/**
+	 * 获取select的where对象
+	 * @return \HuiLib\Db\Query\Where
+	 */
+	public function getWhere()
+	{
+	    return $this->where;
+	}
+	
+	/**
 	 * 设置limit属性
 	 * 
 	 * Select/Delete用到
