@@ -50,6 +50,25 @@ class TableAbstract extends \HuiLib\Model\ModelBase
 	}
 	
 	/**
+	 * 通过主键获取单条记录
+	 *
+	 * @param string $value
+	 * @return \HuiLib\Db\RowAbstract
+	 */
+	public function getRowByPrimaryId($value)
+	{
+	    $select=Query::select ( static::TABLE );
+	    if ($this->dbAdapter!==NULL) {
+	        $select->setAdapter($this->dbAdapter);
+	    }
+	    if ($this->forUpdate) {
+	        $select->enableForUpdate();
+	    }
+	    $rowClass=$this->getRowClass();
+	    return $this->rowObject($select->where ( Where::createPair ( $rowClass::PRIMAY_IDKEY, $value ) )->limit ( 1 )->query ()->fetch ());
+	}
+	
+	/**
 	 * 通过单个Field获取单条记录
 	 * 
 	 * @param string $field
