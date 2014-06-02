@@ -20,6 +20,12 @@ class Query
 	const ENDS='ends';//结束分号
 	
 	/**
+	 * 多个where连接方式，便于多个条件串联
+	 */
+	const WHERE_AND='and';
+	const WHERE_OR='or';
+	
+	/**
 	 * 操作的表
 	 */
 	protected $table = NULL;
@@ -211,10 +217,20 @@ class Query
 	 *
 	 * @return \HuiLib\Db\Query
 	 */
-	public function where(Query\Where $where)
+	public function where(Query\Where $where, $case='and')
 	{
 		$this->setAdapter();
-		$this->where=$where;
+		
+		if ($this->where===NULL) {
+		    $this->where=$where;
+		}else{
+		    if ($case==self::WHERE_AND) {
+		        $this->where->andCase($where);
+		    }else{
+		        $this->where->orCase($where);
+		    }
+		}
+
 		$this->where->setQuery($this);
 		
 		return $this;

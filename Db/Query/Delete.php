@@ -71,23 +71,4 @@ class Delete extends \HuiLib\Db\Query
 	public function toString(){
 		return $this->compile();
 	}
-	
-	public function table($table){
-		parent::table($table);
-	
-		return $this;
-	}
-	
-	public function where(Where $where){
-		parent::where($where);
-	
-		return $this;
-	}
-	
-	public function limit($limit){
-		parent::limit($limit);
-	
-		return $this;
-	}
-	
 }
