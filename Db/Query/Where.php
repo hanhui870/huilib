@@ -145,14 +145,6 @@ class Where
 		$method='render'.ucfirst($this->type);
 		$whereString='('.$this->$method().')';
 		
-		if ($this->orObject) {
-			if ($this->orHand==self::HAND_RIGHT) {
-				$whereString='('.$whereString.' '.self::WHERE_OR. ' '. $this->orObject->toString().')';
-			}else{
-				$whereString='('.$this->orObject->toString().' '.self::WHERE_OR. ' '. $whereString.')';
-			}
-		}
-		
 		if ($this->andObject) {
 			if ($this->andHand==self::HAND_RIGHT) {
 				$whereString='('.$whereString.' '.self::WHERE_AND. ' '. $this->andObject->toString().')';
@@ -160,6 +152,15 @@ class Where
 				$whereString='('.$this->andObject->toString().' '.self::WHERE_AND. ' '. $whereString.')';
 			}
 		}
+		
+		if ($this->orObject) {
+		    if ($this->orHand==self::HAND_RIGHT) {
+		        $whereString='('.$whereString.' '.self::WHERE_OR. ' '. $this->orObject->toString().')';
+		    }else{
+		        $whereString='('.$this->orObject->toString().' '.self::WHERE_OR. ' '. $whereString.')';
+		    }
+		}
+		
 		
 		return $whereString;
 	}
