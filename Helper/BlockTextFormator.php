@@ -1,6 +1,7 @@
 <?php
 namespace HuiLib\Helper;
 
+use HuiLib\Module\Secure\XssFilter;
 /**
  * 块文本内容格式化
  *
@@ -13,6 +14,27 @@ class BlockTextFormator
     const ADD_PTAG=TRUE;
     const NO_PTAG=FALSE;
 
+    /*
+     * 内容格式化，html版
+     * 
+     * xss处理
+    */
+    public static function format($message) {
+        //替换h1-6和font
+        $message=preg_replace('/\<(h\d|font)[^>]*?\>(.*?)\<(\/\1)\>/is', '<p>\2</p>', $message);
+        $message=strip_tags($message, '<p><a><img><div><span><table><td><th><tr><ul><ol><li><b><em><strong>');
+        
+        //清除所有没加引号的属性
+        //preg_match_all('/(?!\<\w+)\s+\w*\=\s*[^>\s\'"]*?\s/is', $message, $mat);print_r($mat);
+        $message=preg_replace('/(?!\<\w+)\s+\w*\=\s*[^>\s\'"]*?\s/is', '', $message);
+        
+        //清除class和style和on事件
+        //preg_match_all('/(?!\<\w+)\s+(?:on|style|class|color)\w*\=\s*[\'"][^\'\">]*[\'"]/is', $message, $mat);print_r($mat);
+        $message=preg_replace('/(?!\<\w+)\s+(?:on|style|class|color)\w*\=\s*[\'"]?[^\'\">]*[\'"]?/is', '', $message);
+        
+        return XssFilter::filter($message);
+    }
+    
     /*
      * 简洁格式化版 $p是否加p
     */
