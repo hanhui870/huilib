@@ -28,9 +28,9 @@ class BlockTextFormator
         //preg_match_all('/(?!\<\w+)\s+\w*\=\s*[^>\s\'"]*?\s/is', $message, $mat);print_r($mat);
         $message=preg_replace('/(?!\<\w+)\s+\w*\=\s*[^>\s\'"]*?\s/is', '', $message);
         
-        //清除class和style和on事件
+        //清除class和style和on事件，指定图片等宽和高的也要清空，手机不兼容
         //preg_match_all('/(?!\<\w+)\s+(?:on|style|class|color)\w*\=\s*[\'"][^\'\">]*[\'"]/is', $message, $mat);print_r($mat);
-        $message=preg_replace('/(?!\<\w+)\s+(?:on|style|class|color)\w*\=\s*[\'"]?[^\'\">]*[\'"]?/is', '', $message);
+        $message=preg_replace('/(?!\<\w+)\s+(?:on|style|class|color|width|height)\w*\=\s*[\'"]?[^\'\">]*[\'"]?/is', '', $message);
         
         //检测标签匹配情况
         //$message=self::matchTags($message);
