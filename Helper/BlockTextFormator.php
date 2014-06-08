@@ -32,7 +32,46 @@ class BlockTextFormator
         //preg_match_all('/(?!\<\w+)\s+(?:on|style|class|color)\w*\=\s*[\'"][^\'\">]*[\'"]/is', $message, $mat);print_r($mat);
         $message=preg_replace('/(?!\<\w+)\s+(?:on|style|class|color)\w*\=\s*[\'"]?[^\'\">]*[\'"]?/is', '', $message);
         
+        //检测标签匹配情况
+        //$message=self::matchTags($message);
+        
         return XssFilter::filter($message);
+    }
+    
+    /**
+     * 检测标签的匹配情况
+     * 
+     * TODO 如果要准确分析，需要进入上下文分析
+     * 
+     * @param string $message
+     */
+    public static function matchTags($message) {
+        $need='<p>,<a>,<div>,<span>,<table>,<tbody>,<td>,<th>,<tr>,<ul>,<ol>,<li>,<b>,<em>,<strong>';
+        $match='</p>,</a>,</div>,</span>,</table>,</tbody>,</td>,</th>,</tr>,</ul>,</ol>,</li>,</b>,</em>,</strong>';
+        $listNeed=explode(',', $need);
+        $listMatch=explode(',', $match);
+        
+        //匹配所有标签
+        preg_match_all('/\<(\/?\w+)[^>]*?\>/is', $message, $resultTags);
+        print_r($resultTags);die();
+        
+        if (empty($resultTags[0])) {
+            return $message;
+        }
+        
+        //目前没有去检测上下文，而是检测到不匹配直接在末尾补上。
+        $stackCache=array();
+        foreach ($resultTags[0] as $tag){
+            $fulltag='<'.$tag.'>';
+            if (in_array($fulltag, $listNeed)) {
+                $stackCache[$fulltag][]=1;
+            }
+            if (in_array($fulltag, $listMatch)) {
+                $stackCache[$fulltag][]=1;
+            }
+        }
+        
+        return $message;
     }
     
     /*

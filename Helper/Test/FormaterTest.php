@@ -28,8 +28,9 @@ class FormaterTest extends \HuiLib\Test\TestBase
                 <b style="fdsafsda" src='fdfd' color="red">fdafdasf</b>
                 <font color="red">font code</font>
                 <img src="fdasfdas" onclick="fdasfdsa">
-                <script>alert(1)</script>
+                <Script>alert(1)</Script>
 <p>关于开源访谈</p>
+                <P>关于开源访谈</P>
                 <ul class="topic-list clearfix">
                     <li class="thumbnail">
               <a href="http://iyunlin/zjgs"><img src="/static/image/nopic/100.gif"></a>
