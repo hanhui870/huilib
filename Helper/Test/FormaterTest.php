@@ -31,6 +31,9 @@ class FormaterTest extends \HuiLib\Test\TestBase
                 <Script>alert(1)</Script>
 <p>关于开源访谈</p>
                 <P>关于开源访谈</P>
+                <p>&nbsp;</p>
+                <p>&nbsp;&nbsp;&nbsp; </p>
+                 <p>   </p>
                 <ul class="topic-list clearfix">
                     <li class="thumbnail">
               <a href="http://iyunlin/zjgs"><img src="/static/image/nopic/100.gif"></a>

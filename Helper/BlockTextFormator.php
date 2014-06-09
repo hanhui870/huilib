@@ -22,6 +22,7 @@ class BlockTextFormator
     public static function format($message) {
         //替换h1-6和font
         $message=preg_replace('/\<(h\d|font)[^>]*?\>(.*?)\<(\/\1)\>/is', '<p>\2</p>', $message);
+        //清除禁止标签
         $message=strip_tags($message, '<p><a><img><div><span><table><tbody><td><th><tr><ul><ol><li><b><em><strong>');
         
         //清除所有没加引号的属性
@@ -32,9 +33,12 @@ class BlockTextFormator
         //preg_match_all('/(?!\<\w+)\s+(?:on|style|class|color)\w*\=\s*[\'"][^\'\">]*[\'"]/is', $message, $mat);print_r($mat);
         $message=preg_replace('/(?!\<\w+)\s+(?:on|style|class|color|width|height)\w*\=\s*[\'"]?[^\'\">]*[\'"]?/is', '', $message);
         
+        //清除空白内容
+        $message=preg_replace('/\s*?\<p\>(\&nbsp;|\s)*?<\/p\>\s*?/is', '', $message);
+        
         //检测标签匹配情况
         //$message=self::matchTags($message);
-        
+
         return XssFilter::filter($message);
     }
     
