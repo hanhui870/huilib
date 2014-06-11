@@ -13,7 +13,8 @@ namespace HuiLib\View;
  *   4、{if}{/if}对应if循环；{loop}{/loop}对应foreach循环；{for}{/for}对应for循环
  *   5、{eval} 对应php的eval函数。
  *   6、{php}在模板执行php代码。
- *   7、{block blockname}{/block blockname} 用于代码块模板文件中前后替换。替换用{blockHolder blockname}
+ *   7、{block blockname}{/block blockname} 用于代码块模板文件中前后替换。替换用{blockHolder blockname};
+ *        block不同于pre，前后替换后，内部还是可以使用其他模板变量解析的
  *   8、增加{pre}{/pre}解析标签，这里面的标签不做任何解析，优先级仅次于sub标签。便于在页面中放一些包含{}的静态内容
  *   9、会清除HTML、JS注释
  *   
