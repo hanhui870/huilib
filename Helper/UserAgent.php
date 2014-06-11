@@ -53,31 +53,31 @@ class UserAgent
 	private function initBroswer()
 	{
 		//设置UA 大小写不敏感
-		if (strexists ( $this->userAgent, '360SE' )) { //360浏览器
+		if (String::exist ( $this->userAgent, '360SE' )) { //360浏览器
 			$this->broswer = self::BROWSER_360SAFE;
-		} elseif (strexists ( $this->userAgent, 'MetaSr' )) { //搜狗浏览器3
+		} elseif (String::exist ( $this->userAgent, 'MetaSr' )) { //搜狗浏览器3
 			$this->broswer = self::BROWSER_SOGOU;
-		} elseif (strexists ( $this->userAgent, 'MSIE' )) { //IE浏览器
+		} elseif (String::exist ( $this->userAgent, 'MSIE' )) { //IE浏览器
 			$this->broswer = self::BROWSER_IE;
-		} elseif (strexists ( $this->userAgent, 'Chrome' )) { //Chrome浏览器
+		} elseif (String::exist ( $this->userAgent, 'Chrome' )) { //Chrome浏览器
 			$this->broswer = self::BROWSER_CHROME;
-		} elseif (strexists ( $this->userAgent, 'Googlebot' )) {
+		} elseif (String::exist ( $this->userAgent, 'Googlebot' )) {
 			$this->broswer = 'Googlebot';
-		} elseif (strexists ( $this->userAgent, 'Baiduspider' )) {
+		} elseif (String::exist ( $this->userAgent, 'Baiduspider' )) {
 			$this->broswer = 'Baiduspider';
-		} elseif (strexists ( $this->userAgent, 'Sogou' )) {
+		} elseif (String::exist ( $this->userAgent, 'Sogou' )) {
 			$this->broswer = 'Sogouspider';
-		} elseif (strexists ( $this->userAgent, 'Opera' )) { //Opera浏览器
+		} elseif (String::exist ( $this->userAgent, 'Opera' )) { //Opera浏览器
 			$this->broswer = self::BROWSER_OPERA;
-		} elseif (strexists ( $this->userAgent, 'Safari' )) { //Safari浏览器 包括iPhone
+		} elseif (String::exist ( $this->userAgent, 'Safari' )) { //Safari浏览器 包括iPhone
 			$this->broswer = self::BROWSER_SAFARI;
-		} elseif (strexists ( $this->userAgent, 'Firefox' )) { //Firefox
+		} elseif (String::exist ( $this->userAgent, 'Firefox' )) { //Firefox
 			$this->broswer = self::BROWSER_FIREFOX;
-		} elseif (strexists ( $this->userAgent, 'Sosospider' )) {
+		} elseif (String::exist ( $this->userAgent, 'Sosospider' )) {
 			$this->broswer = 'Sosospider';
-		} elseif (strexists ( $this->userAgent, 'YoudaoBot' )) {
+		} elseif (String::exist ( $this->userAgent, 'YoudaoBot' )) {
 			$this->broswer = 'YoudaoBot';
-		} elseif (strexists ( $this->userAgent, 'bingbot' )) {
+		} elseif (String::exist ( $this->userAgent, 'bingbot' )) {
 			$this->broswer = 'Bingbot';
 		} else {
 			$this->broswer = 'Other';
