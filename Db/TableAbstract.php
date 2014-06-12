@@ -245,6 +245,24 @@ class TableAbstract extends \HuiLib\Model\ModelBase
 	}
 	
 	/**
+	 * 返回行列表数据对象
+	 *
+	 * @param array $dataList 数据列表
+	 */
+	public function rowSetObjectByData($dataList)
+	{
+	    if (empty($dataList)) {
+	        return NULL;
+	    }
+	
+	    $rowSetInstance=\HuiLib\Db\RowSet::create();
+	    $rowSetInstance->initByDataList($dataList);
+	    $rowSetInstance->setRowClass(static::ROW_CLASS);
+	    $rowSetInstance->setTable($this);
+	    return $rowSetInstance;
+	}
+	
+	/**
 	 * 获取表行默认初始化数据
 	 * @return array
 	 */
