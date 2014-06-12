@@ -214,7 +214,7 @@ class TableAbstract extends \HuiLib\Model\ModelBase
 	 * @param array $data 结果数据
 	 * @return \HuiLib\Db\RowAbstract
 	 */
-	protected function rowObject($data)
+	public function rowObject($data)
 	{
 		if ($data===FALSE) {
 			return NULL;
@@ -231,7 +231,7 @@ class TableAbstract extends \HuiLib\Model\ModelBase
 	 * 
 	 * @param \HuiLib\Db\Query\Select $select
 	 */
-	protected function rowSetObject($select)
+	public function rowSetObject($select)
 	{
 		if (!$select instanceof \HuiLib\Db\Query\Select) {
 			return NULL;
