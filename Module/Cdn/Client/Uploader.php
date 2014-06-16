@@ -76,8 +76,12 @@ class Uploader extends Base
         curl_setopt($handle, CURLOPT_RETURNTRANSFER, TRUE);
         
         $result=curl_exec($handle);
-        //echo $result;die();
+
+        $result= json_decode($result, TRUE);
+        if (!Utility::decrypt($result, $config['app_secret'])) {
+            return $this->format(self::API_FAIL, $this->getHuiLang()->_('cdn.responce.decode.failed'));
+        }
         
-        return json_decode($result, TRUE);
+        return $result;
     }
 }

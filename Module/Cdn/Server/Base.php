@@ -22,7 +22,7 @@ class Base extends  \HuiLib\Module\ModuleBase
     {
         $config=Front::getInstance()->getAppConfig()->getByKey('cdn');
         if (!isset($config['save_path']) || !isset($config['hash_length']) || !isset($config['directory_depth']) || !isset($config['app_list'])) {
-            throw new Exception('App.ini cdn config section is required.');
+            throw new \Exception('App.ini cdn config section is required.');
         }
         
         return $config;
@@ -41,7 +41,7 @@ class Base extends  \HuiLib\Module\ModuleBase
     /**
      * 获取AppId的密钥
      */
-    protected function getAppSecret($appId)
+    public function getAppSecret($appId)
     {
         if (empty($appId)) {
             throw new Exception('AppId can not be null.');

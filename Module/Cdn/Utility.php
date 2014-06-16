@@ -1,6 +1,8 @@
 <?php
 namespace HuiLib\Module\Cdn;
 
+use HuiLib\App\Front;
+
 /**
  * HuiLib CDN Uploader库
  * 
@@ -18,7 +20,7 @@ class Utility
     public static function encrypt($post, $secret)
     {
         if (!is_array($post) || empty($secret)) {
-            throw new Exception($this->getHuiLang()->_('cdn.encrypt.data.error'));
+            throw new \Exception(Front::getInstance()->getHuiLang()->_('cdn.encrypt.data.error'));
         }
     
         ksort($post, SORT_STRING);
@@ -36,7 +38,7 @@ class Utility
     public static function decrypt($post, $secret)
     {
         if (!is_array($post) || empty($post['hash']) || empty($secret)) {
-            throw new Exception($this->getHuiLang()->_('cdn.encrypt.data.error'));
+            throw new \Exception(Front::getInstance()->getHuiLang()->_('cdn.decrypt.data.error'));
         }
     
         $hash=$post['hash'];

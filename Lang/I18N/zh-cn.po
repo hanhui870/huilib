@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: HuiLib框架翻译\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-04-07 11:27+0800\n"
-"PO-Revision-Date: 2014-04-07 11:34+0800\n"
+"POT-Creation-Date: 2014-06-16 22:43+0800\n"
+"PO-Revision-Date: 2014-06-16 22:43+0800\n"
 "Last-Translator: zhujingfa <zhujingfa@gmail.com>\n"
 "Language-Team: \n"
 "Language: zh_CN\n"
@@ -27,16 +27,21 @@ msgstr "%sHuiLib框架%s自带lang组件%d测试%0.2f。"
 msgid "HuiLib.lang.testNotExist"
 msgstr "%sHuiLib框架%s自带lang组件%d测试%0.2f。"
 
-#: D:\webDeveloper\HuiLib/Module/Cdn/Client/Uploader.php:38
+#: D:\webDeveloper\HuiLib/Module/Cdn/Client/Uploader.php:24
 msgid "cdn.post.empty.type.need"
 msgstr "上传的文件类型不能为空。"
 
-#: D:\webDeveloper\HuiLib/Module/Cdn/Client/Uploader.php:46
+#: D:\webDeveloper\HuiLib/Module/Cdn/Client/Uploader.php:32
 msgid "cdn.post.files.error"
 msgstr "上传的文件有错误，停止发送。"
 
+#: D:\webDeveloper\HuiLib/Module/Cdn/Client/Uploader.php:83
+msgid "cdn.responce.decode.failed"
+msgstr "CDN服务器返回数据校验失败。"
+
 #: D:\webDeveloper\HuiLib/Module/Cdn/Server/Base.php:65
-#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:88
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Base.php:111
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:226
 msgid "cdn.upload.files.error"
 msgstr "上传的文件有错误。"
 
@@ -48,40 +53,57 @@ msgstr "hash_length配置错误，长度不能小于%d。"
 msgid "cdn.upload.directory_depth.error"
 msgstr "directory_depth配置错误，长度%d和%d之间。"
 
-#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:28
-#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:49
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:32
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:84
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:122
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:170
 msgid "cdn.upload.type.error"
 msgstr "CDN上传文件类型错误。"
 
-#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:39
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:43
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:140
 msgid "cdn.upload.image.mime.error"
 msgstr "上传的图片类型不允许。"
 
-#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:67
-msgid "cdn.upload.app_id.null"
-msgstr "CDN AppId错误。"
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:55
+msgid "cdn.upload.water.file.miss"
+msgstr "水印文件不存在。"
 
-#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:71
-msgid "cdn.upload.files.empty"
-msgstr "上传文件不能为空。"
-
-#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:80
-msgid "cdn.upload.decode.failed"
-msgstr "上传安全校验失败。"
-
-#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:91
-msgid "cdn.upload.files.finger.print.error"
-msgstr "上传文件指纹校验错误。"
-
-#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:94
-msgid "cdn.upload.files.maxsize.error"
-msgstr "上传的文件大小不能超过%.03fM。"
-
-#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:124
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:70
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:106
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:156
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:192
 msgid "cdn.upload.suceess"
 msgstr "恭喜，上传成功。"
 
-#: D:\webDeveloper\HuiLib/Module/Cdn/Utility.php:21
-#: D:\webDeveloper\HuiLib/Module/Cdn/Utility.php:39
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:134
+msgid "cdn.avatar.need.uid"
+msgstr "上传头像用户Uid不能为空。"
+
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:205
+msgid "cdn.upload.app_id.null"
+msgstr "CDN AppId错误。"
+
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:209
+msgid "cdn.upload.files.empty"
+msgstr "上传文件不能为空。"
+
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:218
+msgid "cdn.upload.decode.failed"
+msgstr "上传安全校验失败。"
+
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:229
+msgid "cdn.upload.files.finger.print.error"
+msgstr "上传文件指纹校验错误。"
+
+#: D:\webDeveloper\HuiLib/Module/Cdn/Server/Uploader.php:232
+msgid "cdn.upload.files.maxsize.error"
+msgstr "上传的文件大小不能超过%.03fM。"
+
+#: D:\webDeveloper\HuiLib/Module/Cdn/Utility.php:23
 msgid "cdn.encrypt.data.error"
 msgstr "加密数据或密钥错误。"
+
+#: D:\webDeveloper\HuiLib/Module/Cdn/Utility.php:41
+msgid "cdn.decrypt.data.error"
+msgstr "解密数据或密钥错误。"
