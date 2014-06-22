@@ -23,7 +23,7 @@ class BlockTextFormator
         //替换h1-6和font
         $message=preg_replace('/\<(h\d|font)[^>]*?\>(.*?)\<(\/\1)\>/is', '<p>\2</p>', $message);
         //清除禁止标签
-        $message=strip_tags($message, '<p><a><img><div><span><table><tbody><td><th><tr><ul><ol><li><b><em><strong>');
+        $message=strip_tags($message, '<p><a><div><img><span><table><tbody><td><th><tr><ul><ol><li><b><em><strong>');
         
         //清除所有没加引号的属性
         //preg_match_all('/(?!\<\w+)\s+\w*\=\s*[^>\s\'"]*?\s/is', $message, $mat);print_r($mat);
@@ -33,8 +33,11 @@ class BlockTextFormator
         //preg_match_all('/(?!\<\w+)\s+(?:on|style|class|color)\w*\=\s*[\'"][^\'\">]*[\'"]/is', $message, $mat);print_r($mat);
         $message=preg_replace('/(?!\<\w+)\s+(?:on|style|class|color|width|height)\w*\=\s*[\'"]?[^\'\">]*[\'"]?/is', '', $message);
         
+        //标签替换
+        $message=str_ireplace(array('<em>', '</em>', '<strong>', '</strong>'), array( '<b>', '</b>', '<b>', '</b>'), $message);
+        
         //清除空白内容
-        $message=preg_replace('/\s*?\<p\>(\&nbsp;|\s)*?<\/p\>\s*?/is', '', $message);
+        $message=preg_replace('/\s*?\<(?:p|span|b|div)\>(\&nbsp;|\s)*?<\/(?:p|span|b|div)\>\s*?/is', '', $message);
         
         //检测标签匹配情况
         //$message=self::matchTags($message);
