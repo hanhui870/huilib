@@ -23,7 +23,7 @@ class BlockTextFormator
         //替换h1-6和font
         $message=preg_replace('/\<(h\d|font)[^>]*?\>(.*?)\<(\/\1)\>/is', '<p>\2</p>', $message);
         //清除禁止标签
-        $message=strip_tags($message, '<p><a><div><img><span><table><tbody><td><th><tr><ul><ol><li><b><em><strong>');
+        $message=strip_tags($message, '<p><a><div><br><img><span><table><tbody><td><th><tr><ul><ol><li><b><em><strong>');
         
         //清除所有没加引号的属性
         //preg_match_all('/(?!\<\w+)\s+\w*\=\s*[^>\s\'"]*?\s/is', $message, $mat);print_r($mat);
