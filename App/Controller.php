@@ -218,7 +218,7 @@ class Controller
 		$result['extra']=$extra;
 		$result['data']=$data;
 		
-		return $this->renderJsonResult($result);
+		return $this->sendJson($result);
 	}
 	
 	/**
@@ -243,20 +243,29 @@ class Controller
 		 	$result['data']=array();
 		 }
 		 
-		 //编码json，之所以没有发送application/json的头，因为统一便于前台处理，特别是发生错误的时候。
-		 $json=json_encode ( $result );
-		 
-		 $callback=\HuiLib\Helper\Param::get('callback', \HuiLib\Helper\Param::TYPE_STRING);
-		 if ($callback) {
-		     $json=$callback."($json)";
-		 }
-		 //如果通过iframe传输，不同于jsonp，因为有时是文件上传
-		 if (Param::get('iframe', Param::TYPE_BOOL)) {
-		     $json='<script type="text/javascript">window.top.'.$json.'</script>';
-		 }
-		 
-		 echo $json;
-		 die();
+		return $this->sendJson($result);
+	}
+	
+	/**
+	 * 发送Json结果数据
+	 * @param array $result 结果
+	 */
+	protected function sendJson($result)
+	{
+	    //编码json，之所以没有发送application/json的头，因为统一便于前台处理，特别是发生错误的时候。
+	    $json=json_encode ( $result );
+	    	
+	    $callback=\HuiLib\Helper\Param::get('callback', \HuiLib\Helper\Param::TYPE_STRING);
+	    if ($callback) {
+	        $json=$callback."($json)";
+	    }
+	    //如果通过iframe传输，不同于jsonp，因为有时是文件上传
+	    if (Param::get('iframe', Param::TYPE_BOOL)) {
+	        $json='<script type="text/javascript">window.top.'.$json.'</script>';
+	    }
+	    	
+	    echo $json;
+	    die();
 	}
 
 	/**

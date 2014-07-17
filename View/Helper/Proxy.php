@@ -192,6 +192,16 @@ class Proxy implements \Iterator, \ArrayAccess
     }
     
     /**
+     * 返回对象的内部数组表示
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->data;
+    }
+    
+    /**
      * 快速创建
      *
      * @return \HuiLib\View\Helper\Proxy
