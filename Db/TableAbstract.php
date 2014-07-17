@@ -69,6 +69,25 @@ class TableAbstract extends \HuiLib\Model\ModelBase
 	}
 	
 	/**
+	 * 通过主键获取列表记录
+	 *
+	 * @param string $ids 主键ID
+	 * @return \HuiLib\Db\RowAbstract
+	 */
+	public function getListByPrimaryIds($ids)
+	{
+	    $select=Query::select ( static::TABLE );
+	    if ($this->dbAdapter!==NULL) {
+	        $select->setAdapter($this->dbAdapter);
+	    }
+	    if ($this->forUpdate) {
+	        $select->enableForUpdate();
+	    }
+	    $rowClass=$this->getRowClass();
+	    return $this->rowSetObject($select->where ( Where::createQuote ( $rowClass::PRIMAY_IDKEY . ' in (?) ', $ids ) ));
+	}
+	
+	/**
 	 * 通过单个Field获取单条记录
 	 * 
 	 * @param string $field
