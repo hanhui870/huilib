@@ -54,6 +54,7 @@ class Uploader extends Base
             if (!file_exists($water)) {
                 return $this->format(self::API_FAIL, Front::getInstance()->getHuiLang()->_('cdn.upload.water.file.miss'));
             }
+            
             //水印位置
             $waterPosition=Front::getInstance()->getAppConfig()->getByKey('cdn.water_position');
             foreach ($_FILES as $key=>$file){
@@ -61,10 +62,17 @@ class Uploader extends Base
         
                 $path=$this->getNewFilePath($meta);
                 
+                $instance=Thumb::create($file['tmp_name']);
+                $result[$key]['type']=$instance->getImageFormat();
+                
                 //上传并打水印
-                Thumb::create($file['tmp_name'])->setWaterImage($water)->thumbNormalUpload($path['file'], $waterPosition);
+                $instance->setWaterImage($water)->thumbNormalUpload($path['file'], $waterPosition);
         
                 $result[$key]['url']=$path['url'];
+                $result[$key]['size']=filesize($path['file']);
+                
+                $meta=Param::post($key, Param::TYPE_ARRAY);
+                $result[$key]['name']=$meta['name'];
             }
         
             return $this->format(self::API_SUCCESS, $huiLang->_('cdn.upload.suceess'), array(), $result);
