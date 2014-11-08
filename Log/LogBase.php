@@ -218,6 +218,7 @@ abstract class LogBase
 	public function release()
 	{
 	    if (isset(self::$instance[$this->internalID])&& self::$instance[$this->internalID] instanceof self){
+	        self::$instance[$this->internalID]->flush();
 	        unset(self::$instance[$this->internalID]);
 	        return true;
 	    }

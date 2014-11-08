@@ -60,7 +60,6 @@ class SingleProcessGuard extends Base
         $pid=intval($pid);
         if ($pid<1) {
             $message='Service '.$this->service.' 获取pid失败，被其他进程锁住。';
-            echo $message;
             $log->add($message);
             die();
         }
@@ -81,7 +80,6 @@ class SingleProcessGuard extends Base
             return true;
         }else{
             $message= 'Service '.$this->service."已存在运行进程，启动失败。";
-            echo $message;
             $log->add($message);
         }
 
