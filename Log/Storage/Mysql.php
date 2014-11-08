@@ -74,9 +74,10 @@ class Mysql extends \HuiLib\Log\LogBase
 		$logInstance['CreateTime']=DateTime::format();
 
 		$this->buffer[]=$logInstance;
+		$this->iter++;
 		
 		//超出缓存允许长度、超出缓存生命期输出到磁盘
-		if (count($this->buffer)>self::MAX_BUFFER_NUM || time()-$this->lastFlush>self::FLUSH_INTERVAL){
+		if ($this->needFulsh()){
 		    $this->flush();
 		}
 		

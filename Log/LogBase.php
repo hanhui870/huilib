@@ -105,6 +105,12 @@ abstract class LogBase
 	 */
 	private static $increaseMent=0;
 
+	/**
+	 * 条目计数
+	 * @var int
+	 */
+	protected $iter=0;
+
 	protected function __construct($config)
 	{
 	}
@@ -226,7 +232,7 @@ abstract class LogBase
 	
 	public function needFulsh()
 	{
-	    return strlen($this->buffer)>self::MAX_BUFFER_NUM || microtime(1)-$this->lastFlush>self::FLUSH_INTERVAL;
+	    return $this->iter>self::MAX_BUFFER_NUM || microtime(1)-$this->lastFlush>self::FLUSH_INTERVAL;
 	}
 	
 	public function isEmpty()
