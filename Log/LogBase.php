@@ -85,6 +85,25 @@ abstract class LogBase
 	 * Log 识别类型
 	 */
 	protected $identify = 'normal';
+	
+	/**
+	 * 内部识别ID
+	 * @var int
+	 */
+	protected $internalID = NULL;
+	
+	/**
+	 * 单例实例
+	 *
+	 * @var LogBase
+	 */
+	private static $instance=array();
+	
+	/**
+	 * 自增键值
+	 * @var int
+	 */
+	private static $increaseMent=0;
 
 	protected function __construct($config)
 	{
@@ -172,13 +191,66 @@ abstract class LogBase
 		}
 		
 		//设置对象创建时间
-		$adapter->startTime=time();
+		$adapter->startTime=microtime(1);
 		//初始化上次刷入
-		$adapter->lastFlush=time();
+		$adapter->lastFlush=microtime(1);
 		//清除老日志，默认不启用
 		$adapter->clean();
-
+		
+		self::$instance[self::$increaseMent]=$adapter;
+		$adapter->internalID=self::$increaseMent;
+		self::$increaseMent++;		
+		
 		return $adapter;
+	}
+	
+	/**
+	 * 释放一个实例
+	 * @param string $service
+	 * @return boolean
+	 */
+	public function release()
+	{
+	    if (isset(self::$instance[$this->internalID])&& self::$instance[$this->internalID] instanceof self){
+	        unset(self::$instance[$this->internalID]);
+	        return true;
+	    }
+	
+	    return false;
+	}
+	
+	public static function getAllInstances()
+	{
+	    return self::$instance;
+	}
+	
+	public function needFulsh()
+	{
+	    return strlen($this->buffer)>self::MAX_BUFFER_NUM || microtime(1)-$this->lastFlush>self::FLUSH_INTERVAL;
+	}
+	
+	public function isEmpty()
+	{
+	    return empty($this->buffer);
+	}
+	
+	/**
+	 * 后台Daemon服务情况下需要调用
+	 *
+	 * 触发保存日志，不然可能造成日志丢失
+	 */
+	public static function daemonFlush()
+	{
+	    foreach (self::$instance as $log){
+	        if ($log instanceof self){
+	             
+	            if ($log->needFulsh()){
+	                if ($log->isEmpty()) $log->add('.');
+	                $log->flush();
+	            }
+	        }
+	    }
+	    return true;
 	}
 
 	/**
@@ -222,7 +294,6 @@ abstract class LogBase
 				array_shift($debug);
 			}
 		}
-		
 		$result = array ();
 		foreach ( $debug as $key => $trace ) {
 			if (empty ( $trace ['file'] ))

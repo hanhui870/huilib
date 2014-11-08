@@ -27,6 +27,12 @@ class File extends \HuiLib\Log\LogBase
 	 */
 	protected $fileFd=NULL;
 	
+	/**
+	 * 条目计数
+	 * @var int
+	 */
+	protected $iter=0;
+	
 	protected function __construct($config)
 	{
 		if (empty($config['path']) || !is_dir($config['path'])) {
@@ -101,9 +107,10 @@ class File extends \HuiLib\Log\LogBase
 		$logInfo['Info']=" $message";
 		
 		if ($isTrace) {
-		    $trace=self::getDebugTrace(2);//过滤两级
+		    $trace=self::getDebugTrace(1);//过滤两级
 		    $traceInfo=array('file'=>'', 'line'=>'');
-		    if (!empty($trace)) {//保留最近一条执行路径
+		    if (!empty($trace)) {
+		        //保留最近一条执行路径
 		        $traceInfo=array_shift($trace);
 		    }
 		    $logInfo['Trace']=" Trace::$traceInfo[file]:$traceInfo[line]";
@@ -112,10 +119,12 @@ class File extends \HuiLib\Log\LogBase
 		
 		$log= implode('', $logInfo);
 		$this->buffer[]=$log;
+		$this->iter++;
 		
 		//超出缓存允许长度、超出缓存生命期输出到磁盘
-		if (count($this->buffer)>self::MAX_BUFFER_NUM || time()-$this->lastFlush>self::FLUSH_INTERVAL){
+		if ($this->iter>self::MAX_BUFFER_NUM || time()-$this->lastFlush>self::FLUSH_INTERVAL){
 		    $this->flush();
+		    $this->iter=0;
 		}
 		
 		return $this;
