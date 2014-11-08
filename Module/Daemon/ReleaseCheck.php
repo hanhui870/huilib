@@ -73,7 +73,7 @@ class ReleaseCheck extends Base
         if ($this->lastRelease===NULL){
             //第一次是初始化上次版本，然后直接返回
             $this->lastRelease=$release;
-            $log->add("New release check, version inited to: ".$this->lastRelease)->flush();;
+            $log->add("New release check, version inited to: ".$this->lastRelease)->flush();
             return TRUE;
         }
 

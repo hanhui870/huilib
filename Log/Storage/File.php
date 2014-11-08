@@ -48,16 +48,24 @@ class File extends \HuiLib\Log\LogBase
 		if ($this->type===NULL) {
 			throw new \HuiLib\Error\Exception ( 'Please set Log Type firstly.' );
 		}
-		if (!$this->startTime || date('d', $this->startTime)!=date('d')){
-		    $this->startTime=time();
+		if (date('d', $this->startTime)!=date('d')){
+		    $this->startTime=microtime(1);
 		}
 		
 		$pathAdd=$this->identify ? '.'.$this->identify :'';
 		$file=$this->filePath.date('Y-m-d', $this->startTime).$pathAdd.'.'.$this->type.'.log';
 
 		if ($this->fileFd) {
+		    $this->buffer[]="A new DAY begin, will transfer to new File:".$file.PHP_EOL;
+		    @fwrite($this->fileFd, $this->buffer);
+		    //关闭原来的
 		    fclose($this->fileFd);
+		    
+		    //开启新一天
+		    $this->buffer=array();
+		    $this->buffer[]="A new DAY begin, transfered from pid:".getmypid().PHP_EOL;
 		}
+		
 		if (file_exists($file)) {
 			$this->fileFd=fopen($file, 'ab+');
 		}else{
@@ -121,10 +129,14 @@ class File extends \HuiLib\Log\LogBase
 		//超出缓存允许长度、超出缓存生命期输出到磁盘
 		if ($this->needFulsh()){
 		    $this->flush();
-		    $this->iter=0;
 		}
 		
 		return $this;
+	}
+	
+	public function needFulsh()
+	{
+	    return parent::needFulsh() || date('d', $this->startTime)!=date('d');
 	}
 	
 	/**
@@ -134,7 +146,9 @@ class File extends \HuiLib\Log\LogBase
 	{
 	    if (!$this->buffer) return FALSE;
 	    
-	    $this->lastFlush=time();
+	    $this->lastFlush=microtime(1);
+	    $this->iter=0;
+	    
 	    fwrite($this->fileFd, implode('', $this->buffer));
 	    $rows=count($this->buffer);
 	    $this->buffer=array();

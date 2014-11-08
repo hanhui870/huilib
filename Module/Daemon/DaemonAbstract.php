@@ -133,7 +133,8 @@ abstract class DaemonAbstract
      */
     protected function onNewReleaseFind()
     {
-        
+        self::getLog()->add('Found new release: '.$this->getReleaseCheck()->getRelease().', will quit for update.');
+        die();
     }
     
     /**
@@ -141,7 +142,8 @@ abstract class DaemonAbstract
      */
     protected function onOutOfMemory()
     {
-        
+        self::getLog()->add('System find that daemon will be out of memory, will quit for restart.');
+        die();
     }
     
     /**
@@ -149,7 +151,7 @@ abstract class DaemonAbstract
      */
     protected function onShutDown()
     {
-        
+        self::getLog()->add('System will shutdown...');
     }
     
     /**

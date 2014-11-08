@@ -45,9 +45,9 @@ abstract class LogBase
 	/**
 	 * 多少时间同步一次
 	 * 
-	 * 单位秒
+	 * 单位秒 用于短期任务
 	 */
-	const FLUSH_INTERVAL=30;
+	const FLUSH_INTERVAL=5;
 	
 	/**
 	 * 日志保存时间
@@ -250,7 +250,6 @@ abstract class LogBase
 	{
 	    foreach (self::$instance as $log){
 	        if ($log instanceof self){
-	             
 	            if ($log->needFulsh()){
 	                if ($log->isEmpty()) $log->add('.');
 	                $log->flush();
