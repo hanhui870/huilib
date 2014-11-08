@@ -147,7 +147,7 @@ class File extends \HuiLib\Log\LogBase
 	    //print_r($files);
 	    foreach ($files as $file){
 	        $mtime=filemtime($file);
-	        if (time()-$mtime>self::LOG_KEEP_DAYS*86400){//一周后的数据清除
+	        if (time()-$mtime>self::LOG_KEEP_DAYS*86400){//三个月
 	            @unlink($file);
 	        }
 	    }
