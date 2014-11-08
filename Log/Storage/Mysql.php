@@ -107,10 +107,4 @@ class Mysql extends \HuiLib\Log\LogBase
 	{
 		return 'mysql';
 	}
-
-	public function __destruct()
-	{
-	    //退出前输出缓存
-	    $this->flush();
-	}
 }

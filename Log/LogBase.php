@@ -342,4 +342,10 @@ abstract class LogBase
 	 * 清除过期日志
 	 */
 	abstract public function clean();
+	
+	public function __destruct()
+	{
+	    //退出前输出缓存
+	    $this->flush();
+	}
 }

@@ -55,6 +55,9 @@ class File extends \HuiLib\Log\LogBase
 		$pathAdd=$this->identify ? '.'.$this->identify :'';
 		$file=$this->filePath.date('Y-m-d', $this->startTime).$pathAdd.'.'.$this->type.'.log';
 
+		if ($this->fileFd) {
+		    fclose($this->fileFd);
+		}
 		if (file_exists($file)) {
 			$this->fileFd=fopen($file, 'ab+');
 		}else{
@@ -163,8 +166,7 @@ class File extends \HuiLib\Log\LogBase
 	
 	public function __destruct()
 	{
-	    //退出前输出缓存
-	    $this->flush();
+	    parent::__destruct();
 	
 	    if ($this->fileFd){
 	        fclose($this->fileFd);
