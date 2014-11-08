@@ -14,11 +14,11 @@ class ReleaseCheck extends Base
     /**
      * 新版本检测时间间隔
      *
-     * 单位秒 默认1分钟
+     * 单位秒 默认1分钟太久了
      *
      * @var int
      */
-    const RELEASE_CHECK_INTERVAL=60;
+    const RELEASE_CHECK_INTERVAL=30;
 
     /**
      * 上次版本检测
