@@ -225,10 +225,10 @@ abstract class OpenConnectBase extends \module\base {
 	    $opt [CURLOPT_RETURNTRANSFER] = true;
 	
 	    // curl操作超时时间 秒
-	    $opt [CURLOPT_TIMEOUT] = 30;
+	    $opt [CURLOPT_TIMEOUT] = 60;
 	
 	    // 发起连接 秒
-	    $opt [CURLOPT_CONNECTTIMEOUT] = 30;
+	    $opt [CURLOPT_CONNECTTIMEOUT] = 60;
 	
 	    // 重定向 qq图片中存在这个情况
 	    $opt [CURLOPT_FOLLOWLOCATION] = 1;
