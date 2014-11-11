@@ -134,6 +134,11 @@ class Base extends  \HuiLib\Module\ModuleBase
     }
     
     protected function getExt($fileName){
-        return substr($fileName, strrpos($fileName, '.'));
+        $ext=substr($fileName, strrpos($fileName, '.'));
+        //不压缩png，直接转换成jpg；因为有很多同学上传的图片格式是png的，压缩效果非常差。1M多。
+        if (strtolower($ext)=='.png') {
+            $ext='.jpg';
+        }
+        return $ext;
     }
 }
