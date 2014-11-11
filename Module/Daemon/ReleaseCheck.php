@@ -73,16 +73,16 @@ class ReleaseCheck extends Base
         if ($this->lastRelease===NULL){
             //第一次是初始化上次版本，然后直接返回
             $this->lastRelease=$release;
-            $log->add("New release check, version inited to: ".$this->lastRelease)->flush();
+            $log->add("New release check for service ".$this->service.", version inited to: ".$this->lastRelease)->flush();
             return TRUE;
         }
 
-        $log->add("New release check.");
+        $log->add("New release check for service ".$this->service.".");
         
         //可以活性设置生效时间
         if (!empty($release) && strtotime($release)!=strtotime($this->lastRelease) && strtotime($release)<time()){
             ////////////发现新版本，触发事件/////////////
-            $message="A new release:".$release." found, trigger event.";
+            $message="A new release for service ".$this->service.":".$release." found, trigger event.";
             $log->add($message);
             $log->flush();
             return false;

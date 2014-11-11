@@ -72,25 +72,25 @@ class MemoryCheck extends Base
         $log=self::getLog();
         if ($this->lastMemoryCheck==0){
             //单独的内存检测日志
-            $log->add('Memory check Service inited, PID:'.getmypid().' System LIMIT:'.ini_get('memory_limit'))->flush();
+            $log->add('Memory check inited for service '.$this->service.', PID:'.getmypid().' System LIMIT:'.ini_get('memory_limit'))->flush();
         }
         $this->lastMemoryCheck=microtime(1);
 
         //单独的内存检测日志
-        $log->add('Memory check, PID:'.getmypid().' '.$this->service.' used:'.self::formatMemory(memory_get_usage()))->flush();
+        $log->add('Memory check for service '.$this->service.', PID:'.getmypid().' used:'.self::formatMemory(memory_get_usage()))->flush();
         
         //Allowed memory size of 134217728 bytes exhausted (tried to allocate 16777216 bytes)， 128M 90%还有12.8M余量，够处理
         $system=self::getMemoryLimit();
         if ($system*$this->percentLimit>=$this->getMemoryKeep()){//如果 system*percent>=keep，则用keep判断。
             if ($system-memory_get_usage()<$this->getMemoryKeep()){
-                $message="Detect Out of memory: System ".ini_get('memory_limit')." used:".self::formatMemory(memory_get_usage())." spare:".self::formatMemory($system-memory_get_usage())."<keep:".$this->spareMemoryKeep."M Trigger event.";
+                $message="Detect Out of memory for service ".$this->service.": System ".ini_get('memory_limit')." used:".self::formatMemory(memory_get_usage())." spare:".self::formatMemory($system-memory_get_usage())."<keep:".$this->spareMemoryKeep."M Trigger event.";
                 $log->add($message);
                 $log->flush();
                 return false;
             }
         }else{ //如果 system*percent<keep，则用percent判断。
             if (memory_get_peak_usage()>$system*$this->percentLimit){
-                $message="Detect Out of memory: System ".self::getMemoryLimit()." used:".self::formatMemory(memory_get_usage())." pecent:".(number_format(memory_get_peak_usage()/ini_get('memory_limit'), 2, '.', '')*100)."% >limit ".($this->percentLimit*100)."% Trigger event.";
+                $message="Detect Out of memory for service ".$this->service.": System ".self::getMemoryLimit()." used:".self::formatMemory(memory_get_usage())." pecent:".(number_format(memory_get_peak_usage()/ini_get('memory_limit'), 2, '.', '')*100)."% >limit ".($this->percentLimit*100)."% Trigger event.";
                 $log->add($message);
                 $log->flush();
                 return false;
