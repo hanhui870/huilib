@@ -25,7 +25,7 @@ class Apc extends \HuiLib\Cache\CacheBase
 		}
 		
 		$this->config=$config;
-		if (empty( $config['prefix'] )) {
+		if (!empty( $config['prefix'] )) {
 			$this->prefix= $config['prefix'];
 		}
 	}

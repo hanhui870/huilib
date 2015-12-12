@@ -55,7 +55,7 @@ class ConfigBase
 		$this->filePath = $configFile;
 		
 		//测试此时Apc中缓存是否存在
-		$this->cacheAdapter = \HuiLib\Cache\CacheBase::getApcDirectly ();
+		$this->cacheAdapter = \HuiLib\Cache\CacheBase::getFileDirectly ();
 		$cacheContent = $this->cacheAdapter->get ( $this->getCacheKey () );
 		//print_r($cacheContent);die();
 		

@@ -68,6 +68,11 @@ abstract class CacheBase
 			case 'apc' :
 				$adapter = new \HuiLib\Cache\Storage\Apc ( $config );
 				break;
+			case 'file' :
+        			        $adapter = new \HuiLib\Cache\Storage\File ( $config );
+        			        break;
+			default:
+			        throw new \Exception('Not support.');
 		}
 	
 		return $adapter;
@@ -105,6 +110,15 @@ abstract class CacheBase
 	        self::$redisCache=self::staticCreate('cache.redis');
 	    }
 	    return self::$redisCache;
+	}
+	
+	/**
+	 * 获取Redis默认缓存实例
+	 */
+	public static function getFileDirectly(){
+	    $config=array('adapter'=>'file', 'namespace'=>'global');
+	
+	    return self::create($config);
 	}
 	
 	/**
