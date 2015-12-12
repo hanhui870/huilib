@@ -2,3 +2,5 @@
 *.view
 *.log
 *.cache
+.settings
+.buildpath
