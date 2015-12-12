@@ -1,6 +1,10 @@
 HuiLib, ZF like php framework. 
 ===================
 
+主要开发时间：2013.8.11-2014.11.11 
+
+DEMO: https://github.com/ZhuJingfa/HuiApp
+
 目标：
 
     1、消灭全局函数 
